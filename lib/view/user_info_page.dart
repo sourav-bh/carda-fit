@@ -131,7 +131,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: _underlineColor),
                               ),
-                              labelText: 'Age',
+                              labelText: 'Alter',
                               labelStyle: TextStyle(color: Colors.grey[700]!),
                               counterText: "",
                             ),
@@ -140,7 +140,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Text('Gender',
+                          Text('Geschlecht',
                             style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
@@ -150,9 +150,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             child: CupertinoSlidingSegmentedControl<int>(
                               groupValue: _genderValue,
                               children: const {
-                                0: Text('Male'),
-                                1: Text('Female'),
-                                2: Text('Other'),
+                                0: Text('Männlich'),
+                                1: Text('Weiblich'),
+                                2: Text('Divers'),
                               },
                               onValueChanged: (groupValue) {
                                 setState(() {
@@ -164,7 +164,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Text('Job Type',
+                          Text('Arbeitszeitmodell',
                             style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
@@ -173,9 +173,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             child: CupertinoSlidingSegmentedControl<int>(
                               groupValue: _jobTypeValue,
-                              children: const {
-                                0: Text('Full-time'),
-                                1: Text('Part-time'),
+                              children: const{
+                                0: Text('Vollzeit'),
+                                1: Text('Teilzeit'),
                               },
                               onValueChanged: (groupValue) {
                                 setState(() {
@@ -192,7 +192,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: _underlineColor),
                                 ),
-                                labelText: 'Designation',
+                                labelText: 'Berufposition',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
                           ),
                         ],
@@ -225,9 +225,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 child: Container(
                                   constraints: const BoxConstraints(maxWidth: 190, minHeight: 40), // min sizes for Material buttons
                                   alignment: Alignment.center,
-                                  child: const Text(
-                                    "SAVE",
-                                    style: TextStyle(
+                                  child: Text(
+                                    "speichern".toUpperCase(),
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700),
                                   ),

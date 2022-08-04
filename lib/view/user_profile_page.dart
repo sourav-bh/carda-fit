@@ -109,7 +109,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               Icon(Icons.man_rounded, color: _color1, size: 20),
                               const SizedBox(width: 20,),
                               Flexible(child:
-                                Text('Male', style: TextStyle(
+                                Text('Männlich', style: TextStyle(
                                   fontSize: 16, color: _color2, fontWeight: FontWeight.w600
                                 ))
                               )
@@ -122,7 +122,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               Icon(Icons.date_range, color: _color1, size: 20),
                               const SizedBox(width: 20,),
                               Flexible(child:
-                                Text('30 Years', style: TextStyle(
+                                Text('30 Jahre', style: TextStyle(
                                   fontSize: 16, color: _color2, fontWeight: FontWeight.w600
                                 ))
                               )
@@ -135,7 +135,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               Icon(Icons.filter_tilt_shift, color: _color1, size: 20),
                               const SizedBox(width: 20,),
                               Flexible(child:
-                              Text('Full-time Worker', style: TextStyle(
+                              Text('Vollzeit', style: TextStyle(
                                   fontSize: 16, color: _color2, fontWeight: FontWeight.w600
                               ))
                               )
@@ -148,7 +148,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               Icon(Icons.perm_identity, color: _color1, size: 20),
                               const SizedBox(width: 20,),
                               Flexible(child:
-                              Text('Senior Sales Executive', style: TextStyle(
+                              Text('Leitender Vertriebsmitarbeiter', style: TextStyle(
                                   fontSize: 16, color: _color2, fontWeight: FontWeight.w600
                               ))
                               )

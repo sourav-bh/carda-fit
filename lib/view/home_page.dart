@@ -33,8 +33,8 @@ class _HomePageState extends State<HomePage> {
 
   void _createRandomAlerts() {
     var waterIntervals = List<Duration>.empty(growable: true);
-    for (int i=0;i<2;i++) {
-      var dur = Duration(seconds: Random().nextInt(180) + 90);
+    for (int i=0;i<1;i++) {
+      var dur = Duration(seconds: Random().nextInt(300) + 120);
       if (!waterIntervals.contains(dur)) {
         waterIntervals.add(dur);
       }
@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
 
     var stepsIntervals = List<Duration>.empty(growable: true);
     for (int i=0;i<2;i++) {
-      var dur = Duration(seconds: Random().nextInt(120) + 30);
+      var dur = Duration(seconds: Random().nextInt(120) + 60);
       if (!stepsIntervals.contains(dur)) {
         stepsIntervals.add(dur);
       }
@@ -76,9 +76,9 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Good Morning, ${AppCache.instance.userName}', style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 20),),
+            Text('Guten Morgen, ${AppCache.instance.userName}', style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 20),),
             const SizedBox(height: 5,),
-            Text('195 Points Earned', style: Theme.of(context).textTheme.subtitle1?.copyWith(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black54),),
+            Text('195 erreichte Punkte', style: Theme.of(context).textTheme.subtitle1?.copyWith(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black54),),
           ],
         ),
         leading: Builder(
@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Daily Targets', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
+                Text('Tagesziele', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
                 const SizedBox(height: 10,),
                 SizedBox(
                   height: 180,
@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                                     colorBlendMode: BlendMode.color,
                                   ),
                                 ),
-                                Text('+${item.points} Points', style: Theme.of(context).textTheme.headline4?.copyWith(fontSize: 16)),
+                                Text('+${item.points} Punkte', style: Theme.of(context).textTheme.headline4?.copyWith(fontSize: 16)),
                               ],
                             ),
                           ),
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Learn How to Do', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
+                Text('Lernen, wie man gesund bleibt', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
                 const SizedBox(height: 10,),
                 ListView.separated(
                   itemBuilder: (BuildContext context, int index) {
@@ -296,10 +296,10 @@ class _HomePageState extends State<HomePage> {
                 alignment: Alignment.centerLeft,
                 child: RichText(
                   textAlign: TextAlign.left,
-                  text: TextSpan(text: 'YOUR OPINION\n',
+                  text: TextSpan(text: 'Deine Meinung\n',
                       style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 24), children: [
                         TextSpan(
-                          text: 'Matters to Us',
+                          text: 'ist uns wichtig',
                           style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
                         ),]
                   ),
@@ -307,7 +307,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              title: const Text('Leaderboard'),
+              title: const Text('Rangliste'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.leaderboard_outlined, color: AppColor.secondary,),
               onTap: () {
@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Learning Materials'),
+              title: const Text('Lernmaterialien'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.bubble_chart_outlined, color: AppColor.secondary,),
               onTap: () {
@@ -324,7 +324,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Notifications'),
+              title: const Text('Benachrichtigungen'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.notifications_none, color: AppColor.secondary,),
               onTap: () {
@@ -333,7 +333,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Privacy Policy'),
+              title: const Text('Datenschutz'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.lock_outline, color: AppColor.secondary,),
               onTap: () {
@@ -342,7 +342,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Terms and Conditions'),
+              title: const Text('Bedingungen und Konditionen'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.support_agent_outlined, color: AppColor.secondary,),
               onTap: () {
@@ -351,7 +351,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('About Us'),
+              title: const Text('Über uns'),
               horizontalTitleGap: 0,
               leading: const Icon(Icons.help_outline, color: AppColor.secondary,),
               onTap: () {
