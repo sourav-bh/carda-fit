@@ -40,7 +40,7 @@ class _DetailsWebState extends State<DetailsWebPage> {
       body: Stack(
         children: [
           WebView(
-            initialUrl: 'https://www.healthline.com/health/fitness/office-exercises#exercises-while-standing',
+            initialUrl: 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik',
             javascriptMode: JavascriptMode.unrestricted,
             gestureNavigationEnabled: true,
             onPageStarted: (String url) {

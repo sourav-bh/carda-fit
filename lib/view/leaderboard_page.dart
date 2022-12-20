@@ -12,18 +12,6 @@ class LeaderBoardPage extends StatefulWidget {
 }
 
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
-  var androidVersions = [
-  "Android Cupcake",
-  "Android Donut",
-  "Android Eclair",
-  "Android Froyo",
-  "Android Gingerbread",
-  "Android Honeycomb",
-  "Android Ice Cream Sandwich",
-  "Android Jelly Bean",
-  "Android Kitkat",
-  ];
-
   final List<LeaderboardParticipantInfo> _participantInfo = List.empty(growable: true);
 
   @override
@@ -45,13 +33,13 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           centerTitle: false,
-          title: const Text('Leaderboard'),
+          title: const Text('Rangliste'),
         ),
         body: Column(
           children: [
             const SizedBox(height: 30,),
-            Text('You have ranked 4th!', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24),),
-            Text('With 195 Points', style: Theme.of(context).textTheme.bodyText1?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
+            Text('Du hast den 4. Platz erreicht!', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24),),
+            Text('Mit 195 Punkte', style: Theme.of(context).textTheme.bodyText1?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
             const SizedBox(height: 20,),
             SizedBox(
               height: 150,
@@ -68,9 +56,9 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('2nd', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
+                        Text('Platz 2', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
                         Text('Cynthia', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24, color: Colors.white), textAlign: TextAlign.center,),
-                        Text('255 Points', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
+                        Text('255 Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
                       ],
                     ),
                   ),
@@ -80,9 +68,9 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('1st', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
+                        Text('Platz 1', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
                         Text('Steven', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24, color: Colors.white), textAlign: TextAlign.center,),
-                        Text('482 Points', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
+                        Text('482 Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
                       ],
                     ),
                   ),
@@ -93,9 +81,9 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('3rd', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
+                        Text('Platz 3', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
                         Text('Alex', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24, color: Colors.white), textAlign: TextAlign.center,),
-                        Text('210 Points', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
+                        Text('210 Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
                       ],
                     ),
                   ),
@@ -103,7 +91,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
               ),
             ),
             const SizedBox(height: 20,),
-            Text('All Other Participants', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 18, color: AppColor.darkGrey),),
+            Text('Andere Teilnehmende', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 18, color: AppColor.darkGrey),),
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.all(8),
@@ -121,7 +109,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(_participantInfo[index].name, style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center,),
-                        Text('${_participantInfo[index].points} Points', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
+                        Text('${_participantInfo[index].points} Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.black45), textAlign: TextAlign.center,),
                       ],
                     ),
                   );

@@ -27,7 +27,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           centerTitle: false,
-          title: const Text('Privacy Policy'),
+          title: const Text('Datenschutz'),
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(8),

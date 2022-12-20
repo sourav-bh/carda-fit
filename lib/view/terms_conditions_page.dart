@@ -28,7 +28,7 @@ class _TermsConditionsPageState extends State<TermsConditionsPage> {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           centerTitle: false,
-          title: const Text('Terms and Conditions'),
+          title: const Text('Bedingungen und Konditionen'),
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(8),

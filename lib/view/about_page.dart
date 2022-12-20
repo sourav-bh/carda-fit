@@ -34,7 +34,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           centerTitle: false,
-          title: const Text('About Us'),
+          title: const Text('Über uns'),
         ),
         body: Container(
           child: Column(
