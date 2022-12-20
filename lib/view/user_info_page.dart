@@ -10,7 +10,6 @@ import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -33,7 +32,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   void _saveAction() {
     var name = _nameText.value.text;
     if (name.isEmpty) {
-      Fluttertoast.showToast(msg: 'Name is mandatory!', toastLength: Toast.LENGTH_SHORT);
+      // Fluttertoast.showToast(msg: 'Name is mandatory!', toastLength: Toast.LENGTH_SHORT);
     } else {
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;
