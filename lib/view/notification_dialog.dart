@@ -41,7 +41,7 @@ class NotificationAlertDialog extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: SlideAction(
                   key: _key,
-                  text: 'Slide to Complete',
+                  text: 'Schieben zum\nBestätigen',
                   textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
                   sliderButtonIconSize: 20,
                   onSubmit: () {

@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     for (var interval in waterIntervals) {
-      Timer(interval, () => _showPopup(context, 'assets/animations/anim_water.gif', '8 Glass of Water a Day, Keep Doctor Away', 'Drink a glass of water now!'));
+      Timer(interval, () => _showPopup(context, 'assets/animations/anim_water.gif', '8 Gläser Wasser pro Tag, halten den Arzt fern', 'Trinke jetzt ein Glas Wasser!'));
     }
 
     var stepsIntervals = List<Duration>.empty(growable: true);
@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     for (var interval in stepsIntervals) {
-      Timer(interval, () => _showPopup(context, 'assets/animations/anim_steps.gif', 'More Steps You Take, More Healthier You Become', 'Walk for 100 Steps Now!'));
+      Timer(interval, () => _showPopup(context, 'assets/animations/anim_steps.gif', 'Je mehr Schritte du machst, desto gesünder wirst du', 'Jetzt 100 Schritte gehen!'));
     }
   }
 
@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.notifications_none, color: AppColor.secondary,),
               onTap: () {
                 Navigator.pop(context);
-                _showPopup(context, 'assets/animations/anim_water.gif', '8 Glass of Water a Day, Keep Doctor Away', 'Drink a glass of water now!');
+                _showPopup(context, 'assets/animations/anim_water.gif', '8 Gläser Wasser pro Tag, halten den Arzt fern', 'Trinke jetzt ein Glas Wasser!');
               },
             ),
             ListTile(
