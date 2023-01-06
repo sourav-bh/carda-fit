@@ -19,7 +19,6 @@ class UserInfoPage extends StatefulWidget {
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
-
   int? _genderValue = 0, _jobTypeValue = 0;
   final Color _underlineColor = const Color(0xFFCCCCCC);
   final TextEditingController _nameText = TextEditingController();
@@ -58,9 +57,10 @@ class _UserInfoPageState extends State<UserInfoPage> {
     return Scaffold(
         backgroundColor: Colors.white,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: Platform.isIOS ? SystemUiOverlayStyle.light : const SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.light
-          ),
+          value: Platform.isIOS
+              ? SystemUiOverlayStyle.light
+              : const SystemUiOverlayStyle(
+                  statusBarIconBrightness: Brightness.light),
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -92,7 +92,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   child: Center(
                     child: Container(
                         alignment: const Alignment(0.2, 0.2),
-                        child: Image.asset('assets/images/transparent_logo.png', height: 120)),
+                        child: Image.asset('assets/images/transparent_logo.png',
+                            height: 120)),
                   ),
                 ),
               ),
@@ -112,9 +113,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.grey[600]!)),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey[600]!)),
                                 enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: _underlineColor),
+                                  borderSide:
+                                      BorderSide(color: _underlineColor),
                                 ),
                                 labelText: 'Name',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
@@ -126,7 +129,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.grey[600]!)),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey[600]!)),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: _underlineColor),
                               ),
@@ -139,8 +143,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Text('Geschlecht',
-                            style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16),
+                          Text(
+                            'Geschlecht',
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption
+                                ?.copyWith(color: Colors.black54, fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
                           Container(
@@ -163,8 +171,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Text('Arbeitszeitmodell',
-                            style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16),
+                          Text(
+                            'Arbeitszeitmodell',
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption
+                                ?.copyWith(color: Colors.black54, fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
                           Container(
@@ -172,7 +184,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             child: CupertinoSlidingSegmentedControl<int>(
                               groupValue: _jobTypeValue,
-                              children: const{
+                              children: const {
                                 0: Text('Vollzeit'),
                                 1: Text('Teilzeit'),
                               },
@@ -187,9 +199,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.grey[600]!)),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey[600]!)),
                                 enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: _underlineColor),
+                                  borderSide:
+                                      BorderSide(color: _underlineColor),
                                 ),
                                 labelText: 'Berufposition',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
@@ -204,10 +218,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         children: <Widget>[
                           TextButton(
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) => Colors.transparent,
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) =>
+                                      Colors.transparent,
                                 ),
-                                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                                overlayColor: MaterialStateProperty.all(
+                                    Colors.transparent),
                               ),
                               onPressed: () {
                                 _saveAction();
@@ -215,14 +232,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               child: Ink(
                                 decoration: const BoxDecoration(
                                   gradient: LinearGradient(
-                                      colors: <Color>[AppColor.primary, AppColor.primaryLight],
+                                      colors: <Color>[
+                                        AppColor.primary,
+                                        AppColor.primaryLight
+                                      ],
                                       begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                                      end: Alignment.bottomCenter),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
                                 ),
                                 child: Container(
-                                  constraints: const BoxConstraints(maxWidth: 190, minHeight: 40), // min sizes for Material buttons
+                                  constraints: const BoxConstraints(
+                                      maxWidth: 190,
+                                      minHeight:
+                                          40), // min sizes for Material buttons
                                   alignment: Alignment.center,
                                   child: Text(
                                     "speichern".toUpperCase(),
@@ -231,8 +254,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                 ),
-                              )
-                          ),
+                              )),
                         ],
                       ),
                     ),
@@ -241,7 +263,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
               )
             ],
           ),
-        )
-    );
+        ));
   }
 }
