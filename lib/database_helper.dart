@@ -43,8 +43,7 @@ class DatabaseHelper {
   Future<List<UserInfo>> getUserInfos() async {
     Database db = await instance.database;
     var userInfo = await db.query('public_users', orderBy: 'full_name');
-    List<UserInfo> userInfoList =
-      userInfo.isNotEmpty ? userInfo.map((e) => UserInfo.fromMap(e)).toList()
+    List<UserInfo> userInfoList = userInfo.isNotEmpty ? userInfo.map((e) => UserInfo.fromMap(e)).toList() : [];
     return userInfoList;
   }
 
@@ -60,6 +59,6 @@ class DatabaseHelper {
 
   Future<int> update(UserInfo item) async {
     Database db = await instance.database; 
-    return await db.update('public_users', item.toMap(), where: 'id = ?', whereArgs: [item.id]);
+    return await db.update('public_users', item.toMap(), where: 'id = ?', whereArgs: [item.userId]);
   }
 }

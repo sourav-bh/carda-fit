@@ -39,7 +39,31 @@ class UserInfo {
     diseases: List<String>.from(json["diseases"].map((x) => x)),
   );
 
+  factory UserInfo.fromMap(Map<String, dynamic> json) => UserInfo(
+    userId: json["user_id"],
+    fullName: json["full_name"],
+    age: json["age"],
+    gender: json["gender"],
+    jobType: json["job_type"],
+    designation: json["designation"],
+    weight: json["weight"],
+    height: json["height"],
+    diseases: List<String>.from(json["diseases"].map((x) => x)),
+  );
+
   Map<String, dynamic> toJson() => {
+    "user_id": userId,
+    "full_name": fullName,
+    "age": age,
+    "gender": gender,
+    "job_type": jobType,
+    "designation": designation,
+    "weight": weight,
+    "height": height,
+    "diseases": diseases != null ? List<dynamic>.from(diseases!.map((x) => x)) : null,
+  };
+
+  Map<String, dynamic> toMap() => {
     "user_id": userId,
     "full_name": fullName,
     "age": age,
