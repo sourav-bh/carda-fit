@@ -15,7 +15,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'public_users.db');
+    String path = join(documentsDirectory.path, 'carda_fit.db');
     return await openDatabase(
       path,
       version: 1,
@@ -43,22 +43,25 @@ class DatabaseHelper {
   Future<List<UserInfo>> getUserInfos() async {
     Database db = await instance.database;
     var userInfo = await db.query('public_users', orderBy: 'full_name');
-    List<UserInfo> userInfoList = userInfo.isNotEmpty ? userInfo.map((e) => UserInfo.fromMap(e)).toList() : [];
+    List<UserInfo> userInfoList = userInfo.isNotEmpty
+        ? userInfo.map((e) => UserInfo.fromMap(e)).toList()
+        : [];
     return userInfoList;
   }
 
   Future<int> add(UserInfo item) async {
-    Database db = await instance.database; 
+    Database db = await instance.database;
     return await db.insert('public_users', item.toMap());
   }
 
   Future<int> remove(int id) async {
-    Database db = await instance.database; 
+    Database db = await instance.database;
     return await db.delete('public_users', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> update(UserInfo item) async {
-    Database db = await instance.database; 
-    return await db.update('public_users', item.toMap(), where: 'id = ?', whereArgs: [item.userId]);
+    Database db = await instance.database;
+    return await db.update('public_users', item.toMap(),
+        where: 'id = ?', whereArgs: [item.userId]);
   }
 }
