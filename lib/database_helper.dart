@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:app/model/allergy.dart';
+import 'package:app/model/condition.dart';
 import 'package:app/model/exercise.dart';
+import 'package:app/model/user_condition.dart';
 import 'package:app/model/user_exercise.dart';
 import 'package:app/model/user_info.dart';
 import 'package:path/path.dart';
@@ -10,14 +12,18 @@ import 'package:sqflite/sqflite.dart';
 import 'package:app/model/learning.dart';
 import 'package:app/model/user_learning_contents.dart';
 
+import 'model/task.dart';
+
 const TABLE_USER = 'user';
-const TABLE_TASKS = 'tasks';
+const TABLE_TASK = 'task';
 const TABLE_EXERCISES = 'exercises';
 const TABLE_USER_EXERCISES = 'user_exercises';
 const TABLE_USER_ALLERGY = 'user_allergies';
 const TABLE_ALLERGY = 'allergies';
 const TABLE_LEARNING = 'learning';
 const TABLE_USER_LEARNING_CONTENTS = 'user_learning_contents';
+const TABLE_CONDITION = 'condition';
+const TABLE_USER_CONDITION = 'user_condition';
 
 class DatabaseHelper {
   // Singleton Pattern
@@ -53,7 +59,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE ${TABLE_TASKS}(
+      CREATE TABLE ${TABLE_TASK}(
         id INTEGER PRIMARY KEY,
         name VARCHAR,
         difficulty_level INTEGER,
@@ -124,7 +130,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.condition(
+      CREATE TABLE ${TABLE_CONDITION}(
         code INTEGER PRIMARY KEY,
         name VARCHAR,
         description VARCHAR,
@@ -133,7 +139,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.user_condition(
+      CREATE TABLE ${TABLE_USER_CONDITION}(
         user_id INTEGER PRIMARY KEY,
         condition_code INTEGER
         done INTEGER
@@ -258,7 +264,7 @@ class DatabaseHelper {
 
   /// learning
 
-  Future<List<Learning>> getAllLearnings() async {
+  Future<List<Learning>> getLearnings() async {
     Database db = await instance.database;
     var learnings = await db.query(TABLE_LEARNING, orderBy: 'title');
     List<Learning> learningList = learnings.isNotEmpty
@@ -368,6 +374,88 @@ class DatabaseHelper {
   Future<int> updateUserExercise(UserExercise item) async {
     Database db = await instance.database;
     return await db.update(TABLE_USER_EXERCISES, item.toMap(),
+        where: 'id = ?', whereArgs: [item.userId]);
+  }
+
+  /// condition
+
+  Future<List<Condition>> getCondition() async {
+    Database db = await instance.database;
+    var conditions = await db.query(TABLE_CONDITION, orderBy: 'code');
+    List<Condition> conditionList = conditions.isNotEmpty
+        ? conditions.map((e) => Condition.fromMap(e)).toList()
+        : [];
+    return conditionList;
+  }
+
+  Future<int> addCondition(Condition item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_CONDITION, item.toMap());
+  }
+
+  Future<int> removeCondition(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_CONDITION, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateCondition(Condition item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_LEARNING, item.toMap(),
+        where: 'id = ?', whereArgs: [item.code]);
+  }
+
+  /// user_condition
+
+  Future<List<UserCondition>> getUserCondition() async {
+    Database db = await instance.database;
+    var userConditions =
+        await db.query(TABLE_USER_CONDITION, orderBy: 'user_id');
+    List<UserCondition> userConditionList = userConditions.isNotEmpty
+        ? userConditions.map((e) => UserCondition.fromMap(e)).toList()
+        : [];
+    return userConditionList;
+  }
+
+  Future<int> addUserCondition(UserCondition item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_USER_CONDITION, item.toMap());
+  }
+
+  Future<int> removeUserCondition(int id) async {
+    Database db = await instance.database;
+    return await db
+        .delete(TABLE_USER_CONDITION, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateUserCondition(UserCondition item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_USER_CONDITION, item.toMap(),
+        where: 'id = ?', whereArgs: [item.userId]);
+  }
+
+  /// task
+
+  Future<List<Task>> getTasks() async {
+    Database db = await instance.database;
+    var tasks = await db.query(TABLE_TASK, orderBy: 'user_id');
+    List<Task> taskList =
+        tasks.isNotEmpty ? tasks.map((e) => Task.fromMap(e)).toList() : [];
+    return taskList;
+  }
+
+  Future<int> addTask(Task item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_TASK, item.toMap());
+  }
+
+  Future<int> removeTask(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_TASK, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateTask(Task item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_TASK, item.toMap(),
         where: 'id = ?', whereArgs: [item.userId]);
   }
 }
