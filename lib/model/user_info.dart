@@ -65,3 +65,10 @@ class UserInfo {
             : null,
       };
 }
+
+enum JobType {
+  none,
+  fulltime,
+  parttime,
+  fieldjob,
+}

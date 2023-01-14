@@ -1,16 +1,23 @@
 import 'dart:io';
 import 'package:app/model/allergy.dart';
+import 'package:app/model/exercise.dart';
+import 'package:app/model/user_exercise.dart';
 import 'package:app/model/user_info.dart';
 import 'package:path/path.dart';
 import 'package:app/model/user_allergy.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:app/model/learning.dart';
+import 'package:app/model/user_learning_contents.dart';
 
 const TABLE_USER = 'user';
-const TABLE_TRAINER = 'tasks';
+const TABLE_TASKS = 'tasks';
 const TABLE_EXERCISES = 'exercises';
+const TABLE_USER_EXERCISES = 'user_exercises';
 const TABLE_USER_ALLERGY = 'user_allergies';
 const TABLE_ALLERGY = 'allergies';
+const TABLE_LEARNING = 'learning';
+const TABLE_USER_LEARNING_CONTENTS = 'user_learning_contents';
 
 class DatabaseHelper {
   // Singleton Pattern
@@ -46,7 +53,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE ${TABLE_TRAINER}(
+      CREATE TABLE ${TABLE_TASKS}(
         id INTEGER PRIMARY KEY,
         name VARCHAR,
         difficulty_level INTEGER,
@@ -59,7 +66,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE trainer_exercises(
+      CREATE TABLE ${TABLE_EXERCISES}(
         id INTEGER PRIMARY KEY,
         name VARCHAR,
         difficulty_level INTEGER,
@@ -110,7 +117,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.user_exercises(
+      CREATE TABLE ${TABLE_USER_EXERCISES}(
         user_id INTEGER PRIMARY KEY,
         exercise_id INTEGER,
         done INTEGER
@@ -133,7 +140,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE trainer.learning(
+      CREATE TABLE ${TABLE_LEARNING}(
         id INTEGER PRIMARY KEY,
         title VARCHAR,
         description VARCHAR,
@@ -145,7 +152,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.learning_contents(
+      CREATE TABLE ${TABLE_USER_LEARNING_CONTENTS}(
         user_id INTEGER PRIMARY KEY,
         content_id INTEGER,
         view_count INTEGER,
@@ -167,7 +174,8 @@ class DatabaseHelper {
     ''');
   }
 
-  ///public_users
+  /// public_users
+
   Future<List<UserInfo>> getUserInfo() async {
     Database db = await instance.database;
     var userInfo = await db.query(TABLE_USER, orderBy: 'full_name');
@@ -193,7 +201,7 @@ class DatabaseHelper {
         where: 'id = ?', whereArgs: [item.userId]);
   }
 
-  ///user_allergies
+  /// user_allergies
 
   Future<List<UserAllergy>> getUserAllergies() async {
     Database db = await instance.database;
@@ -222,10 +230,12 @@ class DatabaseHelper {
   }
 
   /// allerrgies
-  Future<List<Allergy>> getAllAllergies() async {
+
+  Future<List<Allergy>> getAllergies() async {
     Database db = await instance.database;
     var allergies = await db.query(TABLE_ALLERGY, orderBy: 'code');
-    List<Allergy> allergyList = allergies.isNotEmpty ? allergies.map((e) => Allergy.fromMap(e)).toList()
+    List<Allergy> allergyList = allergies.isNotEmpty
+        ? allergies.map((e) => Allergy.fromMap(e)).toList()
         : [];
     return allergyList;
   }
@@ -237,13 +247,127 @@ class DatabaseHelper {
 
   Future<int> removeAllergy(int id) async {
     Database db = await instance.database;
-    return await db
-        .delete(TABLE_ALLERGY, where: 'id = ?', whereArgs: [id]);
+    return await db.delete(TABLE_ALLERGY, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> updateAllergy(Allergy item) async {
     Database db = await instance.database;
     return await db.update(TABLE_ALLERGY, item.toMap(),
         where: 'id = ?', whereArgs: [item.code]);
+  }
+
+  /// learning
+
+  Future<List<Learning>> getAllLearnings() async {
+    Database db = await instance.database;
+    var learnings = await db.query(TABLE_LEARNING, orderBy: 'title');
+    List<Learning> learningList = learnings.isNotEmpty
+        ? learnings.map((e) => Learning.fromMap(e)).toList()
+        : [];
+    return learningList;
+  }
+
+  Future<int> addLearning(Learning item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_LEARNING, item.toMap());
+  }
+
+  Future<int> removeLearning(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_LEARNING, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateLearning(Learning item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_LEARNING, item.toMap(),
+        where: 'id = ?', whereArgs: [item.title]);
+  }
+
+  /// user_learning_contents
+
+  Future<List<UserLearningContent>> getUserLearningContents() async {
+    Database db = await instance.database;
+    var userLearningContents =
+        await db.query(TABLE_USER_LEARNING_CONTENTS, orderBy: 'view_count');
+    List<UserLearningContent> userLearningContentList =
+        userLearningContents.isNotEmpty
+            ? userLearningContents
+                .map((e) => UserLearningContent.fromMap(e))
+                .toList()
+            : [];
+    return userLearningContentList;
+  }
+
+  Future<int> addUserLearningContent(UserLearningContent item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_USER_LEARNING_CONTENTS, item.toMap());
+  }
+
+  Future<int> removeUserLearningContent(int id) async {
+    Database db = await instance.database;
+    return await db
+        .delete(TABLE_USER_LEARNING_CONTENTS, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateUserLearningContent(UserLearningContent item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_USER_LEARNING_CONTENTS, item.toMap(),
+        where: 'id = ?', whereArgs: [item.viewCount]);
+  }
+
+  /// exercise
+
+  Future<List<Exercise>> getExercises() async {
+    Database db = await instance.database;
+    var exercises = await db.query(TABLE_EXERCISES, orderBy: 'name');
+    List<Exercise> exerciseList = exercises.isNotEmpty
+        ? exercises.map((e) => Exercise.fromMap(e)).toList()
+        : [];
+    return exerciseList;
+  }
+
+  Future<int> addExercise(Exercise item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_EXERCISES, item.toMap());
+  }
+
+  Future<int> removeExercise(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_EXERCISES, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateExercise(Exercise item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_EXERCISES, item.toMap(),
+        where: 'id = ?', whereArgs: [item.name]);
+  }
+
+  /// user_exercise
+
+  Future<List<UserExercise>> getUserExercises() async {
+    Database db = await instance.database;
+    var userExercises =
+        await db.query(TABLE_USER_EXERCISES, orderBy: 'user_id');
+    List<UserExercise> userExerciseList = userExercises.isNotEmpty
+        ? userExercises.map((e) => UserExercise.fromMap(e)).toList()
+        : [];
+    return userExerciseList;
+  }
+
+  Future<int> addUserExercise(UserExercise item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_USER_EXERCISES, item.toMap());
+  }
+
+  Future<int> removeUserExercise(int id) async {
+    Database db = await instance.database;
+    return await db
+        .delete(TABLE_USER_EXERCISES, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateUserExercise(UserExercise item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_USER_EXERCISES, item.toMap(),
+        where: 'id = ?', whereArgs: [item.userId]);
   }
 }
