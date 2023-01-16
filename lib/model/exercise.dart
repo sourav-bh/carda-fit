@@ -10,7 +10,7 @@ class Exercise {
   });
   String? userId;
   String? name;
-  String? difficultyLevel;
+  int? difficultyLevel;
   String? description;
   double? createdAt;
 

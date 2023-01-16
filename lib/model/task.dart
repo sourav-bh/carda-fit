@@ -13,9 +13,9 @@ class Task {
   });
   String? userId;
   String? name;
-  String? difficultyLevel;
+  int? difficultyLevel;
   String? description;
-  String? frequency;
+  int? frequency;
   int? duration;
   double? score;
   double? createdAt;

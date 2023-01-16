@@ -2,17 +2,22 @@ import 'dart:io';
 import 'package:app/model/allergy.dart';
 import 'package:app/model/condition.dart';
 import 'package:app/model/exercise.dart';
+import 'package:app/model/scorer.dart';
 import 'package:app/model/user_condition.dart';
 import 'package:app/model/user_exercise.dart';
 import 'package:app/model/user_info.dart';
+import 'package:app/model/user_task.dart';
 import 'package:path/path.dart';
 import 'package:app/model/user_allergy.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:app/model/learning.dart';
 import 'package:app/model/user_learning_contents.dart';
+import 'package:app/model/task_alert.dart';
 
 import 'model/task.dart';
+import 'model/task_alert.dart';
+import 'model/task_alert.dart';
 
 const TABLE_USER = 'user';
 const TABLE_TASK = 'task';
@@ -24,6 +29,9 @@ const TABLE_LEARNING = 'learning';
 const TABLE_USER_LEARNING_CONTENTS = 'user_learning_contents';
 const TABLE_CONDITION = 'condition';
 const TABLE_USER_CONDITION = 'user_condition';
+const TABLE_USER_TASK = 'user_tasks';
+const TABLE_SCORER = 'public_scorer';
+const TABLE_TASK_ALERT = 'task_alert';
 
 class DatabaseHelper {
   // Singleton Pattern
@@ -98,7 +106,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.user_tasks(
+      CREATE TABLE ${TABLE_USER_TASK}(
         user_id INTEGER PRIMARY KEY,
         task_id INTEGER,
         total_due_count INTEGER,
@@ -109,7 +117,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE user.user_alert(
+      CREATE TABLE ${TABLE_TASK_ALERT}(
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
         task_id INTEGER,
@@ -167,7 +175,7 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE public.scorer(
+      CREATE TABLE ${TABLE_SCORER}(
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
         current_score DOUBLE,
@@ -457,5 +465,85 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.update(TABLE_TASK, item.toMap(),
         where: 'id = ?', whereArgs: [item.userId]);
+  }
+
+  /// user_task
+
+  Future<List<UserTask>> getUserTasks() async {
+    Database db = await instance.database;
+    var userTasks = await db.query(TABLE_USER_TASK, orderBy: 'user_id');
+    List<UserTask> userTaskList = userTasks.isNotEmpty
+        ? userTasks.map((e) => UserTask.fromMap(e)).toList()
+        : [];
+    return userTaskList;
+  }
+
+  Future<int> addUserTask(UserTask item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_USER_TASK, item.toMap());
+  }
+
+  Future<int> removeUserTask(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_USER_TASK, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateUserTask(UserTask item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_USER_TASK, item.toMap(),
+        where: 'id = ?', whereArgs: [item.userId]);
+  }
+
+  /// scorer
+
+  Future<List<Scorer>> getScores() async {
+    Database db = await instance.database;
+    var scores = await db.query(TABLE_SCORER, orderBy: 'scorer_id');
+    List<Scorer> scorerList =
+        scores.isNotEmpty ? scores.map((e) => Scorer.fromMap(e)).toList() : [];
+    return scorerList;
+  }
+
+  Future<int> addScorer(Scorer item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_SCORER, item.toMap());
+  }
+
+  Future<int> removeScorer(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_SCORER, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateScorer(Scorer item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_SCORER, item.toMap(),
+        where: 'id = ?', whereArgs: [item.scorerId]);
+  }
+
+  /// user_alert
+
+  Future<List<TaskAlert>> TaskAlerts() async {
+    Database db = await instance.database;
+    var taskAlerts = await db.query(TABLE_TASK_ALERT, orderBy: 'alert_id');
+    List<TaskAlert> taskAlertList = taskAlerts.isNotEmpty
+        ? taskAlerts.map((e) => TaskAlert.fromMap(e)).toList()
+        : [];
+    return taskAlertList;
+  }
+
+  Future<int> addTaskAlert(TaskAlert item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_TASK_ALERT, item.toMap());
+  }
+
+  Future<int> removeTaskAlert(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_TASK_ALERT, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateTaskAlert(TaskAlert item) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_TASK_ALERT, item.toMap(),
+        where: 'id = ?', whereArgs: [item.alertId]);
   }
 }

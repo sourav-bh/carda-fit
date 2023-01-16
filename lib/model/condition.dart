@@ -10,7 +10,7 @@ class Condition {
   String? code;
   String? name;
   String? description;
-  String? frequency;
+  int? frequency;
 
   factory Condition.fromRawJson(String str) =>
       Condition.fromMap(json.decode(str));
