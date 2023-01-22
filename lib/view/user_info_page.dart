@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:app/main.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,13 +30,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   void _saveAction() {
+    // Navigator.pushNamed(context, landingRoute);
+    // return;
+
     var name = _nameText.value.text;
     if (name.isEmpty) {
-      // Fluttertoast.showToast(msg: 'Name is mandatory!', toastLength: Toast.LENGTH_SHORT);
+      const snackBar = SnackBar(
+          content: Text('Name ist obligatorisch')
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;
-      Navigator.pushNamedAndRemoveUntil(context, homeRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }
 
@@ -55,7 +62,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
           value: Platform.isIOS
               ? SystemUiOverlayStyle.light
@@ -64,203 +71,265 @@ class _UserInfoPageState extends State<UserInfoPage> {
           child: Stack(
             children: <Widget>[
               Positioned(
-                top: -getSmallDiameter(context) / 3,
+                top: 110,
+                left: -getSmallDiameter(context) / 3,
+                child: Container(
+                  width: getSmallDiameter(context),
+                  height: getSmallDiameter(context),
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColor.lightOrange,
+                  )
+                ),
+              ),
+              Positioned(
+                bottom: 50,
                 right: -getSmallDiameter(context) / 3,
                 child: Container(
                   width: getSmallDiameter(context),
                   height: getSmallDiameter(context),
                   decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                          colors: [AppColor.secondary, AppColor.lightOrange],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter)),
-                ),
-              ),
-              Positioned(
-                top: -getBigDiameter(context) / 4,
-                left: -getBigDiameter(context) / 4,
-                child: Container(
-                  width: getBigDiameter(context),
-                  height: getBigDiameter(context),
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                          colors: [AppColor.primary, AppColor.primaryLight],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter)),
-                  child: Center(
-                    child: Container(
-                        alignment: const Alignment(0.2, 0.2),
-                        child: Image.asset('assets/images/transparent_logo.png',
-                            height: 120)),
+                      color: AppColor.lightBlue,
                   ),
                 ),
               ),
               Align(
-                alignment: Alignment.bottomCenter,
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(24, 300, 24, 10),
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 25),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          TextField(
-                            controller: _nameText,
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                                focusedBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.grey[600]!)),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: _underlineColor),
-                                ),
-                                labelText: 'Name',
-                                labelStyle: TextStyle(color: Colors.grey[700])),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          TextField(
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[600]!)),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: _underlineColor),
-                              ),
-                              labelText: 'Alter',
-                              labelStyle: TextStyle(color: Colors.grey[700]!),
-                              counterText: "",
-                            ),
-                            maxLength: 3,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Geschlecht',
-                            style: Theme.of(context)
-                                .textTheme
-                                .caption
-                                ?.copyWith(color: Colors.black54, fontSize: 16),
-                            textAlign: TextAlign.left,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: CupertinoSlidingSegmentedControl<int>(
-                              groupValue: _genderValue,
-                              children: const {
-                                0: Text('Männlich'),
-                                1: Text('Weiblich'),
-                                2: Text('Divers'),
-                              },
-                              onValueChanged: (groupValue) {
-                                setState(() {
-                                  _genderValue = groupValue;
-                                });
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            'Arbeitszeitmodell',
-                            style: Theme.of(context)
-                                .textTheme
-                                .caption
-                                ?.copyWith(color: Colors.black54, fontSize: 16),
-                            textAlign: TextAlign.left,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: CupertinoSlidingSegmentedControl<int>(
-                              groupValue: _jobTypeValue,
-                              children: const {
-                                0: Text('Vollzeit'),
-                                1: Text('Teilzeit'),
-                              },
-                              onValueChanged: (groupValue) {
-                                setState(() {
-                                  _jobTypeValue = groupValue;
-                                });
-                              },
-                            ),
-                          ),
-                          TextField(
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                                focusedBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.grey[600]!)),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: _underlineColor),
-                                ),
-                                labelText: 'Berufposition',
-                                labelStyle: TextStyle(color: Colors.grey[700])),
-                          ),
-                        ],
+                alignment: Alignment.center,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    padding: const EdgeInsets.only(bottom: 0),
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 70, bottom: 10),
+                        child: Text(
+                          'Anmeldung',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontSize: 30),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(24, 0, 24, 30),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TextButton(
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) =>
-                                      Colors.transparent,
-                                ),
-                                overlayColor: MaterialStateProperty.all(
-                                    Colors.transparent),
-                              ),
-                              onPressed: () {
-                                _saveAction();
-                              },
-                              child: Ink(
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                      colors: <Color>[
-                                        AppColor.primary,
-                                        AppColor.primaryLight
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                ),
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                      maxWidth: 190,
-                                      minHeight:
-                                          40), // min sizes for Material buttons
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "speichern".toUpperCase(),
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              padding: const EdgeInsets.all(15),
+                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Text('NAME',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
                                   ),
-                                ),
-                              )),
-                        ],
+                                  TextField(
+                                    controller: _nameText,
+                                    keyboardType: TextInputType.text,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      fillColor: Colors.grey.shade300,
+                                      filled: true,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                    child: Text('ALTER',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  TextField(
+                                    keyboardType: TextInputType.text,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      fillColor: Colors.grey.shade300,
+                                      filled: true,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                    child: Text('GESCHLECHT',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: CupertinoSlidingSegmentedControl<int>(
+                                      groupValue: _genderValue,
+                                      children: const {
+                                        0: Text('Männlich'),
+                                        1: Text('Weiblich'),
+                                        2: Text('Divers'),
+                                      },
+                                      onValueChanged: (groupValue) {
+                                        setState(() {
+                                          _genderValue = groupValue;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              padding: const EdgeInsets.all(15),
+                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Text('GEWICHT (kg)',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  TextField(
+                                    keyboardType: TextInputType.text,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      fillColor: Colors.grey.shade300,
+                                      filled: true,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                    child: Text('HEIGHT (cm)',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  TextField(
+                                    keyboardType: TextInputType.text,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      fillColor: Colors.grey.shade300,
+                                      filled: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              padding: const EdgeInsets.all(15),
+                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                    child: Text('ARBEITSZEITMODELL',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: CupertinoSlidingSegmentedControl<int>(
+                                      groupValue: _jobTypeValue,
+                                      children: const {
+                                        0: Text('Vollzeit'),
+                                        1: Text('Teilzeit'),
+                                      },
+                                      onValueChanged: (groupValue) {
+                                        setState(() {
+                                          _jobTypeValue = groupValue;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
+                                    child: Text('BERUFPOSITION',
+                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  TextField(
+                                    keyboardType: TextInputType.text,
+                                    cursorColor: Colors.orange,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      fillColor: Colors.grey.shade300,
+                                      filled: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                        child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) => Colors.transparent,),
+                              overlayColor: MaterialStateProperty.all(Colors.transparent),
+                            ),
+                            onPressed: () {
+                              _saveAction();
+                            },
+                            child: Ink(
+                              decoration: const BoxDecoration(
+                                color: Colors.orangeAccent,
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Container(
+                                constraints: const BoxConstraints(minHeight: 50), // min sizes for Material buttons
+                                alignment: Alignment.center,
+                                child: Text("speichern".toUpperCase(),
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            )),
+                      ),
+                    ],
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ));

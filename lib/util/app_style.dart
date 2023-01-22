@@ -32,8 +32,10 @@ class AppColor {
   static const placeholderGrey = Color(0xffdddddd);
   static const darkBlue = Color(0xff0c243e);
   static const lightGreen = Color(0xff05d69e);
-  static const lightBlue = Color(0xff4975e9);
-  static const lightOrange = Color(0xffff8c00);
+  static const lightBlue = Color(0xff71D8E8);
+  static const orange = Color(0xffff8c00);
+  static const lightOrange = Color(0xffF4BC7F);
+  static const lightPink = Color(0xffE9D4D6);
   static const darkGrey = Color(0xff8e8e8e);
 
 }

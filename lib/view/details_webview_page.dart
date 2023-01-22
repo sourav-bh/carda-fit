@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/util/app_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -30,12 +31,27 @@ class _DetailsWebState extends State<DetailsWebPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.lightPink,
       appBar: AppBar(
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
+        backgroundColor: AppColor.orange,
         centerTitle: false,
         title: const Text('Details'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              //like action
+            },
+            icon: const Icon(Icons.thumb_up_rounded, color: Colors.white,)
+          ),
+          IconButton(
+            onPressed: () {
+              //dislike action
+            },
+            icon: const Icon(Icons.thumb_down_rounded, color: Colors.white,)
+          ),
+        ],
       ),
       body: Stack(
         children: [

@@ -1,7 +1,7 @@
 class DataLoader {
-  static const List<String> quotes = ['¨Sorge dich gut um deinen Körper. Es ist der einzige Ort, den du zum Leben hast.¨',
-    '¨Wer kämpft, kann verlieren. Wer nicht kämpft, hat schon verloren.¨',
-    '¨Der härteste Schritt zu Fitness ist der erste. Nimm ihn jetzt!¨',];
+  static const List<String> quotes = ['Sorge dich gut um deinen Körper',
+    'Wer kämpft, kann verlieren',
+    'Der härteste Schritt zu Fitness ist der erste',];
   static const List<String> quotesAuthor = ['Jim Rohn', 'Berthold Brecht', 'Heather Montgomery',];
 }
 
@@ -17,10 +17,10 @@ class FitnessItemInfo {
 
   static List<FitnessItemInfo> generateDummyList() {
     List<FitnessItemInfo> data = List.empty(growable: true);
-    data.add(FitnessItemInfo(12920, 'assets/animations/anim_water.gif', 'Wasser', 5, 8, 5));
-    data.add(FitnessItemInfo(12921, 'assets/animations/anim_steps.gif', 'Schritte', 3041, 8156, 1));
-    data.add(FitnessItemInfo(12922, 'assets/animations/anim_break_time.gif', 'Pausen', 4, 10, 10));
-    data.add(FitnessItemInfo(12923, 'assets/animations/anim_fitness_1.gif', 'Übungen', 2, 6, 25));
+    data.add(FitnessItemInfo(12920, 'assets/images/water.jpg', 'Wasser', 5, 8, 5));
+    data.add(FitnessItemInfo(12921, 'assets/images/walk.jpg', 'Schritte', 3041, 8156, 1));
+    data.add(FitnessItemInfo(12923, 'assets/images/exercise.jpg', 'Übungen', 2, 6, 25));
+    data.add(FitnessItemInfo(12922, 'assets/images/break.jpg', 'Pausen', 4, 10, 10));
     return data;
   }
 }
@@ -39,6 +39,14 @@ class LearningMaterialInfo {
   static List<LearningMaterialInfo> generateDummyList() {
     List<LearningMaterialInfo> data = List.empty(growable: true);
     data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
+    // data.add(LearningMaterialInfo(13721, 'assets/images/thumb_nutir_foods.png', 'assets/images/nutri_food_banner.png', 'Gesunde Ernährung: Ausgewogen und abwechslungsreich', foodDetails, '', ''));
+    // data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
+    return data;
+  }
+
+  static List<LearningMaterialInfo> generateDummyExerciseList() {
+    List<LearningMaterialInfo> data = List.empty(growable: true);
+    data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
     data.add(LearningMaterialInfo(13721, 'assets/images/thumb_nutir_foods.png', 'assets/images/nutri_food_banner.png', 'Gesunde Ernährung: Ausgewogen und abwechslungsreich', foodDetails, '', ''));
     data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
     return data;
@@ -53,14 +61,14 @@ class LeaderboardParticipantInfo {
 
   static List<LeaderboardParticipantInfo> generateDummyList() {
     List<LeaderboardParticipantInfo> data = List.empty(growable: true);
-    data.add(LeaderboardParticipantInfo('Daniel', 158));
-    data.add(LeaderboardParticipantInfo('Max', 177));
-    data.add(LeaderboardParticipantInfo('Carolina', 165));
-    data.add(LeaderboardParticipantInfo('Vicky', 110));
-    data.add(LeaderboardParticipantInfo('Julia', 85));
-    data.add(LeaderboardParticipantInfo('Ben', 105));
-    data.add(LeaderboardParticipantInfo('Victoria', 141));
-    data.add(LeaderboardParticipantInfo('Francis', 180));
+    data.add(LeaderboardParticipantInfo('Don', 158));
+    data.add(LeaderboardParticipantInfo('Duel', 177));
+    data.add(LeaderboardParticipantInfo('Carrot', 165));
+    data.add(LeaderboardParticipantInfo('Vox', 110));
+    data.add(LeaderboardParticipantInfo('Again', 85));
+    data.add(LeaderboardParticipantInfo('Buch', 105));
+    data.add(LeaderboardParticipantInfo('Queen', 141));
+    data.add(LeaderboardParticipantInfo('Napoleon', 180));
     return data;
   }
 }

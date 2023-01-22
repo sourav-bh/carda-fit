@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:app/main.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
@@ -14,12 +16,15 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  Color _color1 = const Color(0xFF0181cc);
-  Color _color2 = const Color(0xFF333333);
 
   @override
   void initState() {
     super.initState();
+  }
+
+  _logoutAction() async {
+    SharedPref.instance.clearCache();
+    Navigator.pushNamed(context, userInfoRoute);
   }
 
   @override
@@ -42,27 +47,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: Stack(
             children: <Widget>[
               Container(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.topRight,
                 padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
                 height: topHeight,
                 decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                        colors: [AppColor.primary, AppColor.primaryLight],
+                        colors: [AppColor.lightPink, AppColor.lightPink],
                         begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Icon(Icons.arrow_back, color: Colors.white),
-                        )
-                    ),
-                  ],
+                        end: Alignment.bottomCenter)
                 ),
               ),
               Container(
@@ -83,21 +75,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    Text('Don',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
+                    ),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                       alignment: Alignment.topLeft,
-                      margin: const EdgeInsets.only(top: 48),
+                      margin: const EdgeInsets.only(top: 30),
                       child: Column(
                         children: <Widget>[
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.person_pin_rounded, color: _color1, size: 20),
-                              const SizedBox(width: 20,),
-                              Flexible(child:
-                                Text('Robert Steven', style: TextStyle(
-                                  fontSize: 16, color: _color2, fontWeight: FontWeight.w600
-                                ))
+                              const Icon(Icons.person_pin_rounded, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Text('Robert Steven',
+                                style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
                           ),
@@ -105,12 +99,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.man_rounded, color: _color1, size: 20),
-                              const SizedBox(width: 20,),
-                              Flexible(child:
-                                Text('Männlich', style: TextStyle(
-                                  fontSize: 16, color: _color2, fontWeight: FontWeight.w600
-                                ))
+                              const Icon(Icons.male_rounded, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Text('Männlich',
+                                style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
                           ),
@@ -118,12 +110,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.date_range, color: _color1, size: 20),
-                              const SizedBox(width: 20,),
-                              Flexible(child:
-                                Text('30 Jahre', style: TextStyle(
-                                  fontSize: 16, color: _color2, fontWeight: FontWeight.w600
-                                ))
+                              const Icon(Icons.date_range, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Text('30 Jahre',
+                                style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
                           ),
@@ -131,12 +121,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.filter_tilt_shift, color: _color1, size: 20),
-                              const SizedBox(width: 20,),
-                              Flexible(child:
-                              Text('Vollzeit', style: TextStyle(
-                                  fontSize: 16, color: _color2, fontWeight: FontWeight.w600
-                              ))
+                              const Icon(Icons.filter_tilt_shift, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Text('Vollzeit',
+                                style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
                           ),
@@ -144,18 +132,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.perm_identity, color: _color1, size: 20),
-                              const SizedBox(width: 20,),
-                              Flexible(child:
-                              Text('Leitender Vertriebsmitarbeiter', style: TextStyle(
-                                  fontSize: 16, color: _color2, fontWeight: FontWeight.w600
-                              ))
+                              const Icon(Icons.design_services, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Expanded(
+                                child: Text('Leitender Vertriebsmitarbeiter',
+                                  style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
+                                ),
                               )
                             ],
                           ),
                         ],
                       ),
-                    )
+                    ),
+                    const SizedBox(height: 50,),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                      child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) => Colors.transparent,),
+                            overlayColor: MaterialStateProperty.all(Colors.transparent),
+                          ),
+                          onPressed: () {
+                            _logoutAction();
+                          },
+                          child: Ink(
+                            decoration: const BoxDecoration(
+                              color: Colors.orangeAccent,
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 50), // min sizes for Material buttons
+                              alignment: Alignment.center,
+                              child: Text("Abmeldung".toUpperCase(),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          )),
+                    ),
                   ],
                 ),
               )

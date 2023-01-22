@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
 
+  final double _completedJobs = 14 / 20;
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
     _learningMaterials.addAll(LearningMaterialInfo.generateDummyList());
 
-    _createRandomAlerts();
+    // _createRandomAlerts();
   }
 
   void _createRandomAlerts() {
@@ -60,307 +62,227 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          GestureDetector(
-            child: const Icon(Icons.account_circle_outlined, color: AppColor.primaryLight, size: 30,),
-            onTap: () {
-              Navigator.pushNamed(context, profileRoute, arguments: null);
-            },
-          ),
-          const SizedBox(width: 10,),
-        ],
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Guten Morgen, ${AppCache.instance.userName}', style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 20),),
-            const SizedBox(height: 5,),
-            Text('195 erreichte Punkte', style: Theme.of(context).textTheme.subtitle1?.copyWith(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black54),),
-          ],
-        ),
-        leading: Builder(
-            builder: (BuildContext buildContext) {
-              return GestureDetector(
-                child: Image.asset('assets/images/ic_menu.png'),
-                onTap: () => Scaffold.of(buildContext).openDrawer(),
-              );
-            }
-        ),
-      ),
-      body: ListView(
+      backgroundColor: AppColor.lightPink,
+      body: Stack(
         children: [
-          Visibility(
-            visible: true,
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              child: Card(
-                  elevation: 10,
+          Positioned(
+            top: 50,
+            right: -10,
+            child: Image.asset(
+              "assets/images/healthy_day.jpeg",
+              height: 180,
+              color: AppColor.lightPink,
+              colorBlendMode: BlendMode.darken,
+              opacity: const AlwaysStoppedAnimation(.5),
+            ),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ListView(
+              children: [
+                Visibility(
+                  visible: true,
                   child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.secondary.withAlpha(150),
-                        ),
-                        color: AppColor.secondary.withAlpha(150),
-                        borderRadius: const BorderRadius.all(Radius.circular(5))
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              children: <TextSpan>[
-                                TextSpan(text: DataLoader.quotes[AppCache.instance.quoteIndex],
-                                    style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 18, fontStyle: FontStyle.normal,
-                                    )),
-                                TextSpan(text: ' - ${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
-                                  style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 14, fontStyle: FontStyle.normal),),
-                              ],
+                    margin: EdgeInsets.fromLTRB(10, 20, (MediaQuery.of(context).size.width/2)-50, 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      child: RichText(
+                        text: TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(text: DataLoader.quotes[AppCache.instance.quoteIndex],
+                                style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,)
                             ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 10,),
-                        GestureDetector(
-                          onTap: () {
-                            Share.share('${DataLoader.quotes[AppCache.instance.quoteIndex]} - ${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}');
-                          },
-                          child: const Icon(Icons.share_rounded, size: 20,)
-                        )
-                      ],
-                    ),
-                  )
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Tagesziele', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
-                const SizedBox(height: 10,),
-                SizedBox(
-                  height: 180,
-                  child: ListView.separated(
-                      itemBuilder: (BuildContext context, int index) {
-                        FitnessItemInfo item = _dailyFitnessItems[index];
-                        return GestureDetector(
-                          child: Card(
-                            elevation: 5,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(item.name, style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20, color: CommonUtil.getFitnessItemBasedColor(item.id))),
-                                    Text('${item.count}/${item.target}', style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 14)),
-                                  ],
-                                ),
-                                SizedBox(
-                                  width: 120,
-                                  height: 80,
-                                  child: Image.asset(
-                                    item.image,
-                                    color: CommonUtil.getFitnessItemBasedColor(item.id),
-                                    colorBlendMode: BlendMode.color,
-                                  ),
-                                ),
-                                Text('+${item.points} Punkte', style: Theme.of(context).textTheme.headline4?.copyWith(fontSize: 16)),
-                              ],
+                            TextSpan(text: '\n ${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
+                              style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16, fontStyle: FontStyle.italic),
                             ),
-                          ),
-                          onTap: () {
-                          },
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return const Divider(endIndent: 15, color: Colors.transparent);
-                      },
-                      // itemCount: _homeFeed?.popularProducts?.length ?? 0,
-                      itemCount: _dailyFitnessItems.length,
-                      scrollDirection: Axis.horizontal
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 20, 16, 80),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Lernen, wie man gesund bleibt', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, color: AppColor.darkGrey),),
-                const SizedBox(height: 10,),
-                ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    LearningMaterialInfo material = _learningMaterials[index];
-                    return GestureDetector(
-                      child: Card(
-                        elevation: 5,
-                        margin: const EdgeInsets.all(0),
-                        child: Container(
-                          height: 100,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                              ),
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.all(Radius.circular(5))
-                          ),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 80,
-                                margin: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                  image: DecorationImage(
-                                    image: AssetImage(material.thumbnail),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(material.title, style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 30,
-                                height: 30,
-                                margin: const EdgeInsets.all(10),
-                                alignment: Alignment.center,
-                                child: Icon(index == 1 ? Icons.arrow_forward_ios : Icons.video_collection_rounded, color: AppColor.darkBlue, size: 20,),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
-                      onTap: () {
-                        if (index == 0) {
-                          CommonUtil.openUrl(material.videoUrl);
-                        } else if (index == 1) {
-                          Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
-                        } else {
-                          Navigator.pushNamed(context, detailsWebRoute);
-                        }
-
-                      },
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider(endIndent: 0, color: Colors.transparent);
-                  },
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: _learningMaterials.length,
-                  scrollDirection: Axis.vertical,
-                )
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  padding: const EdgeInsets.all(15),
+                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
+                          SizedBox(width: 10,),
+                          Text("Tagesziele"),
+                          Spacer(),
+                          Icon(Icons.more_horiz),
+                        ],
+                      ),
+                      const SizedBox(height: 10,),
+                      Text("Schritt für Schritt erreichen Sie Ihr Ziel",
+                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                      ),
+                      Text("Sie machen sich heute gut, machen Sie weiter, um Ihre Tagesziele zu erreichen!",
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                      const SizedBox(height: 10,),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.all(Radius.circular(10)),
+                              child: LinearProgressIndicator(
+                                value: _completedJobs,
+                                color: Colors.pink,
+                                backgroundColor: Colors.white,
+                                minHeight: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10,),
+                          Text("${_completedJobs*100} %",
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  padding: const EdgeInsets.all(15),
+                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.recommend_outlined, color: Colors.black54,),
+                          SizedBox(width: 10,),
+                          Text("Empfehlungen"),
+                          Spacer(),
+                          Icon(Icons.more_horiz),
+                        ],
+                      ),
+                      const SizedBox(height: 10,),
+                      Text("Glaube an die Magie der Regelmäßigkeit, lass sie uns heute rocken",
+                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                      ),
+                      const SizedBox(height: 10,),
+                      Container(
+                        height: 100,
+                        decoration: CommonUtil.getRectangleBoxDecoration(Colors.white12, 10),
+                        child: ListView.separated(
+                            itemBuilder: (BuildContext context, int index) {
+                              FitnessItemInfo item = _dailyFitnessItems[index];
+                              return GestureDetector(
+                                child: ClipOval(
+                                  child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(50),
+                                    child: Image.asset(
+                                      item.image,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                },
+                              );
+                            },
+                            separatorBuilder: (context, index) {
+                              return const Divider(endIndent: 15, color: Colors.transparent);
+                            },
+                            // itemCount: _homeFeed?.popularProducts?.length ?? 0,
+                            itemCount: _dailyFitnessItems.length,
+                            scrollDirection: Axis.horizontal
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  padding: const EdgeInsets.all(15),
+                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.menu_book, color: Colors.black54,),
+                          SizedBox(width: 10,),
+                          Text("Lernmaterialien"),
+                          Spacer(),
+                          Icon(Icons.more_horiz),
+                        ],
+                      ),
+                      const SizedBox(height: 10,),
+                      Text("Lernen Sie die Dinge in Ihrem eigenen Tempo, das Leben ist kein Wettlauf",
+                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                      ),
+                      const SizedBox(height: 10,),
+                      ListView.separated(
+                        itemBuilder: (BuildContext context, int index) {
+                          LearningMaterialInfo material = _learningMaterials[index];
+                          return GestureDetector(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  margin: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                    image: DecorationImage(
+                                      image: AssetImage(material.thumbnail),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(material.title, style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 30,
+                                  height: 30,
+                                  margin: const EdgeInsets.all(10),
+                                  alignment: Alignment.center,
+                                  child: const Icon(Icons.arrow_forward_ios, color: AppColor.darkBlue, size: 20,),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(context, detailsWebRoute);
+                              // CommonUtil.openUrl(material.videoUrl);
+                              // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
+                            },
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const Divider(endIndent: 0, color: Colors.transparent);
+                        },
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: _learningMaterials.length,
+                        scrollDirection: Axis.vertical,
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, leaderboardRoute, arguments: null);
-        },
-        backgroundColor: AppColor.primary,
-        // shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
-        child: const Icon(Icons.leaderboard_rounded),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: AppColor.primary,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  textAlign: TextAlign.left,
-                  text: TextSpan(text: 'Deine Meinung\n',
-                      style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 24), children: [
-                        TextSpan(
-                          text: 'ist uns wichtig',
-                          style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
-                        ),]
-                  ),
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('Rangliste'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.leaderboard_outlined, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, leaderboardRoute, arguments: null);
-              },
-            ),
-            ListTile(
-              title: const Text('Lernmaterialien'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.bubble_chart_outlined, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Benachrichtigungen'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.notifications_none, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-                _showPopup(context, 'assets/animations/anim_water.gif', '8 Gläser Wasser pro Tag, halten den Arzt fern', 'Trinke jetzt ein Glas Wasser!');
-              },
-            ),
-            ListTile(
-              title: const Text('Datenschutz'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.lock_outline, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, privacyPolicyRoute, arguments: null);
-              },
-            ),
-            ListTile(
-              title: const Text('Bedingungen und Konditionen'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.support_agent_outlined, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, termsConditionsRoute, arguments: null);
-              },
-            ),
-            ListTile(
-              title: const Text('Über uns'),
-              horizontalTitleGap: 0,
-              leading: const Icon(Icons.help_outline, color: AppColor.secondary,),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, aboutUsRoute, arguments: null);
-              },
-            ),
-          ],
-        ),
       ),
     );
   }

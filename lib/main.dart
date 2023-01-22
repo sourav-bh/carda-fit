@@ -3,18 +3,24 @@ import 'package:app/util/common_util.dart';
 import 'package:app/view/about_page.dart';
 import 'package:app/view/details_webview_page.dart';
 import 'package:app/view/home_page.dart';
+import 'package:app/view/landing_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/learning_details_page.dart';
 import 'package:app/view/privacy_policy_page.dart';
 import 'package:app/view/splash_page.dart';
 import 'package:app/view/terms_conditions_page.dart';
+import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_info_page.dart';
+import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:flutter/material.dart';
 
 const splashRoute = '/';
+const landingRoute = '/landing';
 const homeRoute = '/home';
 const userInfoRoute = '/userInfo';
+const activityRoute = '/activity';
+const learningRoute = '/learning';
 const learningDetailsRoute = '/learning/details';
 const detailsWebRoute = '/details/web';
 const leaderboardRoute = '/leaderboard';
@@ -46,7 +52,7 @@ class _MyFitAppState extends State<MyFitApp> {
     return MaterialApp(
       title: 'Health & Fitness Pro',
       theme: ThemeData(
-        primarySwatch: CommonUtil.createMaterialColor(AppColor.primary),
+        primarySwatch: CommonUtil.createMaterialColor(AppColor.lightPink),
         textTheme: AppTextStyle.appTextTheme,
         fontFamily: 'LeagueSpartan',
       ),
@@ -67,8 +73,17 @@ class _MyFitAppState extends State<MyFitApp> {
         case userInfoRoute:
           screen = const UserInfoPage();
           break;
+        case landingRoute:
+          screen = const LandingPage();
+          break;
         case homeRoute:
           screen = const HomePage();
+          break;
+        case activityRoute:
+          screen = const UserActivityPage();
+          break;
+        case learningRoute:
+          screen = const UserLearningPage();
           break;
         case learningDetailsRoute:
           screen = const LearningDetailsPage();

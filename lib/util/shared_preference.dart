@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPref {
   static const keyUserName = "key_user_name";
   static const keyUserInfo = "key_user_info";
+  static const keyUserAvatar = "key_user_avatar";
   static const keyAppSettings = "key_app_settings";
 
   SharedPref._privateConstructor();
@@ -51,7 +52,7 @@ class SharedPref {
     prefs.remove(key);
   }
 
-  clearCacheWithoutSettings() async {
+  clearCache() async {
     deleteValue(keyUserName);
     deleteValue(keyUserInfo);
     deleteValue(keyAppSettings);

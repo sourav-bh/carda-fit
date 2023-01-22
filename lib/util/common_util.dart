@@ -75,4 +75,61 @@ class CommonUtil {
         return AppColor.primaryLight.withAlpha(255);
     }
   }
+
+  static getRectangleBoxDecoration(Color fillColor, double radius) {
+    return BoxDecoration(
+      shape: BoxShape.rectangle,
+      borderRadius: BorderRadius.all(Radius.circular(radius)),
+      color: fillColor,
+    );
+  }
+}
+
+class DrawCircle extends CustomPainter {
+  final Color colorGradiant1;
+  final Color colorGradiant2;
+  final double radius;
+
+  const DrawCircle(this.colorGradiant1, this.colorGradiant2, this.radius);
+
+  @override
+  void paint(Canvas canvas, Size size)
+  {
+    final paint = Paint()
+      ..shader = LinearGradient(colors: [colorGradiant1, colorGradiant2,])
+          .createShader(Rect.fromCircle(center: const Offset(0.0, 0.0), radius: radius));
+    canvas.drawCircle(const Offset(0.0, 0.0), radius, paint);
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class CurvePainter extends CustomPainter {
+  final Color color;
+
+  CurvePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint();
+    paint.color = color;
+    paint.style = PaintingStyle.fill; // Change this to fill
+
+    var path = Path();
+
+    path.moveTo(0, size.height * 0.25);
+    path.quadraticBezierTo(
+        size.width / 2, size.height / 2, size.width, size.height * 0.25);
+    path.lineTo(size.width, 0);
+    path.lineTo(0, 0);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
 }

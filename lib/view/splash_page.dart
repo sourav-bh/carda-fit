@@ -33,7 +33,7 @@ class _SplashPageState extends State<SplashPage> {
     super.didChangeDependencies();
 
     // go to next page after 3 seconds
-    Timer(const Duration(seconds: 5), () {
+    Timer(const Duration(seconds: 3), () {
       _goToNextPage();
     });
   }
@@ -41,7 +41,7 @@ class _SplashPageState extends State<SplashPage> {
   _goToNextPage() async {
     bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
     if (isUserExist && mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, homeRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     } else {
       Navigator.pushNamedAndRemoveUntil(context, userInfoRoute, (r) => false);
     }
@@ -55,14 +55,16 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.primary,
+      backgroundColor: Colors.pink.shade200,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 100,),
           Center(
-            child: Image(image: const AssetImage("assets/images/splash_logo.png"),
+            child: Image(
+              image: const AssetImage("assets/images/transparent_logo.png"),
+
               width: MediaQuery.of(context).size.width/1.5,
             ),
           ),
@@ -70,22 +72,22 @@ class _SplashPageState extends State<SplashPage> {
           Text('CARDA FIT',
             style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.white, fontSize: 36),
           ),
-          const SizedBox(height: 120,),
+          const SizedBox(height: 150,),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(DataLoader.quotes[_quoteIndex],
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.secondary, fontSize: 28, fontStyle: FontStyle.italic, shadows: <Shadow>[
+              style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold, shadows: <Shadow>[
                 const Shadow(
                   offset: Offset(5.0, 5.0),
-                  blurRadius: 20.0,
+                  blurRadius: 50.0,
                 ),
               ])
             ),
           ),
           const SizedBox(height: 15,),
           Text('- ${DataLoader.quotesAuthor[_quoteIndex]}',
-            style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.white, fontSize: 16, fontStyle: FontStyle.normal),
+            style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 18),
             textAlign: TextAlign.center,
           ),
         ],
