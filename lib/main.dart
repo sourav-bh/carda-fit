@@ -1,7 +1,10 @@
 
+import 'dart:math';
+
 import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:app/view/about_page.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/details_webview_page.dart';
@@ -15,6 +18,7 @@ import 'package:app/view/user_info_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:workmanager/workmanager.dart';
 
 const splashRoute = '/';
@@ -35,9 +39,71 @@ GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await TaskAlertService.instance.setup();
-  Workmanager().initialize(TaskAlertService.callbackDispatcherForBgAlert);
+
+  final NotificationAppLaunchDetails? notDetails = await TaskAlertService.instance.getNotificationAppLaunchDetails();
+  if (notDetails == null || notDetails.didNotificationLaunchApp == false) {
+    Workmanager().initialize(callbackDispatcherForBgAlert);
+    TaskAlertService.instance.scheduleBackgroundTask();
+  }
   runApp(const MyFitApp());
 }
+
+void callbackDispatcherForBgAlert() {
+    Workmanager().executeTask((task, inputData) {
+      print("background task executed");
+
+      if (_checkIfUserLoggedIn() == false) return Future.value(true);
+
+      TaskType taskType = TaskType.exercise;
+      if (task == TaskAlertService.taskWalkSteps) {taskType = TaskType.steps;}
+      else if (task == TaskAlertService.taskDoExercise) {taskType = TaskType.exercise;}
+      else if (task == TaskAlertService.taskDrinkWater) {taskType = TaskType.water;}
+      else if (task == TaskAlertService.taskTakeBreak) {taskType = TaskType.breaks;}
+
+      TaskAlertService.instance.showNotificationWithDefaultSound(taskType);
+      return Future.value(true);
+    });
+}
+
+_checkIfUserLoggedIn() async {
+  bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
+  return isUserExist;
+}
+
+// void scheduleBackgroundTask() {
+//   print("background jobs scheduled");
+//
+//   // steps
+//   Workmanager().registerPeriodicTask(
+//     "${Random().nextInt(99) + 24}",
+//     TaskAlertService.taskWalkSteps,
+//     frequency: const Duration(hours: 1),
+//     initialDelay: const Duration(minutes: 45),
+//   );
+//
+//   // water
+//   Workmanager().registerPeriodicTask(
+//     "${Random().nextInt(19) + 2}",
+//     TaskAlertService.taskDrinkWater,
+//     frequency: const Duration(hours: 1),
+//     initialDelay: const Duration(minutes: 15),
+//   );
+//
+//   // exercise
+//   Workmanager().registerPeriodicTask(
+//     "${Random().nextInt(999) + 170}",
+//     TaskAlertService.taskDoExercise,
+//     frequency: const Duration(hours: 1),
+//   );
+//
+//   // break
+//   Workmanager().registerPeriodicTask(
+//     "${Random().nextInt(9999) + 1500}",
+//     TaskAlertService.taskTakeBreak,
+//     frequency: const Duration(hours: 1),
+//     initialDelay: const Duration(minutes: 30),
+//   );
+// }
 
 class MyFitApp extends StatefulWidget {
   const MyFitApp({Key? key}) : super(key: key);

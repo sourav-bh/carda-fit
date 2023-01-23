@@ -50,32 +50,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _createRandomAlerts() {
-    var waterIntervals = List<Duration>.empty(growable: true);
-    for (int i=0;i<1;i++) {
-      var dur = Duration(seconds: Random().nextInt(30) + 20);
-      if (!waterIntervals.contains(dur)) {
-        waterIntervals.add(dur);
-      }
-    }
-
-    for (var interval in waterIntervals) {
-      Timer(interval, () => _showPopup(context, 'assets/animations/anim_water.gif', '8 Gläser Wasser pro Tag, halten den Arzt fern', 'Trinke jetzt ein Glas Wasser!'));
-    }
-
-    var stepsIntervals = List<Duration>.empty(growable: true);
-    for (int i=0;i<2;i++) {
-      var dur = Duration(seconds: Random().nextInt(10) + 6);
-      if (!stepsIntervals.contains(dur)) {
-        stepsIntervals.add(dur);
-      }
-    }
-
-    for (var interval in stepsIntervals) {
-      Timer(interval, () => _showPopup(context, 'assets/animations/anim_steps.gif', 'Je mehr Schritte du machst, desto gesünder wirst du', 'Jetzt 100 Schritte gehen!'));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                           const Text("Tagesziele"),
                           const Spacer(),
                           IconButton(onPressed: () {
-                            Navigator.pushNamed(context, taskAlertRoute, arguments: TaskType.steps.index);
+                            // Navigator.pushNamed(context, taskAlertRoute, arguments: TaskType.steps.index);
                           }, icon: const Icon(Icons.more_horiz),)
                         ],
                       ),
@@ -312,14 +286,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showPopup(BuildContext context, String image, String quote, String title) {
-    TaskAlertService.instance.addNotification(
-      Random().nextInt(299) + 20,
-      title,
-      quote,
-      DateTime.now().millisecondsSinceEpoch + 1000,
-      'DailyTaskCnlId',
-      'DailyTask'
-    );
     // showDialog(context: context, barrierDismissible: false,
     //     builder: (BuildContext context) {
     //       return WillPopScope(

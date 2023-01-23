@@ -11,6 +11,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
@@ -59,10 +60,12 @@ class _LandingPageState extends State<LandingPage> {
 
   _checkIfAppLaunchedFromNotification() async {
     final NotificationAppLaunchDetails? notDetails = await TaskAlertService.instance.getNotificationAppLaunchDetails();
-    print("notificationAppLaunchDetails: $notDetails");
 
     if (notDetails != null && notDetails.didNotificationLaunchApp) {
-      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute);
+      print("notificationAppLaunchDetails: $notDetails");
+      String payload = notDetails.notificationResponse?.payload ?? "2";
+      int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
     }
   }
 
