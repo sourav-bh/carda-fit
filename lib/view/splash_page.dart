@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:app/main.dart';
+import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -40,10 +42,15 @@ class _SplashPageState extends State<SplashPage> {
 
   _goToNextPage() async {
     bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
+    var userId = await SharedPref.instance.getValue(SharedPref.keyUserId);
+    if (userId != null && userId is int) {
+      AppCache.instance.userId = userId;
+    }
+
     if (isUserExist && mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
     } else {
-      Navigator.pushNamedAndRemoveUntil(context, userInfoRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, userInfoRoute, (r) => false);
     }
   }
 

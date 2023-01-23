@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app/main.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -11,6 +13,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -20,26 +23,44 @@ class UserInfoPage extends StatefulWidget {
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
-  int? _genderValue = 0, _jobTypeValue = 0;
-  final Color _underlineColor = const Color(0xFFCCCCCC);
+  Gender? _genderValue = Gender.Mannlich;
+  JobType? _jobTypeValue = JobType.Vollzeit;
   final TextEditingController _nameText = TextEditingController();
+  final TextEditingController _ageText = TextEditingController();
+  final TextEditingController _weightText = TextEditingController();
+  final TextEditingController _heightText = TextEditingController();
+  final TextEditingController _designationText = TextEditingController();
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _saveAction() {
-    // Navigator.pushNamed(context, landingRoute);
-    // return;
-
-    var name = _nameText.value.text;
+  void _saveAction() async {
+    String name = _nameText.value.text;
     if (name.isEmpty) {
       const snackBar = SnackBar(
           content: Text('Name ist obligatorisch')
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
+      int age = int.tryParse(_ageText.value.text) ?? 0;
+      int weight = int.tryParse(_weightText.value.text) ?? 0;
+      int height = int.tryParse(_heightText.value.text) ?? 0;
+      String designation = _designationText.value.text;
+
+      UserInfo userInfo = UserInfo();
+      userInfo.fullName = name;
+      userInfo.gender = _genderValue.toString().split('.').last;
+      userInfo.age = age;
+      userInfo.weight = weight;
+      userInfo.height = height;
+      userInfo.designation = designation;
+      userInfo.jobType = _jobTypeValue.toString().split('.').last;
+      int userId = await DatabaseHelper.instance.addUser(userInfo);
+      SharedPref.instance.saveIntValue(SharedPref.keyUserId, userId);
+      AppCache.instance.userId = userId;
+
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
@@ -151,6 +172,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   TextField(
+                                    controller: _ageText,
                                     keyboardType: TextInputType.text,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
@@ -174,12 +196,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<int>(
+                                    child: CupertinoSlidingSegmentedControl<Gender>(
                                       groupValue: _genderValue,
                                       children: const {
-                                        0: Text('Männlich'),
-                                        1: Text('Weiblich'),
-                                        2: Text('Divers'),
+                                        Gender.Mannlich: Text('Männlich'),
+                                        Gender.Weiblich: Text('Weiblich'),
+                                        Gender.Divers: Text('Divers'),
                                       },
                                       onValueChanged: (groupValue) {
                                         setState(() {
@@ -205,6 +227,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   TextField(
+                                    controller: _weightText,
                                     keyboardType: TextInputType.text,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
@@ -227,6 +250,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   TextField(
+                                    controller: _heightText,
                                     keyboardType: TextInputType.text,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
@@ -260,11 +284,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<int>(
+                                    child: CupertinoSlidingSegmentedControl<JobType>(
                                       groupValue: _jobTypeValue,
                                       children: const {
-                                        0: Text('Vollzeit'),
-                                        1: Text('Teilzeit'),
+                                        JobType.Vollzeit: Text('Vollzeit'),
+                                        JobType.Teilzeit: Text('Teilzeit'),
+                                        JobType.Feldarbeit: Text('Feldarbeit'),
                                       },
                                       onValueChanged: (groupValue) {
                                         setState(() {
@@ -280,6 +305,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   TextField(
+                                    controller: _designationText,
                                     keyboardType: TextInputType.text,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(

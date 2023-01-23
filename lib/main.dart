@@ -1,19 +1,21 @@
+
+import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/view/about_page.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/details_webview_page.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/landing_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/learning_details_page.dart';
-import 'package:app/view/privacy_policy_page.dart';
 import 'package:app/view/splash_page.dart';
-import 'package:app/view/terms_conditions_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_info_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:workmanager/workmanager.dart';
 
 const splashRoute = '/';
 const landingRoute = '/landing';
@@ -25,11 +27,15 @@ const learningDetailsRoute = '/learning/details';
 const detailsWebRoute = '/details/web';
 const leaderboardRoute = '/leaderboard';
 const profileRoute = '/profile';
-const privacyPolicyRoute = '/privacy';
-const termsConditionsRoute = '/tnc';
+const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
 
-void main() {
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await TaskAlertService.instance.setup();
+  Workmanager().initialize(TaskAlertService.callbackDispatcherForBgAlert);
   runApp(const MyFitApp());
 }
 
@@ -50,6 +56,7 @@ class _MyFitAppState extends State<MyFitApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Health & Fitness Pro',
       theme: ThemeData(
         primarySwatch: CommonUtil.createMaterialColor(AppColor.lightPink),
@@ -97,11 +104,8 @@ class _MyFitAppState extends State<MyFitApp> {
         case profileRoute:
           screen = const UserProfilePage();
           break;
-        case privacyPolicyRoute:
-          screen = const PrivacyPolicyPage();
-          break;
-        case termsConditionsRoute:
-          screen = const TermsConditionsPage();
+        case taskAlertRoute:
+          screen = const TaskAlertPage();
           break;
         case aboutUsRoute:
           screen = const AboutUsPage();

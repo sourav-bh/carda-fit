@@ -22,13 +22,11 @@ class UserLearningItemView extends StatelessWidget {
             width: 80,
             height: 80,
             margin: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
+            child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
-              image: DecorationImage(
-                image: AssetImage(itemData.thumbnail),
-                fit: BoxFit.cover,
-              ),
+              child: Image.network(itemData.thumbnail ?? "",
+                fit: BoxFit.fitHeight,
+              )
             ),
           ),
           Expanded(
@@ -38,7 +36,14 @@ class UserLearningItemView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(itemData.title, style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
+                  Text(itemData.title?.trim() ?? "",
+                    style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20),
+                    maxLines: 2,
+                  ),
+                  Text(itemData.description?.trim() ?? "",
+                    style: Theme.of(context).textTheme.bodyText2,
+                    maxLines: 3,
+                  ),
                 ],
               ),
             ),

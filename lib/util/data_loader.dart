@@ -1,3 +1,6 @@
+import 'package:any_link_preview/any_link_preview.dart';
+import 'package:app/model/learning.dart';
+
 class DataLoader {
   static const List<String> quotes = ['Sorge dich gut um deinen Körper',
     'Wer kämpft, kann verlieren',
@@ -26,19 +29,32 @@ class FitnessItemInfo {
 }
 
 class LearningMaterialInfo {
-  late int id;
-  late String thumbnail;
-  late String image;
-  late String title;
-  late String description;
-  late String detailsUrl;
-  late String videoUrl;
+  int? id;
+  String? thumbnail;
+  String? image;
+  String? title;
+  String? description;
+  String? detailsUrl;
+  String? videoUrl;
+  LearningContent? originalContent;
 
-  LearningMaterialInfo(this.id, this.thumbnail, this.image, this.title, this.description, this.detailsUrl, this.videoUrl);
+  LearningMaterialInfo(this.title);
+
+  static Future<LearningMaterialInfo> copyContentFromLink(LearningContent content) async {
+    Metadata? metadata = await AnyLinkPreview.getMetadata(
+      link: content.contentUri ?? "",
+      cache: const Duration(days: 7),
+    );
+    LearningMaterialInfo info = LearningMaterialInfo(metadata?.title);
+    info.thumbnail = metadata?.image;
+    info.description = metadata?.desc;
+    info.originalContent = content;
+    return info;
+  }
 
   static List<LearningMaterialInfo> generateDummyList() {
     List<LearningMaterialInfo> data = List.empty(growable: true);
-    data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
+    // data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
     // data.add(LearningMaterialInfo(13721, 'assets/images/thumb_nutir_foods.png', 'assets/images/nutri_food_banner.png', 'Gesunde Ernährung: Ausgewogen und abwechslungsreich', foodDetails, '', ''));
     // data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
     return data;
@@ -46,9 +62,9 @@ class LearningMaterialInfo {
 
   static List<LearningMaterialInfo> generateDummyExerciseList() {
     List<LearningMaterialInfo> data = List.empty(growable: true);
-    data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
-    data.add(LearningMaterialInfo(13721, 'assets/images/thumb_nutir_foods.png', 'assets/images/nutri_food_banner.png', 'Gesunde Ernährung: Ausgewogen und abwechslungsreich', foodDetails, '', ''));
-    data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
+    // data.add(LearningMaterialInfo(13720, 'assets/images/thumb_posture_error.png', '', 'Wie Sie Ihre Sitzhaltung verbessern können?', 'Watch this video to quickly learn ways to fix your posture', '', 'https://www.youtube.com/watch?v=RqcOCBb4arc'));
+    // data.add(LearningMaterialInfo(13721, 'assets/images/thumb_nutir_foods.png', 'assets/images/nutri_food_banner.png', 'Gesunde Ernährung: Ausgewogen und abwechslungsreich', foodDetails, '', ''));
+    // data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
     return data;
   }
 }

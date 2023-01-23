@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 
 class LearningDetailsPage extends StatefulWidget {
@@ -52,8 +51,7 @@ class _LearningDetailsPageState extends State<LearningDetailsPage> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Html(data: _description ?? '',
-                    )
+                    // child: Html(data: _description ?? '',)
                   ),
                 ),
               ],

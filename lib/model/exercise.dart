@@ -1,17 +1,26 @@
 import 'dart:convert';
 
+import 'package:app/model/exercise_steps.dart';
+
 class Exercise {
   Exercise({
-    this.userId,
+    this.id,
     this.name,
-    this.difficultyLevel,
     this.description,
+    this.url,
+    this.duration,
+    this.difficultyLevel,
+    this.steps,
     this.createdAt,
   });
-  String? userId;
+
+  int? id;
   String? name;
-  int? difficultyLevel;
   String? description;
+  String? url;
+  int? duration;
+  int? difficultyLevel;
+  List<ExerciseStep>? steps = [];
   double? createdAt;
 
   factory Exercise.fromRawJson(String str) =>
@@ -20,18 +29,24 @@ class Exercise {
   String toRawJson() => json.encode(toMap());
 
   factory Exercise.fromMap(Map<String, dynamic> json) => Exercise(
-        difficultyLevel: json["difficulty_level"],
-        name: json["name"],
-        description: json["description"],
-        createdAt: json["created_at"],
-        userId: json["user_id"],
-      );
+    id: json["id"],
+    name: json["name"],
+    description: json["description"],
+    url: json["url"],
+    duration: json["duration"],
+    difficultyLevel: json["difficulty_level"],
+    steps: List<ExerciseStep>.from(json["steps"].map((x) => ExerciseStep.fromMap(x))),
+    createdAt: json["created_at"],
+  );
 
   Map<String, dynamic> toMap() => {
-        "difficulty_level": difficultyLevel,
-        "name": name,
-        "description": description,
-        "cearetd_at": createdAt,
-        "user_id": userId,
-      };
+    "id": id,
+    "name": name,
+    "description": description,
+    "url": url,
+    "duration": duration,
+    "difficulty_level": difficultyLevel,
+    "steps": steps != null ? List<dynamic>.from(steps!.map((x) => x.toMap())) : null,
+    "created_at": createdAt,
+  };
 }

@@ -15,13 +15,14 @@ import 'package:app/model/learning.dart';
 import 'package:app/model/user_learning_contents.dart';
 import 'package:app/model/task_alert.dart';
 
-import 'model/task.dart';
-import 'model/task_alert.dart';
-import 'model/task_alert.dart';
+import '../model/task.dart';
+import '../model/task_alert.dart';
+import '../model/task_alert.dart';
 
 const TABLE_USER = 'user';
 const TABLE_TASK = 'task';
 const TABLE_EXERCISES = 'exercises';
+const TABLE_EXERCISE_STEPS = 'exercise_steps';
 const TABLE_USER_EXERCISES = 'user_exercises';
 const TABLE_USER_ALLERGY = 'user_allergies';
 const TABLE_ALLERGY = 'allergies';
@@ -42,8 +43,8 @@ class DatabaseHelper {
   Future<Database> get database async => _database ??= await _initDatabase();
 
   Future<Database> _initDatabase() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'carda_fit.db');
+    Directory? documentsDirectory = await getExternalStorageDirectory();
+    String path = join(documentsDirectory?.path ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
       version: 1,
@@ -52,151 +53,90 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER}(
-        id INTEGER PRIMARY KEY,
-        fullName TEXT,
-        age DOUBLE,
-        weight DOUBLE,
-        height DOUBLE,  
-        bmi DOUBLE,
-        job_time DOUBLE,
-        job_type user.job_type,
-        created_at TIMESTAMP,
-        done INETEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_TASK}(
-        id INTEGER PRIMARY KEY,
-        name VARCHAR,
-        difficulty_level INTEGER,
-        description VARCHAR,
-        frequency INTEGER,
-        duration INTEGER,
-        score DOUBLE,
-        created_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_EXERCISES}(
-        id INTEGER PRIMARY KEY,
-        name VARCHAR,
-        difficulty_level INTEGER,
-        description VARCHAR,
-        created_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_ALLERGY}(
-        code INTEGER PRIMARY KEY,
-        name VARCHAR,
-        description VARCHAR,
-        cause VARCHAR,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER_ALLERGY}(
-        user_id INTEGER PRIMARY KEY,
-        allergy_code INTEGER
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER_TASK}(
-        user_id INTEGER PRIMARY KEY,
-        task_id INTEGER,
-        total_due_count INTEGER,
-        completed_count INTEGER,
-        created_at TIMESTAMP,
-        last_updated_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_TASK_ALERT}(
-        id INTEGER PRIMARY KEY,
-        user_id INTEGER,
-        task_id INTEGER,
-        title VARCHAR,
-        description INTEGER,
-        content_uri VARCHAR,
-        status public.task_status
-        created_at TIMESTAMP,
-        updated_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER_EXERCISES}(
-        user_id INTEGER PRIMARY KEY,
-        exercise_id INTEGER,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_CONDITION}(
-        code INTEGER PRIMARY KEY,
-        name VARCHAR,
-        description VARCHAR,
-        frequency INTEGER,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER_CONDITION}(
-        user_id INTEGER PRIMARY KEY,
-        condition_code INTEGER
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_LEARNING}(
-        id INTEGER PRIMARY KEY,
-        title VARCHAR,
-        description VARCHAR,
-        content_uri VARCHAR,
-        target_user_level USERS.LEVEL,
-        content_type LEARNING.CONTENT_TYPE,
-        created_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_USER_LEARNING_CONTENTS}(
-        user_id INTEGER PRIMARY KEY,
-        content_id INTEGER,
-        view_count INTEGER,
-        last_viewed_at TIMESTAMP,
-        done INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE ${TABLE_SCORER}(
-        id INTEGER PRIMARY KEY,
-        user_id INTEGER,
-        current_score DOUBLE,
-        current_level USER.LEVEL,
-        current_rank INTEGER,
-        current_streak INTEGER,
-        longest_streak INTEGER,
-        done INTEGER
-      )
-    ''');
+    await db.execute("CREATE TABLE ${TABLE_USER}("
+        "id INTEGER PRIMARY KEY,"
+        "fullName TEXT,"
+        "avatar VARCHAR,"
+        "gender VARCHAR,"
+        "age INTEGER,"
+        "weight INTEGER,"
+        "height INTEGER,"
+        "designation VARCHAR,"
+        "job_type VARCHAR,"
+        "created_at TIMESTAMP)");
+    await db.execute("CREATE TABLE ${TABLE_TASK}("
+        "id INTEGER PRIMARY KEY,"
+        "name VARCHAR,"
+        "difficulty_level INTEGER,"
+        "description VARCHAR,"
+        "frequency INTEGER,"
+        "duration INTEGER,"
+        "score DOUBLE,"
+        "created_at TIMESTAMP)");
+    await db.execute("CREATE TABLE ${TABLE_EXERCISES}("
+        "id INTEGER PRIMARY KEY,"
+        "name VARCHAR,"
+        "description VARCHAR,"
+        "url VARCHAR,"
+        "duration INTEGER,"
+        "difficulty_level INTEGER,"
+        "created_at TIMESTAMP)");
+    await db.execute("CREATE TABLE ${TABLE_EXERCISE_STEPS}("
+        "id INTEGER PRIMARY KEY,"
+        "serial_no VARCHAR,"
+        "name VARCHAR,"
+        "details VARCHAR,"
+        "media VARCHAR,"
+        "duration INTEGER,"
+        "created_at TIMESTAMP)");
+    await db.execute("CREATE TABLE ${TABLE_USER_TASK}("
+        "user_id INTEGER PRIMARY KEY,"
+        "task_id INTEGER,"
+        "total_due_count INTEGER,"
+        "completed_count INTEGER,"
+        "created_at TIMESTAMP,"
+        "last_updated_at TIMESTAMP)");
+    await db.execute("CREATE TABLE ${TABLE_USER_EXERCISES}("
+        "user_id INTEGER PRIMARY KEY,"
+        "exercise_id INTEGER,"
+        "done INTEGER)");
+    await db.execute("CREATE TABLE ${TABLE_LEARNING}("
+        "id INTEGER PRIMARY KEY,"
+        "title VARCHAR,"
+        "description VARCHAR,"
+        "content_uri VARCHAR,"
+        "target_user_level VARCHAR,"
+        "content_type VARCHAR,"
+        "created_at TIMESTAMP,"
+        "done INTEGER)");
+    await db.execute("CREATE TABLE ${TABLE_USER_LEARNING_CONTENTS}("
+        "user_id INTEGER PRIMARY KEY,"
+        "content_id INTEGER,"
+        "favourite INTEGER,"
+        "view_count INTEGER,"
+        "last_viewed_at TIMESTAMP,"
+        "done INTEGER)");
   }
 
   /// public_users
 
-  Future<List<UserInfo>> getUserInfo() async {
+  Future<List<UserInfo>> getAllUserInfo() async {
     Database db = await instance.database;
     var userInfo = await db.query(TABLE_USER, orderBy: 'full_name');
     List<UserInfo> userInfoList = userInfo.isNotEmpty
         ? userInfo.map((e) => UserInfo.fromMap(e)).toList()
         : [];
     return userInfoList;
+  }
+
+  Future<UserInfo?> getUserInfo(int id) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> users = await db.query(TABLE_USER, where: 'id = ?', whereArgs: [id]);
+    if (users.isNotEmpty) {
+      return UserInfo.fromMap(users.first);
+    } else {
+      return null;
+    }
   }
 
   Future<int> addUser(UserInfo item) async {
@@ -209,10 +149,10 @@ class DatabaseHelper {
     return await db.delete(TABLE_USER, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateUser(UserInfo item) async {
+  Future<int> updateUser(UserInfo item, int id) async {
     Database db = await instance.database;
     return await db.update(TABLE_USER, item.toMap(),
-        where: 'id = ?', whereArgs: [item.userId]);
+        where: 'id = ?', whereArgs: [id]);
   }
 
   /// user_allergies
@@ -270,28 +210,27 @@ class DatabaseHelper {
         where: 'id = ?', whereArgs: [item.code]);
   }
 
-  /// learning
-
-  Future<List<Learning>> getLearnings() async {
+  /// learning contents
+  Future<List<LearningContent>> getLearningContents() async {
     Database db = await instance.database;
     var learnings = await db.query(TABLE_LEARNING, orderBy: 'title');
-    List<Learning> learningList = learnings.isNotEmpty
-        ? learnings.map((e) => Learning.fromMap(e)).toList()
+    List<LearningContent> learningList = learnings.isNotEmpty
+        ? learnings.map((e) => LearningContent.fromMap(e)).toList()
         : [];
     return learningList;
   }
 
-  Future<int> addLearning(Learning item) async {
+  Future<int> addLearningContent(LearningContent item) async {
     Database db = await instance.database;
     return await db.insert(TABLE_LEARNING, item.toMap());
   }
 
-  Future<int> removeLearning(int id) async {
+  Future<int> removeLearningContent(int id) async {
     Database db = await instance.database;
     return await db.delete(TABLE_LEARNING, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateLearning(Learning item) async {
+  Future<int> updateLearningContent(LearningContent item) async {
     Database db = await instance.database;
     return await db.update(TABLE_LEARNING, item.toMap(),
         where: 'id = ?', whereArgs: [item.title]);

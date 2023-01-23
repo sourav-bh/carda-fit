@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:app/main.dart';
+import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
 
-  final double _completedJobs = 14 / 20;
+  final double _completedJobs = 1 / 20;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   void _createRandomAlerts() {
     var waterIntervals = List<Duration>.empty(growable: true);
     for (int i=0;i<1;i++) {
-      var dur = Duration(seconds: Random().nextInt(300) + 120);
+      var dur = Duration(seconds: Random().nextInt(30) + 20);
       if (!waterIntervals.contains(dur)) {
         waterIntervals.add(dur);
       }
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
 
     var stepsIntervals = List<Duration>.empty(growable: true);
     for (int i=0;i<2;i++) {
-      var dur = Duration(seconds: Random().nextInt(120) + 60);
+      var dur = Duration(seconds: Random().nextInt(10) + 6);
       if (!stepsIntervals.contains(dur)) {
         stepsIntervals.add(dur);
       }
@@ -109,12 +110,14 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
-                          Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
-                          SizedBox(width: 10,),
-                          Text("Tagesziele"),
-                          Spacer(),
-                          Icon(Icons.more_horiz),
+                        children: [
+                          const Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
+                          const SizedBox(width: 10,),
+                          const Text("Tagesziele"),
+                          const Spacer(),
+                          IconButton(onPressed: () {
+                            Navigator.pushNamed(context, taskAlertRoute);
+                          }, icon: const Icon(Icons.more_horiz),)
                         ],
                       ),
                       const SizedBox(height: 10,),
@@ -235,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                                     color: Colors.white,
                                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                                     image: DecorationImage(
-                                      image: AssetImage(material.thumbnail),
+                                      image: AssetImage(material.thumbnail ?? ""),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -247,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(material.title, style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
+                                        Text(material.title ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
                                       ],
                                     ),
                                   ),
@@ -288,21 +291,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showPopup(BuildContext context, String image, String quote, String title) {
-    showDialog(context: context, barrierDismissible: false,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                backgroundColor: Colors.transparent,
-                child: NotificationAlertDialog(image, quote, title)
-            ),
-          );
-        }
+    TaskAlertService.instance.addNotification(
+      Random().nextInt(299) + 20,
+      title,
+      quote,
+      DateTime.now().millisecondsSinceEpoch + 1000,
+      'DailyTaskCnlId',
+      'DailyTask'
     );
+    // showDialog(context: context, barrierDismissible: false,
+    //     builder: (BuildContext context) {
+    //       return WillPopScope(
+    //         onWillPop: () {
+    //           return Future.value(false);
+    //         },
+    //         child: Dialog(
+    //             shape: RoundedRectangleBorder(
+    //               borderRadius: BorderRadius.circular(24),
+    //             ),
+    //             backgroundColor: Colors.transparent,
+    //             child: NotificationAlertDialog(image, quote, title)
+    //         ),
+    //       );
+    //     }
+    // );
   }
 }

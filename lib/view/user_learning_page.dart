@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:app/model/exercise.dart';
+import 'package:app/model/exercise_steps.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/main.dart';
+import 'package:app/model/learning.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/view/widgets/user_learning_item.dart';
@@ -18,31 +22,42 @@ class UserLearningPage extends StatefulWidget {
 
 class _UserLearningPageState extends State<UserLearningPage> {
 
-  final List<LearningMaterialInfo> _exercises = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
-  int? _selectedTab = 0;
+  int? _selectedTab = 1;
 
   @override
   void initState() {
     super.initState();
 
-    _exercises.addAll(LearningMaterialInfo.generateDummyExerciseList());
-    _learningMaterials.addAll(LearningMaterialInfo.generateDummyList());
-
     _loadDataFromAsset();
   }
 
   _loadDataFromAsset() async {
-    ByteData data = await rootBundle.load("assets/data/Datenbasis.xlsx");
+    ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
 
+    List<LearningContent> learningContents = [];
     for (var table in excel.tables.keys) {
-      print(table); //sheet Name
-      print(excel.tables[table]?.maxCols);
-      print(excel.tables[table]?.maxRows);
-      for (var row in excel.tables[table]?.rows ?? []) {
-        print("$row");
+      Sheet? sheet = excel.tables[table];
+      if (table == "Lernmaterialien") {
+        for (int rowIndex = 2; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
+          Data? titleCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+
+          LearningContent content = LearningContent();
+          content.title = titleCell?.value.toString();
+          content.contentUri = linkCell?.value.toString();
+          learningContents.add(content);
+
+          DatabaseHelper.instance.addLearningContent(content);
+          var info = await LearningMaterialInfo.copyContentFromLink(content);
+          if (mounted) {
+            setState(() {
+              _learningMaterials.add(info);
+            });
+          }
+        }
       }
     }
   }
@@ -53,47 +68,50 @@ class _UserLearningPageState extends State<UserLearningPage> {
       backgroundColor: AppColor.lightPink,
       body: Container(
           width: MediaQuery.of(context).size.width,
-          margin: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+          margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
           child: Column(
             children: [
-              Card(
-                elevation: 5,
-                child: CupertinoSlidingSegmentedControl<int>(
-                  groupValue: _selectedTab,
-                  backgroundColor: Colors.white,
-                  thumbColor: Colors.orange,
-                  padding: EdgeInsets.zero,
-                  children: const {
-                    0: Text('Übungen'),
-                    1: Text('Lernmaterialien'),
-                  },
-                  onValueChanged: (newValue) {
-                    print(newValue);
-                    setState(() {
-                      _selectedTab = newValue;
-                    });
-                  },
+              Visibility(
+                visible: false,
+                child: Card(
+                  elevation: 5,
+                  child: CupertinoSlidingSegmentedControl<int>(
+                    groupValue: _selectedTab,
+                    backgroundColor: Colors.white,
+                    thumbColor: Colors.orange,
+                    padding: EdgeInsets.zero,
+                    children: const {
+                      0: Text('Übungen'),
+                      1: Text('Lernmaterialien'),
+                    },
+                    onValueChanged: (newValue) {
+                      print(newValue);
+                      setState(() {
+                        _selectedTab = newValue;
+                      });
+                    },
+                  ),
                 ),
               ),
-              ListView.separated(
-                itemBuilder: (BuildContext context, int index) {
-                  LearningMaterialInfo material = _selectedTab == 0 ? _exercises[index] : _learningMaterials[index];
-                  return GestureDetector(
-                    child: UserLearningItemView(itemData: material),
-                    onTap: () {
-                      Navigator.pushNamed(context, detailsWebRoute);
-                      // CommonUtil.openUrl(material.videoUrl);
-                      // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const Divider(endIndent: 0, color: Colors.transparent);
-                },
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: _selectedTab == 0 ? _exercises.length : _learningMaterials.length,
-                scrollDirection: Axis.vertical,
+              Expanded(
+                child: ListView.separated(
+                  itemBuilder: (BuildContext context, int index) {
+                    LearningMaterialInfo material = _learningMaterials[index];
+                    return GestureDetector(
+                      child: UserLearningItemView(itemData: material),
+                      onTap: () {
+                        Navigator.pushNamed(context, detailsWebRoute, arguments: material.originalContent);
+                        // CommonUtil.openUrl(material.videoUrl);
+                        // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const Divider(endIndent: 0, color: Colors.transparent);
+                  },
+                  itemCount: _learningMaterials.length,
+                  scrollDirection: Axis.vertical,
+                ),
               )
             ],
           ),

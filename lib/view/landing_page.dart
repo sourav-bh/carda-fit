@@ -1,20 +1,19 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:app/main.dart';
+import 'package:app/model/exercise.dart';
+import 'package:app/model/exercise_steps.dart';
+import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_style.dart';
-import 'package:app/view/about_page.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
-import 'package:app/view/learning_details_page.dart';
-import 'package:app/view/privacy_policy_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
-// import 'package:flowder/flowder.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -41,35 +40,82 @@ class _LandingPageState extends State<LandingPage> {
     _pageController = PageController(initialPage: 0);
     _pageController.addListener(_handleTabSelection);
 
-    // _startTimer();
-
     super.initState();
+
+    _loadExerciseDataFromAsset();
   }
 
-  // _startTimer() {
-  //   Timer(Duration(seconds: Random().nextInt(7)), () async {
-  //     final downloaderUtils = DownloaderUtils(
-  //       progressCallback: (current, total) {
-  //         final progress = (current / total) * 100;
-  //         print('Downloading: $progress');
-  //       },
-  //       file: File('path_to_store_file/200MB.zip'),
-  //       progress: ProgressImplementation(),
-  //       onDone: () => print('Download done'),
-  //       deleteOnCancel: true,
-  //     );
-  //
-  //     final core = await Flowder.download(
-  //         'http://ipv4.download.thinkbroadband.com/200MB.zip',
-  //         downloaderUtils);
-  //
-  //     core.download('http://ipv4.download.thinkbroadband.com/200MB.zip', downloaderUtils);
-  //   });
-  // }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _checkIfAppLaunchedFromNotification();
+  }
+
+  _checkIfAppLaunchedFromNotification() async {
+    final NotificationAppLaunchDetails? notDetails = await TaskAlertService.instance.getNotificationAppLaunchDetails();
+    print("notificationAppLaunchDetails: $notDetails");
+
+    if (notDetails != null && notDetails.didNotificationLaunchApp) {
+      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute);
+    }
+  }
 
   void _handleTabSelection() {
     setState(() {
     });
+  }
+
+  _loadExerciseDataFromAsset() async {
+    ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
+    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    var excel = Excel.decodeBytes(bytes);
+
+    List<Exercise> exercises = [];
+    for (var table in excel.tables.keys) {
+      Sheet? sheet = excel.tables[table];
+      print(table); //sheet Name
+
+      if (table == "Übungen") {
+        String? exerciseName = "";
+        int? duration = 0;
+        String? url = "";
+        List<ExerciseStep> steps = [];
+        for (int rowIndex = 2; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
+          Data? stepCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? detailsCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+          Data? durationCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+
+          String stepVal = stepCell?.value.toString() ?? "";
+          if (stepVal == "Start") {
+            exerciseName = detailsCell?.value.toString();
+            // duration = int.parse(durationCell?.value.toString() ?? "");
+            url = linkCell?.value.toString();
+          }
+
+          ExerciseStep step = ExerciseStep();
+          step.serialNo = stepVal;
+          step.name = detailsCell?.value.toString();
+          // step.duration = int.parse(durationCell?.value.toString() ?? "");
+          step.media = linkCell?.value.toString();
+          steps.add(step);
+
+          if (stepVal == "End") {
+            Exercise exercise = Exercise();
+            exercise.name = exerciseName;
+            exercise.duration = duration;
+            exercise.url = url;
+            exercise.steps?.addAll(steps);
+            exercises.add(exercise);
+
+            steps.clear();
+          }
+        }
+
+        print(exercises.length);
+      }
+    }
   }
 
   @override

@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:app/main.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/service/database_helper.dart';
+import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
@@ -16,10 +19,22 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  UserInfo? _userInfo;
 
   @override
   void initState() {
     super.initState();
+
+    _loadUserInfo();
+  }
+
+  _loadUserInfo() async {
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    if (userInfo != null) {
+      setState(() {
+        _userInfo = userInfo;
+      });
+    }
   }
 
   _logoutAction() async {
@@ -76,7 +91,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text('Don',
+                    Text(_userInfo?.avatar ?? "",
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
                     ),
                     Container(
@@ -90,7 +105,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.person_pin_rounded, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text('Robert Steven',
+                              Text(_userInfo?.fullName ?? "",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -101,7 +116,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.male_rounded, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text('Männlich',
+                              Text(_userInfo?.gender ?? "",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -112,7 +127,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.date_range, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text('30 Jahre',
+                              Text('${_userInfo?.age ?? 1} Jahre',
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -123,7 +138,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.filter_tilt_shift, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text('Vollzeit',
+                              Text(_userInfo?.jobType ?? "",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -135,7 +150,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               const Icon(Icons.design_services, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
                               Expanded(
-                                child: Text('Leitender Vertriebsmitarbeiter',
+                                child: Text(_userInfo?.designation ?? "",
                                   style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                                 ),
                               )

@@ -16,6 +16,7 @@ class AppConstant {
 
 class AppCache {
   String userName = 'User';
+  int userId = 0;
   int quoteIndex = 0;
 
   AppCache._privateConstructor();
