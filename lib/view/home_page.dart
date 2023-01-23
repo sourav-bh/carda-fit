@@ -8,6 +8,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/view/notification_dialog.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -22,16 +23,31 @@ class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
 
-  final double _completedJobs = 1 / 20;
+  final double _completedJobs = 0 / 20;
 
   @override
   void initState() {
     super.initState();
 
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
-    _learningMaterials.addAll(LearningMaterialInfo.generateDummyList());
 
     // _createRandomAlerts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _loadLearningContent();
+  }
+
+  _loadLearningContent() async {
+    if (AppCache.instance.contents.isNotEmpty) {
+      var info = await LearningMaterialInfo.copyContentFromLink(AppCache.instance.contents.first);
+      setState(() {
+        _learningMaterials.add(info);
+      });
+    }
   }
 
   void _createRandomAlerts() {
@@ -116,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                           const Text("Tagesziele"),
                           const Spacer(),
                           IconButton(onPressed: () {
-                            Navigator.pushNamed(context, taskAlertRoute);
+                            Navigator.pushNamed(context, taskAlertRoute, arguments: TaskType.steps.index);
                           }, icon: const Icon(Icons.more_horiz),)
                         ],
                       ),
@@ -234,13 +250,11 @@ class _HomePageState extends State<HomePage> {
                                   width: 80,
                                   height: 80,
                                   margin: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                    image: DecorationImage(
-                                      image: AssetImage(material.thumbnail ?? ""),
-                                      fit: BoxFit.cover,
-                                    ),
+                                  child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                      child: Image.network(material.thumbnail ?? "",
+                                        fit: BoxFit.fitHeight,
+                                      )
                                   ),
                                 ),
                                 Expanded(
@@ -250,7 +264,14 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(material.title ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20)),
+                                        Text(material.title?.trim() ?? "",
+                                          style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20),
+                                          maxLines: 2,
+                                        ),
+                                        Text(material.description?.trim() ?? "",
+                                          style: Theme.of(context).textTheme.bodyText2,
+                                          maxLines: 3,
+                                        ),
                                       ],
                                     ),
                                   ),

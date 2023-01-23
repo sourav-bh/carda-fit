@@ -6,7 +6,7 @@ class SharedPref {
   static const keyUserName = "key_user_name";
   static const keyUserId = "key_user_id";
   static const keyUserAvatar = "key_user_avatar";
-  static const keyAppSettings = "key_app_settings";
+  static const keyUserTargets = "key_user_targets";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();
@@ -55,6 +55,6 @@ class SharedPref {
   clearCache() async {
     deleteValue(keyUserName);
     deleteValue(keyUserId);
-    deleteValue(keyAppSettings);
+    deleteValue(keyUserTargets);
   }
 }

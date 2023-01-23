@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app/main.dart';
+import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
@@ -23,7 +24,7 @@ class UserInfoPage extends StatefulWidget {
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
-  Gender? _genderValue = Gender.Mannlich;
+  Gender? _genderValue = Gender.Divers;
   JobType? _jobTypeValue = JobType.Vollzeit;
   final TextEditingController _nameText = TextEditingController();
   final TextEditingController _ageText = TextEditingController();
@@ -61,10 +62,49 @@ class _UserInfoPageState extends State<UserInfoPage> {
       SharedPref.instance.saveIntValue(SharedPref.keyUserId, userId);
       AppCache.instance.userId = userId;
 
+      _createUserTargets(userInfo);
+
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
+  }
+
+  void _createUserTargets(UserInfo userInfo) {
+    int steps = 7500;
+    int exercises = 12;
+    int waterGlasses = 8;
+    int breaks = 8;
+
+    // double bmi;
+    // if (userInfo.weight != null && userInfo.weight! > 0 && userInfo.height != null && userInfo.height! > 0) {
+    //   bmi = userInfo.weight! / (userInfo.height!/100);
+    // }
+
+    if (userInfo.age != null) {
+      int age = userInfo.age!;
+      String gender = userInfo.gender ?? "Divers";
+
+      if (age > 18 && age < 35) {
+        steps = gender == "Mannlich" ? 7500 : 7000;
+      } else if (age > 35 && age < 50) {
+        steps = gender == "Mannlich" ? 6840 : 6400;
+        exercises = 10;
+      } else if (age > 50) {
+        steps = gender == "Mannlich" ? 5910 : 5750;
+        exercises = 8;
+      }
+    }
+
+    if ((userInfo.jobType ?? "") == "Teilzeit") {
+      exercises = (exercises/2).toInt();
+      waterGlasses = 4;
+      breaks = 4;
+    }
+
+    DailyTarget dailyTarget = DailyTarget(steps: steps, exercises: exercises, waterGlasses: waterGlasses, breaks: breaks);
+    AppCache.instance.dailyTarget = dailyTarget;
+    SharedPref.instance.saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
   }
 
   double getSmallDiameter(BuildContext context) {

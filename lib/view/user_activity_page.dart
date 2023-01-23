@@ -1,9 +1,8 @@
+import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_style.dart';
-import 'package:app/util/common_util.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/user_activity_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class UserActivityPage extends StatefulWidget {
   const UserActivityPage({Key? key}) : super(key: key);
@@ -14,12 +13,28 @@ class UserActivityPage extends StatefulWidget {
 
 class _UserActivityPageState extends State<UserActivityPage> {
 
+  DailyTarget? _dailyTarget;
+  DailyTarget? _completedJobs;
+
   @override
   void initState() {
     super.initState();
   }
 
-  final double _completedJobs = 14 / 20;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _loadDailyTarget();
+  }
+
+  _loadDailyTarget() async {
+    var target = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
+    setState(() {
+      _dailyTarget = DailyTarget.fromRawJson(target);
+      _completedJobs = DailyTarget(steps: 0, exercises: 0, waterGlasses: 0, breaks: 0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +61,10 @@ class _UserActivityPageState extends State<UserActivityPage> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  UserActivityItemView(icon: Icons.directions_walk, title: "Step", subTitle: "3200/7068 km", highlightColor: Colors.purple, shadeColor: Colors.purple.shade100, progressValue: (3200.0/7068.0)),
-                  UserActivityItemView(icon: Icons.sports_gymnastics, title: "Exercise", subTitle: "6/10", highlightColor: Colors.orange, shadeColor: Colors.orange.shade100, progressValue: (6.0/10.0)),
-                  UserActivityItemView(icon: Icons.local_drink_rounded, title: "Water", subTitle: "4/8 Glass", highlightColor: Colors.lightBlue, shadeColor: Colors.lightBlue.shade100, progressValue: (4.0/8.0)),
-                  UserActivityItemView(icon: Icons.timer, title: "Break", subTitle: "3/5", highlightColor: Colors.red, shadeColor: Colors.red.shade100, progressValue: (3.0/5.0)),
+                  UserActivityItemView(icon: Icons.directions_walk, title: "Step", subTitle: "${_completedJobs?.steps ?? 0}/${_dailyTarget?.steps ?? 0}", highlightColor: Colors.purple, shadeColor: Colors.purple.shade100, progressValue: ((_completedJobs?.steps ?? 0)/(_dailyTarget?.steps ?? 1))),
+                  UserActivityItemView(icon: Icons.sports_gymnastics, title: "Exercise", subTitle: "${_completedJobs?.exercises ?? 0}/${_dailyTarget?.exercises ?? 0}", highlightColor: Colors.orange, shadeColor: Colors.orange.shade100, progressValue: ((_completedJobs?.exercises ?? 0)/(_dailyTarget?.exercises ?? 1))),
+                  UserActivityItemView(icon: Icons.local_drink_rounded, title: "Water", subTitle: "${_completedJobs?.waterGlasses ?? 0}/${_dailyTarget?.waterGlasses ?? 0}", highlightColor: Colors.lightBlue, shadeColor: Colors.lightBlue.shade100, progressValue: ((_completedJobs?.waterGlasses ?? 0)/(_dailyTarget?.waterGlasses ?? 1))),
+                  UserActivityItemView(icon: Icons.timer, title: "Break", subTitle: "${_completedJobs?.breaks ?? 0}/${_dailyTarget?.breaks ?? 0}", highlightColor: Colors.red, shadeColor: Colors.red.shade100, progressValue: ((_completedJobs?.breaks ?? 0)/(_dailyTarget?.breaks ?? 1))),
                 ],
               ),
             ),

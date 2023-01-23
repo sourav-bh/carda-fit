@@ -3,8 +3,12 @@ import 'dart:typed_data';
 import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
+import 'package:app/model/learning.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/service/task_alert_service.dart';
+import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/data_loader.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/user_activity_page.dart';
@@ -43,6 +47,7 @@ class _LandingPageState extends State<LandingPage> {
     super.initState();
 
     _loadExerciseDataFromAsset();
+    _loadLearningMaterialFromAsset();
   }
 
   @override
@@ -81,7 +86,7 @@ class _LandingPageState extends State<LandingPage> {
         int? duration = 0;
         String? url = "";
         List<ExerciseStep> steps = [];
-        for (int rowIndex = 2; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
+        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
           Data? stepCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
           Data? detailsCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
           Data? durationCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
@@ -90,14 +95,14 @@ class _LandingPageState extends State<LandingPage> {
           String stepVal = stepCell?.value.toString() ?? "";
           if (stepVal == "Start") {
             exerciseName = detailsCell?.value.toString();
-            // duration = int.parse(durationCell?.value.toString() ?? "");
+            duration = int.tryParse(durationCell?.value.toString() ?? "5");
             url = linkCell?.value.toString();
           }
 
           ExerciseStep step = ExerciseStep();
           step.serialNo = stepVal;
           step.name = detailsCell?.value.toString();
-          // step.duration = int.parse(durationCell?.value.toString() ?? "");
+          step.duration = int.tryParse(durationCell?.value.toString() ?? "5");
           step.media = linkCell?.value.toString();
           steps.add(step);
 
@@ -106,6 +111,7 @@ class _LandingPageState extends State<LandingPage> {
             exercise.name = exerciseName;
             exercise.duration = duration;
             exercise.url = url;
+            exercise.steps = [];
             exercise.steps?.addAll(steps);
             exercises.add(exercise);
 
@@ -113,7 +119,37 @@ class _LandingPageState extends State<LandingPage> {
           }
         }
 
+        AppCache.instance.exercises.clear();
+        AppCache.instance.exercises.addAll(exercises);
         print(exercises.length);
+      }
+    }
+  }
+
+  _loadLearningMaterialFromAsset() async {
+    ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
+    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    var excel = Excel.decodeBytes(bytes);
+
+    AppCache.instance.contents.clear();
+    List<LearningContent> learningContents = [];
+    for (var table in excel.tables.keys) {
+      Sheet? sheet = excel.tables[table];
+      if (table == "Lernmaterialien") {
+        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
+          Data? titleCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+
+          LearningContent content = LearningContent();
+          content.title = titleCell?.value.toString();
+          content.contentUri = linkCell?.value.toString();
+          learningContents.add(content);
+
+          AppCache.instance.contents.add(content);
+          DatabaseHelper.instance.addLearningContent(content);
+        }
+
+        print(learningContents.length);
       }
     }
   }

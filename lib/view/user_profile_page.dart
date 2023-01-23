@@ -91,7 +91,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(_userInfo?.avatar ?? "",
+                    Text('Avatar: ${_userInfo?.avatar ?? ""}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
                     ),
                     Container(

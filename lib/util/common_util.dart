@@ -61,6 +61,18 @@ class CommonUtil {
     }
   }
 
+  static String formatDuration(int totalSeconds) {
+    if (totalSeconds <= 0) return '00:00';
+
+    final duration = Duration(seconds: totalSeconds);
+    final minutes = duration.inMinutes;
+    final seconds = totalSeconds % 60;
+
+    final minutesString = '$minutes'.padLeft(2, '0');
+    final secondsString = '$seconds'.padLeft(2, '0');
+    return '$minutesString:$secondsString';
+  }
+
   static getFitnessItemBasedColor(int id) {
     switch (id) {
       case 12920:

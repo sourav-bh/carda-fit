@@ -41,7 +41,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
     for (var table in excel.tables.keys) {
       Sheet? sheet = excel.tables[table];
       if (table == "Lernmaterialien") {
-        for (int rowIndex = 2; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
+        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
           Data? titleCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
           Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
 
@@ -50,7 +50,6 @@ class _UserLearningPageState extends State<UserLearningPage> {
           content.contentUri = linkCell?.value.toString();
           learningContents.add(content);
 
-          DatabaseHelper.instance.addLearningContent(content);
           var info = await LearningMaterialInfo.copyContentFromLink(content);
           if (mounted) {
             setState(() {
