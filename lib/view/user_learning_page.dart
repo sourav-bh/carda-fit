@@ -21,8 +21,8 @@ class UserLearningPage extends StatefulWidget {
 }
 
 class _UserLearningPageState extends State<UserLearningPage> {
-
-  final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
+  final List<LearningMaterialInfo> _learningMaterials =
+      List.empty(growable: true);
   int? _selectedTab = 1;
 
   @override
@@ -41,11 +41,16 @@ class _UserLearningPageState extends State<UserLearningPage> {
     for (var table in excel.tables.keys) {
       Sheet? sheet = excel.tables[table];
       if (table == "Lernmaterialien") {
-        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0) ; rowIndex++) {
-          Data? titleCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
-          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0); rowIndex++) {
+          Data? titleCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+          Data? conditionCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
 
           LearningContent content = LearningContent();
+          content.condition = conditionCell?.value.toString();
           content.title = titleCell?.value.toString();
           content.contentUri = linkCell?.value.toString();
           learningContents.add(content);
@@ -66,55 +71,56 @@ class _UserLearningPageState extends State<UserLearningPage> {
     return Scaffold(
       backgroundColor: AppColor.lightPink,
       body: Container(
-          width: MediaQuery.of(context).size.width,
-          margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-          child: Column(
-            children: [
-              Visibility(
-                visible: false,
-                child: Card(
-                  elevation: 5,
-                  child: CupertinoSlidingSegmentedControl<int>(
-                    groupValue: _selectedTab,
-                    backgroundColor: Colors.white,
-                    thumbColor: Colors.orange,
-                    padding: EdgeInsets.zero,
-                    children: const {
-                      0: Text('Übungen'),
-                      1: Text('Lernmaterialien'),
-                    },
-                    onValueChanged: (newValue) {
-                      print(newValue);
-                      setState(() {
-                        _selectedTab = newValue;
-                      });
-                    },
-                  ),
+        width: MediaQuery.of(context).size.width,
+        margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+        child: Column(
+          children: [
+            Visibility(
+              visible: false,
+              child: Card(
+                elevation: 5,
+                child: CupertinoSlidingSegmentedControl<int>(
+                  groupValue: _selectedTab,
+                  backgroundColor: Colors.white,
+                  thumbColor: Colors.orange,
+                  padding: EdgeInsets.zero,
+                  children: const {
+                    0: Text('Übungen'),
+                    1: Text('Lernmaterialien'),
+                  },
+                  onValueChanged: (newValue) {
+                    print(newValue);
+                    setState(() {
+                      _selectedTab = newValue;
+                    });
+                  },
                 ),
               ),
-              Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    LearningMaterialInfo material = _learningMaterials[index];
-                    return GestureDetector(
-                      child: UserLearningItemView(itemData: material),
-                      onTap: () {
-                        Navigator.pushNamed(context, detailsWebRoute, arguments: material.originalContent);
-                        // CommonUtil.openUrl(material.videoUrl);
-                        // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
-                      },
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider(endIndent: 0, color: Colors.transparent);
-                  },
-                  itemCount: _learningMaterials.length,
-                  scrollDirection: Axis.vertical,
-                ),
-              )
-            ],
-          ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (BuildContext context, int index) {
+                  LearningMaterialInfo material = _learningMaterials[index];
+                  return GestureDetector(
+                    child: UserLearningItemView(itemData: material),
+                    onTap: () {
+                      Navigator.pushNamed(context, detailsWebRoute,
+                          arguments: material.originalContent);
+                      // CommonUtil.openUrl(material.videoUrl);
+                      // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
+                    },
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return const Divider(endIndent: 0, color: Colors.transparent);
+                },
+                itemCount: _learningMaterials.length,
+                scrollDirection: Axis.vertical,
+              ),
+            )
+          ],
         ),
+      ),
     );
   }
 }

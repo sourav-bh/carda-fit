@@ -47,7 +47,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory?.path ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
     );
   }
@@ -75,6 +75,7 @@ class DatabaseHelper {
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE ${TABLE_EXERCISES}("
         "id INTEGER PRIMARY KEY,"
+        "condition VARCHAR,"
         "name VARCHAR,"
         "description VARCHAR,"
         "url VARCHAR,"
@@ -102,6 +103,7 @@ class DatabaseHelper {
         "done INTEGER)");
     await db.execute("CREATE TABLE ${TABLE_LEARNING}("
         "id INTEGER PRIMARY KEY,"
+        "condition VARCHAR,"
         "title VARCHAR,"
         "description VARCHAR,"
         "content_uri VARCHAR,"
@@ -131,7 +133,8 @@ class DatabaseHelper {
 
   Future<UserInfo?> getUserInfo(int id) async {
     Database db = await instance.database;
-    List<Map<String, dynamic>> users = await db.query(TABLE_USER, where: 'id = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> users =
+        await db.query(TABLE_USER, where: 'id = ?', whereArgs: [id]);
     if (users.isNotEmpty) {
       return UserInfo.fromMap(users.first);
     } else {
@@ -151,8 +154,8 @@ class DatabaseHelper {
 
   Future<int> updateUser(UserInfo item, int id) async {
     Database db = await instance.database;
-    return await db.update(TABLE_USER, item.toMap(),
-        where: 'id = ?', whereArgs: [id]);
+    return await db
+        .update(TABLE_USER, item.toMap(), where: 'id = ?', whereArgs: [id]);
   }
 
   /// user_allergies

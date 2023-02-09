@@ -3,16 +3,16 @@ import 'dart:convert';
 import 'package:app/model/exercise_steps.dart';
 
 class Exercise {
-  Exercise({
-    this.id,
-    this.name,
-    this.description,
-    this.url,
-    this.duration,
-    this.difficultyLevel,
-    this.steps,
-    this.createdAt,
-  });
+  Exercise(
+      {this.id,
+      this.name,
+      this.description,
+      this.url,
+      this.duration,
+      this.difficultyLevel,
+      this.steps,
+      this.createdAt,
+      this.condition});
 
   int? id;
   String? name;
@@ -22,6 +22,7 @@ class Exercise {
   int? difficultyLevel;
   List<ExerciseStep>? steps = [];
   double? createdAt;
+  String? condition;
 
   factory Exercise.fromRawJson(String str) =>
       Exercise.fromMap(json.decode(str));
@@ -29,24 +30,28 @@ class Exercise {
   String toRawJson() => json.encode(toMap());
 
   factory Exercise.fromMap(Map<String, dynamic> json) => Exercise(
-    id: json["id"],
-    name: json["name"],
-    description: json["description"],
-    url: json["url"],
-    duration: json["duration"],
-    difficultyLevel: json["difficulty_level"],
-    steps: List<ExerciseStep>.from(json["steps"].map((x) => ExerciseStep.fromMap(x))),
-    createdAt: json["created_at"],
-  );
+      id: json["id"],
+      name: json["name"],
+      description: json["description"],
+      url: json["url"],
+      duration: json["duration"],
+      difficultyLevel: json["difficulty_level"],
+      steps: List<ExerciseStep>.from(
+          json["steps"].map((x) => ExerciseStep.fromMap(x))),
+      createdAt: json["created_at"],
+      condition: json["condition"]);
 
   Map<String, dynamic> toMap() => {
-    "id": id,
-    "name": name,
-    "description": description,
-    "url": url,
-    "duration": duration,
-    "difficulty_level": difficultyLevel,
-    "steps": steps != null ? List<dynamic>.from(steps!.map((x) => x.toMap())) : null,
-    "created_at": createdAt,
-  };
+        "id": id,
+        "name": name,
+        "description": description,
+        "url": url,
+        "duration": duration,
+        "difficulty_level": difficultyLevel,
+        "steps": steps != null
+            ? List<dynamic>.from(steps!.map((x) => x.toMap()))
+            : null,
+        "created_at": createdAt,
+        "condition": condition,
+      };
 }
