@@ -40,9 +40,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   void _saveAction() async {
     String name = _nameText.value.text;
     if (name.isEmpty) {
-      const snackBar = SnackBar(
-          content: Text('Name ist obligatorisch')
-      );
+      const snackBar = SnackBar(content: Text('Name ist obligatorisch'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
       int age = int.tryParse(_ageText.value.text) ?? 0;
@@ -97,14 +95,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
     }
 
     if ((userInfo.jobType ?? "") == "Teilzeit") {
-      exercises = (exercises/2).toInt();
+      exercises = (exercises / 2).toInt();
       waterGlasses = 4;
       breaks = 4;
     }
 
-    DailyTarget dailyTarget = DailyTarget(steps: steps, exercises: exercises, waterGlasses: waterGlasses, breaks: breaks);
+    DailyTarget dailyTarget = DailyTarget(
+        steps: steps,
+        exercises: exercises,
+        waterGlasses: waterGlasses,
+        breaks: breaks);
     AppCache.instance.dailyTarget = dailyTarget;
-    SharedPref.instance.saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
+    SharedPref.instance
+        .saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
   }
 
   double getSmallDiameter(BuildContext context) {
@@ -114,6 +117,17 @@ class _UserInfoPageState extends State<UserInfoPage> {
   double getBigDiameter(BuildContext context) {
     return MediaQuery.of(context).size.width * 7 / 8;
   }
+
+  List<String> items = <String>[
+    'Choose your Problems',
+    'Heart',
+    'Bone',
+    'Knee',
+    'Shoulder',
+    'Neck'
+  ];
+
+  String dropdownValue = 'choose your Problems';
 
   @override
   void dispose() {
@@ -135,13 +149,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 top: 110,
                 left: -getSmallDiameter(context) / 3,
                 child: Container(
-                  width: getSmallDiameter(context),
-                  height: getSmallDiameter(context),
-                  decoration: const BoxDecoration(
+                    width: getSmallDiameter(context),
+                    height: getSmallDiameter(context),
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColor.lightOrange,
-                  )
-                ),
+                    )),
               ),
               Positioned(
                 bottom: 50,
@@ -150,8 +163,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   width: getSmallDiameter(context),
                   height: getSmallDiameter(context),
                   decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColor.lightBlue,
+                    shape: BoxShape.circle,
+                    color: AppColor.lightBlue,
                   ),
                 ),
               ),
@@ -166,7 +179,10 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         padding: const EdgeInsets.only(top: 70, bottom: 10),
                         child: Text(
                           'Anmeldung',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontSize: 30),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(color: Colors.black, fontSize: 30),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -178,14 +194,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           children: <Widget>[
                             Container(
                               padding: const EdgeInsets.all(15),
-                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              decoration: CommonUtil.getRectangleBoxDecoration(
+                                  Colors.white, 25),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: Text('NAME',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    child: Text(
+                                      'NAME',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   TextField(
@@ -194,21 +215,34 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                                    child: Text('ALTER',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'ALTER',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   TextField(
@@ -217,26 +251,40 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                                    child: Text('GESCHLECHT',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'GESCHLECHT',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<Gender>(
+                                    child: CupertinoSlidingSegmentedControl<
+                                        Gender>(
                                       groupValue: _genderValue,
                                       children: const {
                                         Gender.Mannlich: Text('Männlich'),
@@ -253,17 +301,36 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 ],
                               ),
                             ),
+                            DropdownButton(
+                              onChanged: (String? newValue) {
+                                dropdownValue = newValue!;
+                              },
+                              value: dropdownValue,
+                              items: items.map<DropdownMenuItem<String>>(
+                                (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                },
+                              ).toList(),
+                            ),
                             Container(
                               margin: const EdgeInsets.only(top: 20),
                               padding: const EdgeInsets.all(15),
-                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              decoration: CommonUtil.getRectangleBoxDecoration(
+                                  Colors.white, 25),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: Text('GEWICHT (kg)',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    child: Text(
+                                      'GEWICHT (kg)',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   TextField(
@@ -272,21 +339,34 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                                    child: Text('HEIGHT (cm)',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'HEIGHT (cm)',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   TextField(
@@ -295,12 +375,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
@@ -312,19 +400,26 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             Container(
                               margin: const EdgeInsets.only(top: 20),
                               padding: const EdgeInsets.all(15),
-                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              decoration: CommonUtil.getRectangleBoxDecoration(
+                                  Colors.white, 25),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                                    child: Text('ARBEITSZEITMODELL',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'ARBEITSZEITMODELL',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<JobType>(
+                                    child: CupertinoSlidingSegmentedControl<
+                                        JobType>(
                                       groupValue: _jobTypeValue,
                                       children: const {
                                         JobType.Vollzeit: Text('Vollzeit'),
@@ -339,9 +434,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                                    child: Text('BERUFPOSITION',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'BERUFPOSITION',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                   ),
                                   TextField(
@@ -350,12 +450,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1,
+                                            color:
+                                                Colors.white12), //<-- SEE HERE
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
@@ -371,9 +479,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) => Colors.transparent,),
-                              overlayColor: MaterialStateProperty.all(Colors.transparent),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) =>
+                                    Colors.transparent,
+                              ),
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                             ),
                             onPressed: () {
                               _saveAction();
@@ -381,13 +493,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             child: Ink(
                               decoration: const BoxDecoration(
                                 color: Colors.orangeAccent,
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Container(
-                                constraints: const BoxConstraints(minHeight: 50), // min sizes for Material buttons
+                                constraints: const BoxConstraints(
+                                    minHeight:
+                                        50), // min sizes for Material buttons
                                 alignment: Alignment.center,
-                                child: Text("speichern".toUpperCase(),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                child: Text(
+                                  "speichern".toUpperCase(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700),
                                 ),
                               ),
                             )),
