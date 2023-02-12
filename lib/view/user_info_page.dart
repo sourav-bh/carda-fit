@@ -302,6 +302,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               ),
                             ),
                             DropdownButton(
+                              onTap: () {
+                                _saveAction();
+                              },
                               onChanged: (String? newValue) {
                                 dropdownValue = newValue!;
                               },
