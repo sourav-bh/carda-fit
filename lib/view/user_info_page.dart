@@ -6,6 +6,7 @@ import 'package:app/main.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
+import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -56,11 +57,16 @@ class _UserInfoPageState extends State<UserInfoPage> {
       userInfo.height = height;
       userInfo.designation = designation;
       userInfo.jobType = _jobTypeValue.toString().split('.').last;
+
+      // Sourav - here you need to save the selected dropdown value (user condition)
+      // create another userInfo property for saving the condition.
+      // Also don't forget to update the database columns for that new property.
       int userId = await DatabaseHelper.instance.addUser(userInfo);
       SharedPref.instance.saveIntValue(SharedPref.keyUserId, userId);
       AppCache.instance.userId = userId;
 
       _createUserTargets(userInfo);
+      TaskAlertService.instance.scheduleBackgroundTask();
 
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;
@@ -95,7 +101,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     }
 
     if ((userInfo.jobType ?? "") == "Teilzeit") {
-      exercises = (exercises / 2).toInt();
+      exercises = exercises ~/ 2;
       waterGlasses = 4;
       breaks = 4;
     }
@@ -127,7 +133,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     'Neck'
   ];
 
-  String dropdownValue = 'choose your Problems';
+  String dropdownValue = 'Choose your Problems';
 
   @override
   void dispose() {
@@ -302,10 +308,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               ),
                             ),
                             DropdownButton(
+                              // Sourav - onTap is not required here, it is normally used for Buttons
                               onTap: () {
                                 _saveAction();
                               },
                               onChanged: (String? newValue) {
+                                // Sourav - only set the value is not enough for updating the UI,
+                                // you need to call setState block for updating the UI. See other page UI updates please
                                 dropdownValue = newValue!;
                               },
                               value: dropdownValue,

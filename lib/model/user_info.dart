@@ -30,6 +30,8 @@ class UserInfo {
   List<String>? diseases;
   List<UserAllergy>? allergies;
 
+  // Sourav - create a new variable to store the condition value from user info page
+
   factory UserInfo.fromRawJson(String str) =>
       UserInfo.fromMap(json.decode(str));
 

@@ -50,26 +50,6 @@ class _LandingPageState extends State<LandingPage> {
     _loadLearningMaterialFromAsset();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _checkIfAppLaunchedFromNotification();
-  }
-
-  _checkIfAppLaunchedFromNotification() async {
-    final NotificationAppLaunchDetails? notDetails =
-        await TaskAlertService.instance.getNotificationAppLaunchDetails();
-
-    if (notDetails != null && notDetails.didNotificationLaunchApp) {
-      print("notificationAppLaunchDetails: $notDetails");
-      String payload = notDetails.notificationResponse?.payload ?? "2";
-      int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
-      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute,
-          arguments: taskType);
-    }
-  }
-
   void _handleTabSelection() {
     setState(() {});
   }

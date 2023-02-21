@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:any_link_preview/any_link_preview.dart';
+import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/task.dart';
 import 'package:app/util/app_constant.dart';
@@ -205,7 +206,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(_title, style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue), textAlign: TextAlign.center,),
@@ -225,7 +226,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: SlideAction(
@@ -236,6 +237,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                   onSubmit: () {
                     Future.delayed(const Duration(seconds: 1), () {
                       Navigator.of(context).pop();
+                      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
                     },
                     );
                   },

@@ -113,7 +113,7 @@ class _DetailsWebState extends State<DetailsWebPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             color: Colors.grey[100],
-            child: Center(
+            child: const Center(
               child: CircularProgressIndicator(),
             ),
           )

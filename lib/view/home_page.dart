@@ -1,16 +1,9 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:app/main.dart';
-import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
-import 'package:app/view/notification_dialog.dart';
-import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -178,6 +171,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 onTap: () {
+                                  print("-------> opening task alert page from on home page item click");
+                                  Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: item.taskType.index);
                                 },
                               );
                             },

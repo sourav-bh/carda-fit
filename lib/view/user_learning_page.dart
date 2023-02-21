@@ -53,6 +53,10 @@ class _UserLearningPageState extends State<UserLearningPage> {
           content.condition = conditionCell?.value.toString();
           content.title = titleCell?.value.toString();
           content.contentUri = linkCell?.value.toString();
+
+          // Sourav - before adding a learning content, retrieve the userInfo from database
+          // and see what is the condition saved for the current user.
+          // Match that user condition with the content's condition you found from excel
           learningContents.add(content);
 
           var info = await LearningMaterialInfo.copyContentFromLink(content);

@@ -1,5 +1,6 @@
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/view/task_alert_page.dart';
 
 class DataLoader {
   static const List<String> quotes = ['Sorge dich gut um deinen Körper',
@@ -15,15 +16,16 @@ class FitnessItemInfo {
   late int count;
   late int target;
   late int points;
+  late TaskType taskType;
 
-  FitnessItemInfo(this.id, this.image, this.name, this.count, this.target, this.points);
+  FitnessItemInfo(this.id, this.image, this.name, this.count, this.target, this.points, this.taskType);
 
   static List<FitnessItemInfo> generateDummyList() {
     List<FitnessItemInfo> data = List.empty(growable: true);
-    data.add(FitnessItemInfo(12920, 'assets/images/water.jpg', 'Wasser', 5, 8, 5));
-    data.add(FitnessItemInfo(12921, 'assets/images/walk.jpg', 'Schritte', 3041, 8156, 1));
-    data.add(FitnessItemInfo(12923, 'assets/images/exercise.jpg', 'Übungen', 2, 6, 25));
-    data.add(FitnessItemInfo(12922, 'assets/images/break.jpg', 'Pausen', 4, 10, 10));
+    data.add(FitnessItemInfo(12920, 'assets/images/water.jpg', 'Wasser', 5, 8, 5, TaskType.water));
+    data.add(FitnessItemInfo(12921, 'assets/images/walk.jpg', 'Schritte', 3041, 8156, 1, TaskType.steps));
+    data.add(FitnessItemInfo(12923, 'assets/images/exercise.jpg', 'Übungen', 2, 6, 25, TaskType.exercise));
+    data.add(FitnessItemInfo(12922, 'assets/images/break.jpg', 'Pausen', 4, 10, 10, TaskType.breaks));
     return data;
   }
 }

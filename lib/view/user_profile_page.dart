@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:workmanager/workmanager.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -39,6 +40,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   _logoutAction() async {
     SharedPref.instance.clearCache();
+    Workmanager().cancelAll();
     Navigator.pushNamed(context, userInfoRoute);
   }
 

@@ -14,6 +14,8 @@ void _onSelectNotification(NotificationResponse details) {
 
   String payload = details.payload ?? "2";
   int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+
+  print("-------> opening task alert page from _onSelectNotification in Alert service");
   Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
 }
 
@@ -78,7 +80,7 @@ class TaskAlertService {
       "${Random().nextInt(99) + 24}",
       taskWalkSteps,
       frequency: const Duration(hours: 1),
-      // initialDelay: const Duration(minutes: 45),
+      initialDelay: const Duration(minutes: 45),
     );
 
     // water
@@ -86,7 +88,7 @@ class TaskAlertService {
       "${Random().nextInt(19) + 2}",
       taskDrinkWater,
       frequency: const Duration(hours: 1),
-      // initialDelay: const Duration(minutes: 15),
+      initialDelay: const Duration(minutes: 15),
     );
 
     // exercise
@@ -102,7 +104,7 @@ class TaskAlertService {
       "${Random().nextInt(9999) + 1500}",
       taskTakeBreak,
       frequency: const Duration(hours: 1),
-      // initialDelay: const Duration(minutes: 30),
+      initialDelay: const Duration(minutes: 30),
     );
   }
 

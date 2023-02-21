@@ -39,12 +39,8 @@ GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await TaskAlertService.instance.setup();
+  Workmanager().initialize(callbackDispatcherForBgAlert);
 
-  final NotificationAppLaunchDetails? notDetails = await TaskAlertService.instance.getNotificationAppLaunchDetails();
-  if (notDetails == null || notDetails.didNotificationLaunchApp == false) {
-    Workmanager().initialize(callbackDispatcherForBgAlert);
-    TaskAlertService.instance.scheduleBackgroundTask();
-  }
   runApp(const MyFitApp());
 }
 
