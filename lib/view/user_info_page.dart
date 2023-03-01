@@ -308,14 +308,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               ),
                             ),
                             DropdownButton(
-                              // Sourav - onTap is not required here, it is normally used for Buttons
-                              onTap: () {
-                                _saveAction();
-                              },
                               onChanged: (String? newValue) {
-                                // Sourav - only set the value is not enough for updating the UI,
-                                // you need to call setState block for updating the UI. See other page UI updates please
-                                dropdownValue = newValue!;
+                                setState(() {
+                                  // Sourav - only set the value is not enough for updating the UI,
+                                  // you need to call setState block for updating the UI. See other page UI updates please
+                                  dropdownValue = newValue!;
+                                });
                               },
                               value: dropdownValue,
                               items: items.map<DropdownMenuItem<String>>(
@@ -436,7 +434,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                       children: const {
                                         JobType.Vollzeit: Text('Vollzeit'),
                                         JobType.Teilzeit: Text('Teilzeit'),
-                                        JobType.Feldarbeit: Text('Feldarbeit'),
+                                        JobType.HomeOffice: Text('Feldarbeit'),
                                       },
                                       onValueChanged: (groupValue) {
                                         setState(() {
