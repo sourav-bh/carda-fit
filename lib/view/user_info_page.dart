@@ -57,6 +57,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       userInfo.height = height;
       userInfo.designation = designation;
       userInfo.jobType = _jobTypeValue.toString().split('.').last;
+      userInfo.condition = conditionValue.toString().split(',').last;
 
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
@@ -126,14 +127,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   List<String> items = <String>[
     'Choose your Problems',
-    'Heart',
-    'Bone',
-    'Knee',
-    'Shoulder',
-    'Neck'
+    'Herz',
+    'Beine',
+    'Knie',
+    'Schulter',
+    'Nacken',
+    'Rücken',
+    'Arme',
+    'Hände',
+    'Bauch',
+    'Augen',
   ];
 
-  String dropdownValue = 'Choose your Problems';
+  String conditionValue = 'Choose your Problems';
 
   @override
   void dispose() {
@@ -308,14 +314,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               ),
                             ),
                             DropdownButton(
-                              onChanged: (String? newValue) {
+                              onChanged: (String? condition) {
                                 setState(() {
                                   // Sourav - only set the value is not enough for updating the UI,
                                   // you need to call setState block for updating the UI. See other page UI updates please
-                                  dropdownValue = newValue!;
+                                  conditionValue = condition!;
                                 });
                               },
-                              value: dropdownValue,
+                              value: conditionValue,
                               items: items.map<DropdownMenuItem<String>>(
                                 (String value) {
                                   return DropdownMenuItem<String>(

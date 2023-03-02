@@ -39,23 +39,23 @@ class UserInfo {
   String toRawJson() => json.encode(toMap());
 
   factory UserInfo.fromMap(Map<String, dynamic> json) => UserInfo(
-      // userId: json["user_id"],
-      fullName: json["fullName"],
-      avatar: json["avatar"],
-      gender: json["gender"],
-      age: json["age"],
-      jobType: json["job_type"],
-      weight: json["weight"],
-      height: json["height"],
-      designation: json["designation"],
-      createdAt: json['created_at'],
-      condition: json["condition"]
-      // allergies: List<UserAllergy>.from(json["allergies"].map((x) => x)),
-      // diseases: List<String>.from(json["diseases"].map((x) => x)),
+        userId: json["user_id"],
+        fullName: json["fullName"],
+        avatar: json["avatar"],
+        gender: json["gender"],
+        age: json["age"],
+        jobType: json["job_type"],
+        weight: json["weight"],
+        height: json["height"],
+        designation: json["designation"],
+        createdAt: json['created_at'],
+        condition: json["condition"],
+        //allergies: List<UserAllergy>.from(json["allergies"].map((x) => x)),
+        //diseases: List<String>.from(json["diseases"].map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        // "user_id": userId,
+        "user_id": userId,
         "fullName": fullName,
         "avatar": avatar,
         "gender": gender,
@@ -65,9 +65,9 @@ class UserInfo {
         "height": height,
         "designation": designation,
         "created_at": createdAt,
-        "condition": condition
-        // "diseases": diseases != null ? List<dynamic>.from(diseases!.map((x) => x)) : null,
-        // "allergies": allergies != null ? List<dynamic>.from(allergies!.map((x) => x)) : null,
+        "condition": condition,
+        // "diseases": diseases != null? List<dynamic>.from(diseases!.map((x) => x)) : null,
+        // "allergies": allergies != null ? List<dynamic>.from(allergies!.map((x) => x)): null,
       };
 }
 

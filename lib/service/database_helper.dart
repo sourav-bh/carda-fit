@@ -63,6 +63,7 @@ class DatabaseHelper {
         "height INTEGER,"
         "designation VARCHAR,"
         "job_type VARCHAR,"
+        "condition VARCHAR,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE ${TABLE_TASK}("
         "id INTEGER PRIMARY KEY,"
@@ -110,6 +111,7 @@ class DatabaseHelper {
         "target_user_level VARCHAR,"
         "content_type VARCHAR,"
         "created_at TIMESTAMP,"
+        "condition VARCHAR,"
         "done INTEGER)");
     await db.execute("CREATE TABLE ${TABLE_USER_LEARNING_CONTENTS}("
         "user_id INTEGER PRIMARY KEY,"
