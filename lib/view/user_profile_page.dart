@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:random_avatar/random_avatar.dart';
 import 'package:workmanager/workmanager.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -86,15 +87,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       radius: MediaQuery.of(context).size.width / 5.5,
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
-                        radius: (MediaQuery.of(context).size.width / 5.5) - 4,
-                        child: const ClipOval(
-                            child: Icon(Icons.person_outlined, size: 100,)
+                        radius: (MediaQuery.of(context).size.width / 5.5),
+                        child: ClipOval(
+                            child: _userInfo?.avatarImage != null
+                                ? randomAvatar(_userInfo?.avatarImage ?? "")
+                                : const Icon(Icons.person_outlined, size: 100,)
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text('Avatar: ${_userInfo?.avatar ?? ""}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Avatar Name: ',
+                          style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 18),
+                        ),
+                        Text(_userInfo?.avatar ?? "",
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
+                        ),
+                      ],
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -130,6 +141,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               const Icon(Icons.date_range, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
                               Text('${_userInfo?.age ?? 1} Jahre',
+                                style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Icon(Icons.medical_services, color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10,),
+                              Text(_userInfo?.condition ?? "",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],

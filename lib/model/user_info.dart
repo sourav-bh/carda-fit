@@ -1,11 +1,13 @@
 import 'dart:convert';
+import 'dart:math';
 import 'user_allergy.dart';
 
 class UserInfo {
   UserInfo(
-      {this.userId,
+      {this.id,
       this.fullName,
       this.avatar,
+      this.avatarImage,
       this.gender,
       this.age,
       this.weight,
@@ -17,9 +19,10 @@ class UserInfo {
       this.height,
       this.condition});
 
-  String? userId;
+  String? id;
   String? fullName;
   String? avatar;
+  String? avatarImage;
   String? gender;
   int? age;
   int? weight;
@@ -39,9 +42,10 @@ class UserInfo {
   String toRawJson() => json.encode(toMap());
 
   factory UserInfo.fromMap(Map<String, dynamic> json) => UserInfo(
-        userId: json["user_id"],
+        id: json["id"].toString(),
         fullName: json["fullName"],
         avatar: json["avatar"],
+        avatarImage: json["avatar_image"],
         gender: json["gender"],
         age: json["age"],
         jobType: json["job_type"],
@@ -55,9 +59,10 @@ class UserInfo {
       );
 
   Map<String, dynamic> toMap() => {
-        "user_id": userId,
+        "id": id != null ? id.toString() : Random().nextInt(999),
         "fullName": fullName,
         "avatar": avatar,
+        "avatar_image": avatarImage,
         "gender": gender,
         "age": age,
         "job_type": jobType,

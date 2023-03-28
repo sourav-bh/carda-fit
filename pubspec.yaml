@@ -52,6 +52,7 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   workmanager: ^0.5.1
   any_link_preview: ^3.0.0
+  random_avatar: any
 
 dev_dependencies:
   flutter_test:

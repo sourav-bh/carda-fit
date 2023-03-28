@@ -27,6 +27,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
   int? _selectedTab = 1;
+  bool _showFilteredList = false;
+  String? _userCondition;
 
   @override
   void initState() {
@@ -36,6 +38,14 @@ class _UserLearningPageState extends State<UserLearningPage> {
   }
 
   _loadDataFromAsset() async {
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
+      setState(() {
+        _showFilteredList = true;
+        _userCondition = userInfo.condition;
+      });
+    }
+
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -60,13 +70,28 @@ class _UserLearningPageState extends State<UserLearningPage> {
           // Sourav - before adding a learning content, retrieve the userInfo from database
           // and see what is the condition saved for the current user.
           // Match that user condition with the content's condition you found from excel
-          learningContents.add(content);
+          bool addContent = false;
+          if (_showFilteredList) {
+            if (content.condition != null && _userCondition != null &&
+                content.condition == _userCondition) {
+              addContent = true;
+            } else if (_userCondition == null) {
+              addContent = true;
+            } else {
+              // skip this learning content, since it is not useful for the user condition specified
+            }
+          } else {
+            addContent = true;
+          }
 
-          var info = await LearningMaterialInfo.copyContentFromLink(content);
-          if (mounted) {
-            setState(() {
-              _learningMaterials.add(info);
-            });
+          if (addContent) {
+            learningContents.add(content);
+            var info = await LearningMaterialInfo.copyContentFromLink(content);
+            if (mounted) {
+              setState(() {
+                _learningMaterials.add(info);
+              });
+            }
           }
         }
       }
@@ -101,6 +126,16 @@ class _UserLearningPageState extends State<UserLearningPage> {
                       _selectedTab = newValue;
                     });
                   },
+                ),
+              ),
+            ),
+            Visibility(
+              visible: _showFilteredList,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                child: Text('Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColor.darkBlue, fontSize: 20),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),

@@ -33,6 +33,21 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final TextEditingController _heightText = TextEditingController();
   final TextEditingController _designationText = TextEditingController();
 
+  List<String> conditionItems = <String>[
+    'Wählen Sie Ihr Problem',
+    'Herz',
+    'Beine',
+    'Knie',
+    'Schulter',
+    'Nacken',
+    'Rücken',
+    'Arme',
+    'Hände',
+    'Bauch',
+    'Augen',
+  ];
+  String conditionValue = "Wählen Sie Ihr Problem";
+
   @override
   void initState() {
     super.initState();
@@ -124,22 +139,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
   double getBigDiameter(BuildContext context) {
     return MediaQuery.of(context).size.width * 7 / 8;
   }
-
-  List<String> items = <String>[
-    'Choose your Problems',
-    'Herz',
-    'Beine',
-    'Knie',
-    'Schulter',
-    'Nacken',
-    'Rücken',
-    'Arme',
-    'Hände',
-    'Bauch',
-    'Augen',
-  ];
-
-  String conditionValue = 'Choose your Problems';
 
   @override
   void dispose() {
@@ -259,7 +258,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   TextField(
                                     controller: _ageText,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.number,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
@@ -295,9 +294,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<
-                                        Gender>(
+                                    child: CupertinoSlidingSegmentedControl<Gender>(
                                       groupValue: _genderValue,
+                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                       children: const {
                                         Gender.Mannlich: Text('Männlich'),
                                         Gender.Weiblich: Text('Weiblich'),
@@ -310,26 +309,40 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                       },
                                     ),
                                   ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10),
+                                    child: Text(
+                                      'Medizinische Konditionen'.toUpperCase(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: DropdownButton(
+                                      elevation: 10,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      onChanged: (String? condition) {
+                                        setState(() {
+                                          // Sourav - only set the value is not enough for updating the UI,
+                                          // you need to call setState block for updating the UI. See other page UI updates please
+                                          conditionValue = condition!;
+                                        });
+                                      },
+                                      value: conditionValue,
+                                      items: conditionItems.map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        },
+                                      ).toList(),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            DropdownButton(
-                              onChanged: (String? condition) {
-                                setState(() {
-                                  // Sourav - only set the value is not enough for updating the UI,
-                                  // you need to call setState block for updating the UI. See other page UI updates please
-                                  conditionValue = condition!;
-                                });
-                              },
-                              value: conditionValue,
-                              items: items.map<DropdownMenuItem<String>>(
-                                (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                },
-                              ).toList(),
                             ),
                             Container(
                               margin: const EdgeInsets.only(top: 20),
@@ -351,7 +364,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   TextField(
                                     controller: _weightText,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.number,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
@@ -387,7 +400,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   TextField(
                                     controller: _heightText,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.number,
                                     cursorColor: Colors.orange,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
@@ -422,8 +435,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 20, bottom: 10),
+                                    padding: const EdgeInsets.only(top: 0, bottom: 10),
                                     child: Text(
                                       'ARBEITSZEITMODELL',
                                       style: Theme.of(context)
@@ -434,8 +446,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<
-                                        JobType>(
+                                    child: CupertinoSlidingSegmentedControl<JobType>(
+                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                       groupValue: _jobTypeValue,
                                       children: const {
                                         JobType.Vollzeit: Text('Vollzeit'),

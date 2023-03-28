@@ -5,6 +5,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/widgets/avatar_image_picker.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
   final List<LeaderboardParticipantInfo> _participantInfo = List.empty(growable: true);
   final TextEditingController _avatarText = TextEditingController();
   String? _avatarName = "";
+  String? _avatarImage = "";
 
   @override
   void initState() {
@@ -34,6 +36,13 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     if (avatarName != null && avatarName is String) {
       setState(() {
         _avatarName = avatarName;
+      });
+    }
+
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    if (userInfo != null) {
+      setState(() {
+        _avatarImage = userInfo.avatarImage;
       });
     }
   }
@@ -58,6 +67,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
     if (userInfo != null) {
       userInfo.avatar = avatar;
+      userInfo.avatarImage = _avatarImage;
       await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userId);
     }
   }
@@ -102,7 +112,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                             margin: const EdgeInsets.only(top: 8, left: 8, right: 8),
                             decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
                             child: CustomPaint(
-                              painter: CurvePainter(Colors.green.shade800),
+                              painter: CurvePainter(Colors.green.shade300),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
@@ -116,7 +126,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                           Container(
                             decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
                             child: CustomPaint(
-                              painter: CurvePainter(Colors.orange.shade800),
+                              painter: CurvePainter(Colors.orange.shade300),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
@@ -131,7 +141,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                             margin: const EdgeInsets.only(top: 16),
                             decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
                             child: CustomPaint(
-                              painter: CurvePainter(Colors.blue.shade800),
+                              painter: CurvePainter(Colors.blue.shade300),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
@@ -155,15 +165,15 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: Card(
                                 elevation: 5,
-                                color: Colors.pink.shade400,
+                                color: Colors.pink.shade100,
                                 child: Container(
-                                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.pink.shade400, 15),
+                                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.pink.shade100, 15),
                                   child: Row(
                                     children: [
                                       Expanded(
                                         child: Container(
                                           padding: const EdgeInsets.all(15),
-                                          decoration: CommonUtil.getRectangleBoxDecoration(Colors.white.withAlpha(235), 5),
+                                          decoration: CommonUtil.getRectangleBoxDecoration(Colors.white.withAlpha(205), 5),
                                           child: Row(
                                             children: [
                                               Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
@@ -176,7 +186,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                       SizedBox(
                                         width: 100,
                                         child: Text('${participant.points}',
-                                          style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
+                                          style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: Colors.black54, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ],
@@ -191,18 +201,18 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                 );
               } else {
                 // ask to set a avatar name
-                return Column(
+                return ListView(
                   children: [
-                    const SizedBox(height: 50,),
+                    const SizedBox(height: 20,),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-                      child: Text('Bitte geben Sie zuerst Ihren Avatarnamen ein, um die Rangliste zu sehen!',
-                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,),
+                      child: Text('Bitte geben Sie Ihren Avatarnamen ein und wählen Sie ein Avatarbild, um die Rangliste zu sehen!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColor.darkBlue, fontSize: 20),
                         textAlign: TextAlign.center,
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       padding: const EdgeInsets.all(15),
                       decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
                       child: Column(
@@ -213,6 +223,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                             keyboardType: TextInputType.text,
                             cursorColor: Colors.orange,
                             decoration: InputDecoration(
+                              hintText: "Avatar Name",
                               enabledBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(width: 1, color: Colors.white12), //<-- SEE HERE
                                 borderRadius: BorderRadius.circular(20.0),
@@ -229,8 +240,21 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                      child: SizedBox(
+                        height: 300,
+                        child: AvatarImagePickerView(
+                          onItemSelected: (String? avatar) {
+                            _avatarImage = avatar;
+                            print("avatar selected: $avatar");
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: TextButton(
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.resolveWith<Color>(

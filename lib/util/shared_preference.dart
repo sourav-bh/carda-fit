@@ -55,6 +55,7 @@ class SharedPref {
   clearCache() async {
     deleteValue(keyUserName);
     deleteValue(keyUserId);
+    deleteValue(keyUserAvatar);
     deleteValue(keyUserTargets);
   }
 }

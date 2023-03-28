@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
+import 'package:app/api/api_manager.dart';
+import 'package:app/model/user_api_model.dart';
 import 'package:app/util/app_style.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -94,6 +97,34 @@ class CommonUtil {
       borderRadius: BorderRadius.all(Radius.circular(radius)),
       color: fillColor,
     );
+  }
+
+  static String getRandomString(int length) {
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    Random _rnd = Random();
+    return String.fromCharCodes(Iterable.generate(
+        length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+  }
+
+  static testApi() async {
+    // ApiManager apiManager = ApiManager();
+    
+    // List<UserApiModel> users = await apiManager.getAllUsers();
+    // print(users.length);
+    //
+    // UserApiModel? uu = await apiManager.getUser("64217ad63ad8a5050d827b11");
+    // print(uu?.userName);
+    
+    // UserApiModel umd = UserApiModel(userName: "anna", avatarName: "ava", deviceToken: "deviceToken", score: 100, avatarImage: "abcdef");
+    // String? id = await apiManager.createUser(umd);
+    // print(id);
+
+    // bool suc = await apiManager.updateDeviceToken("64234ba6ef6d890cde2ad446", "fcmToken");
+    // print(suc);
+
+    // umd.id = "64234ba6ef6d890cde2ad446";
+    // bool usu = await apiManager.updateUser(umd);
+    // print(usu);
   }
 }
 

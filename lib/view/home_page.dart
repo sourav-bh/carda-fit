@@ -6,7 +6,9 @@ import 'package:app/util/data_loader.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final VoidCallback? onTabSwitch;
+
+  const HomePage({Key? key, this.onTabSwitch}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -93,14 +95,12 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: [
-                          const Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
-                          const SizedBox(width: 10,),
-                          const Text("Tagesziele"),
-                          const Spacer(),
-                          IconButton(onPressed: () {
-                            // Navigator.pushNamed(context, taskAlertRoute, arguments: TaskType.steps.index);
-                          }, icon: const Icon(Icons.more_horiz),)
+                        children: const [
+                          Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
+                          SizedBox(width: 10,),
+                          Text("Tagesziele"),
+                          Spacer(),
+                          Icon(Icons.more_horiz),
                         ],
                       ),
                       const SizedBox(height: 10,),
@@ -195,12 +195,21 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
-                          Icon(Icons.menu_book, color: Colors.black54,),
-                          SizedBox(width: 10,),
-                          Text("Lernmaterialien"),
-                          Spacer(),
-                          Icon(Icons.more_horiz),
+                        children: [
+                          const Icon(Icons.menu_book, color: Colors.black54,),
+                          const SizedBox(width: 10,),
+                          const Text("Lernmaterialien"),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              // switch tab
+                              widget.onTabSwitch?.call();
+                              // CommonUtil.testApi();
+                            },
+                            child: Text("Alles",
+                              style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.orange, fontSize: 18, fontStyle: FontStyle.normal,),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10,),

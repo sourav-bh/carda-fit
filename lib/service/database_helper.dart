@@ -47,13 +47,14 @@ class DatabaseHelper {
     String path = join(documentsDirectory?.path ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 5,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
   Future _onCreate(Database db, int version) async {
-    await db.execute("CREATE TABLE ${TABLE_USER}("
+    await db.execute("CREATE TABLE $TABLE_USER("
         "id INTEGER PRIMARY KEY,"
         "fullName TEXT,"
         "avatar VARCHAR,"
@@ -65,7 +66,7 @@ class DatabaseHelper {
         "job_type VARCHAR,"
         "condition VARCHAR,"
         "created_at TIMESTAMP)");
-    await db.execute("CREATE TABLE ${TABLE_TASK}("
+    await db.execute("CREATE TABLE $TABLE_TASK("
         "id INTEGER PRIMARY KEY,"
         "name VARCHAR,"
         "difficulty_level INTEGER,"
@@ -74,7 +75,7 @@ class DatabaseHelper {
         "duration INTEGER,"
         "score DOUBLE,"
         "created_at TIMESTAMP)");
-    await db.execute("CREATE TABLE ${TABLE_EXERCISES}("
+    await db.execute("CREATE TABLE $TABLE_EXERCISES("
         "id INTEGER PRIMARY KEY,"
         "condition VARCHAR,"
         "name VARCHAR,"
@@ -83,7 +84,7 @@ class DatabaseHelper {
         "duration INTEGER,"
         "difficulty_level INTEGER,"
         "created_at TIMESTAMP)");
-    await db.execute("CREATE TABLE ${TABLE_EXERCISE_STEPS}("
+    await db.execute("CREATE TABLE $TABLE_EXERCISE_STEPS("
         "id INTEGER PRIMARY KEY,"
         "serial_no VARCHAR,"
         "name VARCHAR,"
@@ -91,20 +92,19 @@ class DatabaseHelper {
         "media VARCHAR,"
         "duration INTEGER,"
         "created_at TIMESTAMP)");
-    await db.execute("CREATE TABLE ${TABLE_USER_TASK}("
+    await db.execute("CREATE TABLE $TABLE_USER_TASK("
         "user_id INTEGER PRIMARY KEY,"
         "task_id INTEGER,"
         "total_due_count INTEGER,"
         "completed_count INTEGER,"
         "created_at TIMESTAMP,"
         "last_updated_at TIMESTAMP)");
-    await db.execute("CREATE TABLE ${TABLE_USER_EXERCISES}("
+    await db.execute("CREATE TABLE $TABLE_USER_EXERCISES("
         "user_id INTEGER PRIMARY KEY,"
         "exercise_id INTEGER,"
         "done INTEGER)");
-    await db.execute("CREATE TABLE ${TABLE_LEARNING}("
+    await db.execute("CREATE TABLE $TABLE_LEARNING("
         "id INTEGER PRIMARY KEY,"
-        "condition VARCHAR,"
         "title VARCHAR,"
         "description VARCHAR,"
         "content_uri VARCHAR,"
@@ -113,7 +113,7 @@ class DatabaseHelper {
         "created_at TIMESTAMP,"
         "condition VARCHAR,"
         "done INTEGER)");
-    await db.execute("CREATE TABLE ${TABLE_USER_LEARNING_CONTENTS}("
+    await db.execute("CREATE TABLE $TABLE_USER_LEARNING_CONTENTS("
         "user_id INTEGER PRIMARY KEY,"
         "content_id INTEGER,"
         "favourite INTEGER,"
@@ -122,7 +122,9 @@ class DatabaseHelper {
         "done INTEGER)");
   }
 
-  /// public_users
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    await db.execute('ALTER TABLE $TABLE_USER ADD avatar_image VARCHAR');
+  }
 
   Future<List<UserInfo>> getAllUserInfo() async {
     Database db = await instance.database;
@@ -138,6 +140,7 @@ class DatabaseHelper {
     List<Map<String, dynamic>> users =
         await db.query(TABLE_USER, where: 'id = ?', whereArgs: [id]);
     if (users.isNotEmpty) {
+      print(users.first["id"]);
       return UserInfo.fromMap(users.first);
     } else {
       return null;

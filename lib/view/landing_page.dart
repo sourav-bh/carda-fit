@@ -31,16 +31,16 @@ class _LandingPageState extends State<LandingPage> {
   late PageController _pageController;
   int _currentIndex = 0;
 
-  final List<Widget> _contentPages = <Widget>[
-    const HomePage(),
-    const UserActivityPage(),
-    const UserLearningPage(),
-    const LeaderBoardPage(),
-    const UserProfilePage(),
-  ];
+  final List<Widget> _contentPages = [];
 
   @override
   void initState() {
+    _contentPages.add(HomePage(onTabSwitch: _switchFromHomeToLearning,));
+    _contentPages.add(const UserActivityPage());
+    _contentPages.add(const UserLearningPage());
+    _contentPages.add(const LeaderBoardPage());
+    _contentPages.add(const UserProfilePage());
+
     _pageController = PageController(initialPage: 0);
     _pageController.addListener(_handleTabSelection);
 
@@ -52,6 +52,13 @@ class _LandingPageState extends State<LandingPage> {
 
   void _handleTabSelection() {
     setState(() {});
+  }
+
+  void _switchFromHomeToLearning() {
+    _currentIndex = 2;
+    _pageController.jumpToPage(2);
+
+    FocusScope.of(context).unfocus();
   }
 
   _loadExerciseDataFromAsset() async {
