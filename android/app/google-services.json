@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "213686276476",
+    "project_id": "cardafit",
+    "storage_bucket": "cardafit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213686276476:android:250aaac4675327531c54f9",
+        "android_client_info": {
+          "package_name": "uni.siegen.bgf.cardafit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "213686276476-c7m4tc49g626mi3dmrpg3sjm94krhm9e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH4ztm3Oe03R3tULwB6mAATm08bAuepZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213686276476-c7m4tc49g626mi3dmrpg3sjm94krhm9e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "213686276476-d8eerjrpdrg1h34j3v2vrsdcehie0soq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.uni-siegen.bgf.cardafit"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -39,9 +39,11 @@ class _HomePageState extends State<HomePage> {
   _loadLearningContent() async {
     if (AppCache.instance.contents.isNotEmpty) {
       var info = await LearningMaterialInfo.copyContentFromLink(AppCache.instance.contents.first);
-      setState(() {
-        _learningMaterials.add(info);
-      });
+      if (mounted) {
+        setState(() {
+          _learningMaterials.add(info);
+        });
+      }
     }
   }
 

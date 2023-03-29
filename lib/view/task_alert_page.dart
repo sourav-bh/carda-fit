@@ -111,9 +111,11 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     );
     print(_metadata?.title);
     print(_metadata?.image);
-    setState(() {
-      _image = _metadata?.image ?? '';
-    });
+    if (mounted) {
+      setState(() {
+        _image = _metadata?.image ?? '';
+      });
+    }
   }
 
   void _startTimer() {

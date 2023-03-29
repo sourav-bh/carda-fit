@@ -1,4 +1,4 @@
-package de.unisiegen.hci.app;
+package uni.siegen.bgf.cardafit;
 
 import io.flutter.embedding.android.FlutterActivity;
 

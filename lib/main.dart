@@ -17,9 +17,11 @@ import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_info_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 const splashRoute = '/';
 const landingRoute = '/landing';
@@ -40,6 +42,44 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await TaskAlertService.instance.setup();
   Workmanager().initialize(callbackDispatcherForBgAlert);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final messaging = FirebaseMessaging.instance;
+
+  final settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  print('Permission granted: ${settings.authorizationStatus}');
+
+  messaging.subscribeToTopic('team');
+  String? token = await messaging.getToken();
+  print('FCM token: $token');
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+
+      var data = message.data['text'];
+      print('remote payload data: $data');
+      String payload = data ?? "2";
+      int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+
+      print("-------> opening task alert page from _onSelectNotification in Alert service");
+      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
+    }
+  });
 
   runApp(const MyFitApp());
 }

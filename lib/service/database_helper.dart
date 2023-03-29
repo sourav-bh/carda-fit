@@ -43,14 +43,29 @@ class DatabaseHelper {
   Future<Database> get database async => _database ??= await _initDatabase();
 
   Future<Database> _initDatabase() async {
-    Directory? documentsDirectory = await getExternalStorageDirectory();
-    String path = join(documentsDirectory?.path ?? "", 'carda_fit.db');
+    String? documentsDirectory = await _getLocalDirectoryPath();
+    String path = join(documentsDirectory ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<String?> _getLocalDirectoryPath() async {
+    String? externalStorageDirPath;
+    if (Platform.isAndroid) {
+      try {
+        externalStorageDirPath = (await getApplicationDocumentsDirectory()).path;
+      } catch (e) {
+        final directory = await getExternalStorageDirectory();
+        externalStorageDirPath = directory?.path;
+      }
+    } else if (Platform.isIOS) {
+      externalStorageDirPath = (await getApplicationDocumentsDirectory()).absolute.path;
+    }
+    return externalStorageDirPath;
   }
 
   Future _onCreate(Database db, int version) async {
@@ -58,6 +73,7 @@ class DatabaseHelper {
         "id INTEGER PRIMARY KEY,"
         "fullName TEXT,"
         "avatar VARCHAR,"
+        "avatar_image VARCHAR,"
         "gender VARCHAR,"
         "age INTEGER,"
         "weight INTEGER,"

@@ -53,6 +53,8 @@ dependencies:
   workmanager: ^0.5.1
   any_link_preview: ^3.0.0
   random_avatar: any
+  firebase_core: ^2.8.0
+  firebase_messaging: ^14.3.0
 
 dev_dependencies:
   flutter_test:
