@@ -94,7 +94,13 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
       _participantInfo.clear();
     });
 
-    List<UserApiModel> allUsers = await ApiManager().getAllUsers();
+    List<UserApiModel> allUsers = [];
+    try {
+      allUsers = await ApiManager().getAllUsers();
+    } on Exception catch (_) {
+      print('failed to connect with server');
+    }
+
     for (var user in allUsers) {
       setState(() {
         _participantInfo.add(user);

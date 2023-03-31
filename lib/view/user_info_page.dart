@@ -32,7 +32,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final TextEditingController _designationText = TextEditingController();
 
   List<String> conditionItems = <String>[
-    'Wählen Sie Ihr Problem',
+    'Wählen Sie Ihre Problemzonen',
     'Herz',
     'Beine',
     'Knie',
@@ -64,17 +64,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       UserInfo userInfo = UserInfo();
       userInfo.fullName = name;
-      if (_genderValue != null)
-        userInfo.gender = _genderValue.toString().split('.').last;
+      if (_genderValue != null) userInfo.gender = _genderValue.toString().split('.').last;
       userInfo.age = age;
       userInfo.weight = weight;
       userInfo.height = height;
       userInfo.designation = designation;
-      if (_jobTypeValue != null)
-        userInfo.jobType = _jobTypeValue.toString().split('.').last;
+      if (_jobTypeValue != null) userInfo.jobType = _jobTypeValue.toString().split('.').last;
 
-      if (conditionValue != conditionItems.first)
-        userInfo.condition = conditionValue;
+      if (conditionValue != conditionItems.first) userInfo.condition = conditionValue;
 
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
@@ -87,8 +84,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       _createUserTargets(userInfo);
 
-      var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(2000) + 120);
-      String? userServerId = await ApiManager().registerUser(userModel);
+      String? userServerId;
+      try {
+        var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(2000) + 120);
+        userServerId = await ApiManager().registerUser(userModel);
+      } on Exception catch (_) {
+        print('failed to connect with server');
+      }
+
       if (userServerId != null) {
         SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
         AppCache.instance.userServerId = userServerId;
