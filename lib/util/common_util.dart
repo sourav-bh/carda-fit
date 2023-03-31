@@ -106,6 +106,10 @@ class CommonUtil {
         length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   }
 
+  static int getRandomScore(int max) {
+    return Random().nextInt(max);
+  }
+
   static testApi() async {
     // ApiManager apiManager = ApiManager();
     

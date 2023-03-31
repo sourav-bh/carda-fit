@@ -29,7 +29,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   _loadUserInfo() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;

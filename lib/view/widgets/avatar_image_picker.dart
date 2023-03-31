@@ -20,7 +20,7 @@ class _AvatarImagePickerState extends State<AvatarImagePickerView> {
   @override
   void initState() {
     for (int i=0; i<60; i++) {
-      _avatarData.add(CommonUtil.getRandomString(5));
+      _avatarData.add(CommonUtil.getRandomString(6));
     }
     super.initState();
   }

@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
+import 'package:app/model/user_api_model.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
@@ -73,14 +76,24 @@ class _UserInfoPageState extends State<UserInfoPage> {
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
       // Also don't forget to update the database columns for that new property.
-      int userId = await DatabaseHelper.instance.addUser(userInfo);
-      SharedPref.instance.saveIntValue(SharedPref.keyUserId, userId);
-      AppCache.instance.userId = userId;
+      int userDbId = await DatabaseHelper.instance.addUser(userInfo);
+      SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
+      AppCache.instance.userName = name;
+      SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
+      AppCache.instance.userDbId = userDbId;
 
       _createUserTargets(userInfo);
 
-      SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
-      AppCache.instance.userName = name;
+      var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(2000) + 120);
+      String? userServerId = await ApiManager().registerUser(userModel);
+      if (userServerId != null) {
+        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
+        AppCache.instance.userServerId = userServerId;
+      } else {
+        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+      }
+
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }

@@ -38,7 +38,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
   }
 
   _loadDataFromAsset() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
       setState(() {
         _showFilteredList = true;

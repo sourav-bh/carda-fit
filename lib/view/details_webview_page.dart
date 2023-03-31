@@ -41,7 +41,7 @@ class _DetailsWebState extends State<DetailsWebPage> {
 
   _likeDislikeAction(bool isLiked) async {
     UserLearningContent userLc = UserLearningContent();
-    userLc.userId = AppCache.instance.userId;
+    userLc.userId = AppCache.instance.userDbId;
     userLc.contentId = _learningContent?.id;
     userLc.isFavourite = isLiked;
 

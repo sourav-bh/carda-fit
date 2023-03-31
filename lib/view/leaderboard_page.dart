@@ -1,3 +1,8 @@
+import 'dart:math';
+
+import 'package:app/api/api_manager.dart';
+import 'package:app/main.dart';
+import 'package:app/model/user_api_model.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
@@ -6,9 +11,9 @@ import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_image_picker.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 class LeaderBoardPage extends StatefulWidget {
   const LeaderBoardPage({Key? key}) : super(key: key);
@@ -18,17 +23,18 @@ class LeaderBoardPage extends StatefulWidget {
 }
 
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
-  final List<LeaderboardParticipantInfo> _participantInfo = List.empty(growable: true);
+  final List<UserApiModel> _participantInfo = List.empty(growable: true);
   final TextEditingController _avatarText = TextEditingController();
-  String? _avatarName = "";
-  String? _avatarImage = "";
+  String? _avatarName;
+  String? _avatarImage;
 
   @override
   void initState() {
     super.initState();
 
     _loadAvatarName();
-    _participantInfo.addAll(LeaderboardParticipantInfo.generateDummyList());
+    _loadAllUsers();
+    // _participantInfo.addAll(LeaderboardParticipantInfo.generateDummyList());
   }
 
   _loadAvatarName() async {
@@ -39,7 +45,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
       });
     }
 
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       setState(() {
         _avatarImage = userInfo.avatarImage;
@@ -64,11 +70,64 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
       _avatarName = avatar;
     });
 
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       userInfo.avatar = avatar;
       userInfo.avatarImage = _avatarImage;
-      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userId);
+      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userDbId);
+
+      String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+      if (userId != null && userId.isNotEmpty) {
+        bool? res = await ApiManager().updateAvatarInfo(userId, avatar, _avatarImage ?? "");
+        if (!res) {
+          const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+          ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+        } else {
+          // _loadAllUsers();
+        }
+      }
+    }
+  }
+
+  void _loadAllUsers() async {
+    setState(() {
+      _participantInfo.clear();
+    });
+
+    List<UserApiModel> allUsers = await ApiManager().getAllUsers();
+    for (var user in allUsers) {
+      setState(() {
+        _participantInfo.add(user);
+      });
+    }
+
+    setState(() {
+      _participantInfo.sort((a, b) => (b.score ?? 0).compareTo((a.score ?? 0)));
+    });
+  }
+
+  UserApiModel _getTopUserInfo(int position) {
+    if (position == 0 || position > _participantInfo.length) {
+      return UserApiModel();
+    } else {
+      return _participantInfo[position-1];
+    }
+  }
+
+  UserApiModel _getCurrentUserInfo() {
+    if (_avatarName != null && _avatarName!.isNotEmpty) {
+      var user = _participantInfo.firstWhere((element) => element.avatarName == _avatarName, orElse: () => UserApiModel());
+      return user;
+    } else {
+      return UserApiModel();
+    }
+  }
+
+  int _getCurrentUserPosition() {
+    if (_avatarName != null && _avatarName!.isNotEmpty) {
+      return _participantInfo.indexWhere((element) => element.avatarName == _avatarName);
+    } else {
+      return -1;
     }
   }
 
@@ -93,12 +152,12 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                     const SizedBox(height: 30,),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-                      child: Text('Du hast den 2. Platz erreicht!',
+                      child: Text('Du hast den ${_getCurrentUserPosition() + 1} Platz erreicht!',
                         style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Text('Mit 255 Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 20, color: Colors.brown)),
+                    Text('Mit ${_getCurrentUserInfo().score ?? 0} Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 20, color: Colors.brown)),
                     const SizedBox(height: 20,),
                     SizedBox(
                       height: 150,
@@ -117,8 +176,17 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Text('2', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                  Text(_avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                                  Text('255', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
+                                  const SizedBox(width: 10,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(_getTopUserInfo(2).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                      const SizedBox(width: 10,),
+                                      randomAvatar(_getTopUserInfo(2).avatarImage ?? "", width: 25, height: 25),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 10,),
+                                  Text('${_getTopUserInfo(2).score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
                                 ],
                               ),
                             ),
@@ -131,8 +199,17 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Text('1', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                  Text('Toy', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                                  Text('482', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
+                                  const SizedBox(width: 10,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(_getTopUserInfo(1).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                      const SizedBox(width: 10,),
+                                      randomAvatar(_getTopUserInfo(1).avatarImage ?? "", width: 25, height: 25),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 10,),
+                                  Text('${_getTopUserInfo(1).score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
                                 ],
                               ),
                             ),
@@ -146,8 +223,17 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Text('3', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                  Text('Alles', style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                                  Text('210', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
+                                  const SizedBox(width: 10,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(_getTopUserInfo(3).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                      const SizedBox(width: 10,),
+                                      randomAvatar(_getTopUserInfo(3).avatarImage ?? "", width: 25, height: 25),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 10,),
+                                  Text('${_getTopUserInfo(3).score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
                                 ],
                               ),
                             ),
@@ -158,9 +244,9 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                     Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.all(20),
-                        itemCount: _participantInfo.length,
+                        itemCount: max(_participantInfo.length-3, 0),
                         itemBuilder: (BuildContext context, int index) {
-                          LeaderboardParticipantInfo participant = _participantInfo[index];
+                          UserApiModel participant = _participantInfo[index + 3];
                           return Container(
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: Card(
@@ -178,14 +264,16 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                             children: [
                                               Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                                               const SizedBox(width: 10,),
-                                              Text(participant.name, style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                              Text(participant.avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                              const SizedBox(width: 10,),
+                                              randomAvatar(participant.avatarImage ?? "", width: 40, height: 40)
                                             ],
                                           ),
                                         ),
                                       ),
                                       SizedBox(
                                         width: 100,
-                                        child: Text('${participant.points}',
+                                        child: Text('${participant.score ?? 0}',
                                           style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: Colors.black54, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
                                         ),
                                       ),

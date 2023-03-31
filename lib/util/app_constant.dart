@@ -10,12 +10,14 @@ class AppConstant {
 
 class AppCache {
   String userName = 'User';
-  int userId = 0;
+  String userServerId = '';
+  int userDbId = 0;
   int quoteIndex = 0;
   DailyTarget? dailyTarget;
   List<Exercise> exercises = [];
   List<LearningContent> contents = [];
   String authToken = "";
+  String fcmToken = "";
 
   AppCache._privateConstructor();
   static final AppCache instance = AppCache._privateConstructor();

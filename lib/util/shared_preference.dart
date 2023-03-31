@@ -4,9 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
   static const keyUserName = "key_user_name";
-  static const keyUserId = "key_user_id";
+  static const keyUserDbId = "key_user_db_id";
+  static const keyUserServerId = "key_user_server_id";
   static const keyUserAvatar = "key_user_avatar";
   static const keyUserTargets = "key_user_targets";
+  static const keyDeviceToken = "key_fcm_token";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();
@@ -54,8 +56,10 @@ class SharedPref {
 
   clearCache() async {
     deleteValue(keyUserName);
-    deleteValue(keyUserId);
+    deleteValue(keyUserDbId);
+    deleteValue(keyUserServerId);
     deleteValue(keyUserAvatar);
     deleteValue(keyUserTargets);
+    deleteValue(keyDeviceToken);
   }
 }

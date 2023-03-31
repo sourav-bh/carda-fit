@@ -72,8 +72,8 @@ class LearningMaterialInfo {
 }
 
 class LeaderboardParticipantInfo {
-  late String name;
-  late int points;
+  String? name;
+  int? points;
 
   LeaderboardParticipantInfo(this.name, this.points);
 

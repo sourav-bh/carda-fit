@@ -27,7 +27,7 @@ class ApiManager {
   }
 
   // return user id
-  Future<String?> createUser(UserApiModel userModel) async {
+  Future<String?> registerUser(UserApiModel userModel) async {
     var reqBody = userModel.toJson();
     var response = await ApiClient.instance.postRequest('/user', reqBody);
 

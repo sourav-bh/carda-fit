@@ -1,7 +1,9 @@
 
 import 'dart:math';
 
+import 'package:app/api/api_manager.dart';
 import 'package:app/service/task_alert_service.dart';
+import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
@@ -61,6 +63,13 @@ void main() async {
   messaging.subscribeToTopic('team');
   String? token = await messaging.getToken();
   print('FCM token: $token');
+  if (token != null && token.isNotEmpty) {
+    AppCache.instance.fcmToken = token;
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    if (userId != null && userId.isNotEmpty) {
+      await ApiManager().updateDeviceToken(userId, token);
+    }
+  }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Remote notification message data whilst in the foreground: ${message.data}');

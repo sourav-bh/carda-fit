@@ -43,9 +43,9 @@ class _SplashPageState extends State<SplashPage> {
 
   _goToNextPage() async {
     bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
-    var userId = await SharedPref.instance.getValue(SharedPref.keyUserId);
+    var userId = await SharedPref.instance.getValue(SharedPref.keyUserDbId);
     if (userId != null && userId is int) {
-      AppCache.instance.userId = userId;
+      AppCache.instance.userDbId = userId;
     }
 
     if (isUserExist && mounted) {
