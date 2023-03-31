@@ -44,7 +44,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     'Bauch',
     'Augen',
   ];
-  String conditionValue = "Wählen Sie Ihr Problem";
+  String conditionValue = "Wählen Sie Ihre Problemzonen";
 
   @override
   void initState() {
@@ -64,14 +64,17 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       UserInfo userInfo = UserInfo();
       userInfo.fullName = name;
-      if (_genderValue != null) userInfo.gender = _genderValue.toString().split('.').last;
+      if (_genderValue != null)
+        userInfo.gender = _genderValue.toString().split('.').last;
       userInfo.age = age;
       userInfo.weight = weight;
       userInfo.height = height;
       userInfo.designation = designation;
-      if (_jobTypeValue != null) userInfo.jobType = _jobTypeValue.toString().split('.').last;
+      if (_jobTypeValue != null)
+        userInfo.jobType = _jobTypeValue.toString().split('.').last;
 
-      if (conditionValue != conditionItems.first) userInfo.condition = conditionValue;
+      if (conditionValue != conditionItems.first)
+        userInfo.condition = conditionValue;
 
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
@@ -302,9 +305,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<Gender>(
+                                    child: CupertinoSlidingSegmentedControl<
+                                        Gender>(
                                       groupValue: _genderValue,
-                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
                                       children: const {
                                         Gender.Mannlich: Text('Männlich'),
                                         Gender.Weiblich: Text('Weiblich'),
@@ -340,7 +345,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                         });
                                       },
                                       value: conditionValue,
-                                      items: conditionItems.map<DropdownMenuItem<String>>((String value) {
+                                      items: conditionItems
+                                          .map<DropdownMenuItem<String>>(
+                                        (String value) {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Text(value),
@@ -443,7 +450,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 0, bottom: 10),
+                                    padding: const EdgeInsets.only(
+                                        top: 0, bottom: 10),
                                     child: Text(
                                       'ARBEITSZEITMODELL',
                                       style: Theme.of(context)
@@ -454,13 +462,15 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    child: CupertinoSlidingSegmentedControl<JobType>(
-                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                    child: CupertinoSlidingSegmentedControl<
+                                        JobType>(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
                                       groupValue: _jobTypeValue,
                                       children: const {
                                         JobType.Vollzeit: Text('Vollzeit'),
                                         JobType.Teilzeit: Text('Teilzeit'),
-                                        JobType.HomeOffice: Text('Feldarbeit'),
+                                        JobType.HomeOffice: Text('Außendienst'),
                                       },
                                       onValueChanged: (groupValue) {
                                         setState(() {
