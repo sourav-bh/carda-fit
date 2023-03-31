@@ -7,11 +7,9 @@ import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:random_avatar/random_avatar.dart';
-import 'package:workmanager/workmanager.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -41,7 +39,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   _logoutAction() async {
     SharedPref.instance.clearCache();
-    Workmanager().cancelAll();
     Navigator.pushNamed(context, userInfoRoute);
   }
 
@@ -102,7 +99,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         Text('Avatar Name: ',
                           style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 18),
                         ),
-                        Text(_userInfo?.avatar ?? "",
+                        Text(_userInfo?.avatar ?? "Nicht ausgewählt",
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24),
                         ),
                       ],
@@ -129,7 +126,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.male_rounded, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text(_userInfo?.gender ?? "",
+                              Text(_userInfo?.gender ?? "Nicht ausgewählt",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -140,7 +137,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.date_range, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text('${_userInfo?.age ?? 1} Jahre',
+                              Text(_userInfo?.age != 0 ? '${_userInfo?.age} Jahre' : 'Nicht ausgewählt',
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -151,7 +148,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.medical_services, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text(_userInfo?.condition ?? "",
+                              Text(_userInfo?.condition ?? "Nicht ausgewählt",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -162,7 +159,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: <Widget>[
                               const Icon(Icons.filter_tilt_shift, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
-                              Text(_userInfo?.jobType ?? "",
+                              Text(_userInfo?.jobType ?? "Nicht ausgewählt",
                                 style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                               )
                             ],
@@ -174,7 +171,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               const Icon(Icons.design_services, color: Colors.orangeAccent, size: 25),
                               const SizedBox(width: 10,),
                               Expanded(
-                                child: Text(_userInfo?.designation ?? "",
+                                child: Text(_userInfo?.designation ?? "Nicht ausgewählt",
                                   style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
                                 ),
                               )
@@ -183,9 +180,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 50,),
+                    const SizedBox(height: 30,),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: TextButton(
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.resolveWith<Color>(

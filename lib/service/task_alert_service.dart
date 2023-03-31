@@ -4,7 +4,6 @@ import 'package:app/main.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:workmanager/workmanager.dart';
 
 void _onSelectNotification(NotificationResponse details) {
   print('notification onClicked');
@@ -72,55 +71,40 @@ class TaskAlertService {
     );
   }
 
-  void scheduleBackgroundTask() {
-    print("background jobs scheduled");
-
-    // steps
-    Workmanager().registerPeriodicTask(
-      "${Random().nextInt(99) + 24}",
-      taskWalkSteps,
-      frequency: const Duration(hours: 1),
-      initialDelay: const Duration(minutes: 45),
-    );
-
-    // water
-    Workmanager().registerPeriodicTask(
-      "${Random().nextInt(19) + 2}",
-      taskDrinkWater,
-      frequency: const Duration(hours: 1),
-      initialDelay: const Duration(minutes: 15),
-    );
-
-    // exercise
-    Workmanager().registerPeriodicTask(
-      "${Random().nextInt(999) + 170}",
-      taskDoExercise,
-      frequency: const Duration(hours: 1),
-      // initialDelay: const Duration(minutes: 10),
-    );
-
-    // break
-    Workmanager().registerPeriodicTask(
-      "${Random().nextInt(9999) + 1500}",
-      taskTakeBreak,
-      frequency: const Duration(hours: 1),
-      initialDelay: const Duration(minutes: 30),
-    );
-  }
-
-  // static void callbackDispatcherForBgAlert() {
-  //   Workmanager().executeTask((task, inputData) {
-  //     print("background task executed");
+  // void scheduleBackgroundTask() {
+  //   print("background jobs scheduled");
   //
-  //     TaskType taskType = TaskType.exercise;
-  //     // if (task == taskWalkSteps) {taskType = TaskType.steps;}
-  //     // else if (task == taskDoExercise) {taskType = TaskType.exercise;}
-  //     // else if (task == taskDrinkWater) {taskType = TaskType.water;}
-  //     // else if (task == taskTakeBreak) {taskType = TaskType.breaks;}
+  //   // steps
+  //   Workmanager().registerPeriodicTask(
+  //     "${Random().nextInt(998) + 2}",
+  //     taskWalkSteps,
+  //     frequency: const Duration(hours: 1),
+  //     initialDelay: const Duration(minutes: 45),
+  //   );
   //
-  //     TaskAlertService.instance.showNotificationWithDefaultSound(taskType);
-  //     return Future.value(true);
-  //   });
+  //   // water
+  //   Workmanager().registerPeriodicTask(
+  //     "${Random().nextInt(1002) + 999}",
+  //     taskDrinkWater,
+  //     frequency: const Duration(hours: 1),
+  //     initialDelay: const Duration(minutes: 15),
+  //   );
+  //
+  //   // exercise
+  //   Workmanager().registerPeriodicTask(
+  //     "${Random().nextInt(10003) + 9999}",
+  //     taskDoExercise,
+  //     frequency: const Duration(hours: 1),
+  //     // initialDelay: const Duration(minutes: 10),
+  //   );
+  //
+  //   // break
+  //   Workmanager().registerPeriodicTask(
+  //     "${Random().nextInt(100005) + 99999}",
+  //     taskTakeBreak,
+  //     frequency: const Duration(hours: 1),
+  //     initialDelay: const Duration(minutes: 30),
+  //   );
   // }
 
   Future<NotificationAppLaunchDetails?> getNotificationAppLaunchDetails() async {

@@ -15,6 +15,7 @@ import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
+// import 'package:background_fetch/background_fetch.dart';
 import 'package:excel/excel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -33,38 +34,6 @@ class _LandingPageState extends State<LandingPage> {
   int _currentIndex = 0;
 
   final List<Widget> _contentPages = [];
-
-  Future<void> setupInteractedMessage() async {
-    // Get any messages which caused the application to open from
-    // a terminated state.
-    RemoteMessage? initialMessage =
-    await FirebaseMessaging.instance.getInitialMessage();
-
-    // If the message also contains a data property with a "type" of "chat",
-    // navigate to a chat screen
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    }
-
-    // Also handle any interaction when the app is in the background via a
-    // Stream listener
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    print('remote notification onClicked');
-    if (message != null) {
-      print('remote notification payload: $message');
-    }
-
-    var data = message.data['text'];
-    print('remote payload data: $data');
-    String payload = data ?? "2";
-    int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
-
-    print("-------> opening task alert page from _onSelectNotification in Alert service");
-    Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
-  }
 
   @override
   void initState() {
@@ -87,6 +56,29 @@ class _LandingPageState extends State<LandingPage> {
 
   void _handleTabSelection() {
     setState(() {});
+  }
+
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from a terminated state.
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    print('remote push notification onClicked');
+    if (message != null) {
+      print('remote notification payload: $message');
+    }
+
+    var data = message.data['text'];
+    String payload = data ?? "2";
+    int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+
+    print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
+    Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
   }
 
   void _switchFromHomeToLearning() {

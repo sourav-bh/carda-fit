@@ -1,21 +1,16 @@
-import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:app/main.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
-import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
-import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -25,8 +20,8 @@ class UserInfoPage extends StatefulWidget {
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
-  Gender? _genderValue = Gender.Divers;
-  JobType? _jobTypeValue = JobType.Vollzeit;
+  Gender? _genderValue;
+  JobType? _jobTypeValue;
   final TextEditingController _nameText = TextEditingController();
   final TextEditingController _ageText = TextEditingController();
   final TextEditingController _weightText = TextEditingController();
@@ -66,13 +61,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       UserInfo userInfo = UserInfo();
       userInfo.fullName = name;
-      userInfo.gender = _genderValue.toString().split('.').last;
+      if (_genderValue != null) userInfo.gender = _genderValue.toString().split('.').last;
       userInfo.age = age;
       userInfo.weight = weight;
       userInfo.height = height;
       userInfo.designation = designation;
-      userInfo.jobType = _jobTypeValue.toString().split('.').last;
-      userInfo.condition = conditionValue.toString().split(',').last;
+      if (_jobTypeValue != null) userInfo.jobType = _jobTypeValue.toString().split('.').last;
+
+      if (conditionValue != conditionItems.first) userInfo.condition = conditionValue;
 
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
@@ -82,7 +78,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
       AppCache.instance.userId = userId;
 
       _createUserTargets(userInfo);
-      TaskAlertService.instance.scheduleBackgroundTask();
 
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, name);
       AppCache.instance.userName = name;

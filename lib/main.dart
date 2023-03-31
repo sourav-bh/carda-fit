@@ -19,7 +19,6 @@ import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -40,8 +39,7 @@ GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await TaskAlertService.instance.setup();
-  Workmanager().initialize(callbackDispatcherForBgAlert);
+  // await TaskAlertService.instance.setup();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -65,18 +63,14 @@ void main() async {
   print('FCM token: $token');
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+    print('Remote notification message data whilst in the foreground: ${message.data}');
 
     if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-
       var data = message.data['text'];
-      print('remote payload data: $data');
       String payload = data ?? "2";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
-      print("-------> opening task alert page from _onSelectNotification in Alert service");
+      print("-------> opening task alert page from FirebaseMessaging foregorund listener");
       Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
     }
   });
@@ -84,62 +78,10 @@ void main() async {
   runApp(const MyFitApp());
 }
 
-void callbackDispatcherForBgAlert() {
-    Workmanager().executeTask((task, inputData) {
-      print("background task executed");
-
-      if (_checkIfUserLoggedIn() == false) return Future.value(true);
-
-      TaskType taskType = TaskType.exercise;
-      if (task == TaskAlertService.taskWalkSteps) {taskType = TaskType.steps;}
-      else if (task == TaskAlertService.taskDoExercise) {taskType = TaskType.exercise;}
-      else if (task == TaskAlertService.taskDrinkWater) {taskType = TaskType.water;}
-      else if (task == TaskAlertService.taskTakeBreak) {taskType = TaskType.breaks;}
-
-      TaskAlertService.instance.showNotificationWithDefaultSound(taskType);
-      return Future.value(true);
-    });
-}
-
 _checkIfUserLoggedIn() async {
   bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
   return isUserExist;
 }
-
-// void scheduleBackgroundTask() {
-//   print("background jobs scheduled");
-//
-//   // steps
-//   Workmanager().registerPeriodicTask(
-//     "${Random().nextInt(99) + 24}",
-//     TaskAlertService.taskWalkSteps,
-//     frequency: const Duration(hours: 1),
-//     initialDelay: const Duration(minutes: 45),
-//   );
-//
-//   // water
-//   Workmanager().registerPeriodicTask(
-//     "${Random().nextInt(19) + 2}",
-//     TaskAlertService.taskDrinkWater,
-//     frequency: const Duration(hours: 1),
-//     initialDelay: const Duration(minutes: 15),
-//   );
-//
-//   // exercise
-//   Workmanager().registerPeriodicTask(
-//     "${Random().nextInt(999) + 170}",
-//     TaskAlertService.taskDoExercise,
-//     frequency: const Duration(hours: 1),
-//   );
-//
-//   // break
-//   Workmanager().registerPeriodicTask(
-//     "${Random().nextInt(9999) + 1500}",
-//     TaskAlertService.taskTakeBreak,
-//     frequency: const Duration(hours: 1),
-//     initialDelay: const Duration(minutes: 30),
-//   );
-// }
 
 class MyFitApp extends StatefulWidget {
   const MyFitApp({Key? key}) : super(key: key);
