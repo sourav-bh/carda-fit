@@ -86,7 +86,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       String? userServerId;
       try {
-        var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(2000) + 120);
+        var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(100) + 10);
         userServerId = await ApiManager().registerUser(userModel);
       } on Exception catch (_) {
         print('failed to connect with server');

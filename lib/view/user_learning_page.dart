@@ -34,10 +34,10 @@ class _UserLearningPageState extends State<UserLearningPage> {
   void initState() {
     super.initState();
 
-    _loadDataFromAsset();
+    _loadData();
   }
 
-  _loadDataFromAsset() async {
+  _loadData() async {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
       setState(() {
@@ -46,6 +46,17 @@ class _UserLearningPageState extends State<UserLearningPage> {
       });
     }
 
+    _loadContentsFromAsset(true, _userCondition);
+
+    if (_learningMaterials.isEmpty) {
+      setState(() {
+        _showFilteredList = false;
+      });
+      _loadContentsFromAsset(false, null);
+    }
+  }
+
+  _loadContentsFromAsset(bool isFiltered, String? filerCondition) async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -67,15 +78,12 @@ class _UserLearningPageState extends State<UserLearningPage> {
           content.title = titleCell?.value.toString();
           content.contentUri = linkCell?.value.toString();
 
-          // Sourav - before adding a learning content, retrieve the userInfo from database
-          // and see what is the condition saved for the current user.
-          // Match that user condition with the content's condition you found from excel
           bool addContent = false;
-          if (_showFilteredList) {
+          if (isFiltered) {
             if (content.condition != null && _userCondition != null &&
-                content.condition == _userCondition) {
+                content.condition == filerCondition) {
               addContent = true;
-            } else if (_userCondition == null) {
+            } else if (filerCondition == null) {
               addContent = true;
             } else {
               // skip this learning content, since it is not useful for the user condition specified

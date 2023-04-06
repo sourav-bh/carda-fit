@@ -5,7 +5,8 @@ import 'package:app/model/user_daily_target.dart';
 
 class AppConstant {
   static const productionBuild = false;
-  static const baseURL = "http://10.0.2.2:8075";
+  // static const baseURL = "http://10.0.2.2:8075"; // local
+  static const baseURL = "https://kontikat.de/cardafit"; // live
 }
 
 class AppCache {

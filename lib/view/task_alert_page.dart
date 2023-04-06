@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:any_link_preview/any_link_preview.dart';
+import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/task.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
+import 'package:app/util/data_loader.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:slide_to_act/slide_to_act.dart';
@@ -16,6 +19,7 @@ enum TaskType {
   steps,
   exercise,
   breaks,
+  teamExercise,
 }
 
 class TaskAlertPage extends StatefulWidget {
@@ -57,9 +61,14 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   _loadIntent() {
     _taskType = ModalRoute.of(context)?.settings.arguments as int;
 
-    if (_taskType == TaskType.exercise.index) {
+    if (_taskType == TaskType.exercise.index || _taskType == TaskType.teamExercise.index) {
       List<Exercise> exerciseList = AppCache.instance.exercises;
-      exerciseList.shuffle();
+
+      if (_taskType == TaskType.exercise.index) {
+        exerciseList.shuffle();
+      } else {
+        // do nothing, for team exercise we are always choosing the first one
+      }
       Exercise exerciseNow = exerciseList.first;
       print(exerciseNow.toRawJson());
 
@@ -164,6 +173,14 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+  void onSubmitScore() async {
+    int score = DataLoader.getScoreForTask(_taskType ?? -1);
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    if (userId != null && userId.isNotEmpty) {
+      ApiManager().updateUserScore(userId, score);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,6 +254,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                   textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
                   sliderButtonIconSize: 20,
                   onSubmit: () {
+                    onSubmitScore();
                     Future.delayed(const Duration(seconds: 1), () {
                       Navigator.of(context).pop();
                       Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);

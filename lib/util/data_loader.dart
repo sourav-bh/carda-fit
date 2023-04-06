@@ -7,6 +7,23 @@ class DataLoader {
     'Wer kämpft, kann verlieren',
     'Der härteste Schritt zu Fitness ist der erste',];
   static const List<String> quotesAuthor = ['Jim Rohn', 'Berthold Brecht', 'Heather Montgomery',];
+
+  static int getScoreForTask(int taskType) {
+    switch (taskType) {
+      case 4:
+        return 100;
+      case 2:
+        return 20;
+      case 0:
+        return 10;
+      case 1:
+        return 20;
+      case 3:
+        return 10;
+      default:
+        return 0;
+    }
+  }
 }
 
 class FitnessItemInfo {

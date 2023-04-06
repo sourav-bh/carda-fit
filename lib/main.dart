@@ -76,7 +76,7 @@ void main() async {
 
     if (message.notification != null) {
       var data = message.data['text'];
-      String payload = data ?? "2";
+      String payload = data ?? "0";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
       print("-------> opening task alert page from FirebaseMessaging foregorund listener");

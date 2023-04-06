@@ -4,6 +4,7 @@ import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
@@ -74,7 +75,7 @@ class _LandingPageState extends State<LandingPage> {
     }
 
     var data = message.data['text'];
-    String payload = data ?? "2";
+    String payload = data ?? "0";
     int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
     print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
@@ -89,6 +90,12 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   _loadExerciseDataFromAsset() async {
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    var userCondition = "";
+    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
+      userCondition = userInfo.condition ?? "";
+    }
+
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -139,12 +146,23 @@ class _LandingPageState extends State<LandingPage> {
             exercise.url = url;
             exercise.steps = [];
             exercise.steps?.addAll(steps);
-            exercises.add(exercise);
 
+            bool addContent = false;
+            if (exercise.condition != null && userCondition.isNotEmpty &&
+                !exercise.condition!.contains(userCondition)) {
+              addContent = true;
+            } else if (userCondition.isEmpty) {
+              addContent = true;
+            } else {
+              // skip this learning content, since it is not useful for the user condition specified
+            }
+
+            if (addContent) exercises.add(exercise);
             steps.clear();
           }
         }
 
+        print(">>>>>>>>>excercise list: ${exercises.length}");
         AppCache.instance.exercises.clear();
         AppCache.instance.exercises.addAll(exercises);
         print(exercises.length);

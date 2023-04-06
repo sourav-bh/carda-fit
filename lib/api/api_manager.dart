@@ -86,7 +86,7 @@ class ApiManager {
     }
   }
 
-  Future<bool> updateUserScore(String userId, String score) async {
+  Future<bool> updateUserScore(String userId, int score) async {
     var reqBody = <String, dynamic> {
       'score': score,
     };
