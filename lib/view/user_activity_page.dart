@@ -29,11 +29,17 @@ class _UserActivityPageState extends State<UserActivityPage> {
   }
 
   _loadDailyTarget() async {
-    var target = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
-    if (target != null && target is String && target.isNotEmpty) {
+    var targetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
+    if (targetJson != null && targetJson is String && targetJson.isNotEmpty) {
       setState(() {
-        _dailyTarget = DailyTarget.fromRawJson(target);
-        _completedJobs = DailyTarget(steps: 0, exercises: 0, waterGlasses: 0, breaks: 0);
+        _dailyTarget = DailyTarget.fromRawJson(targetJson);
+      });
+    }
+
+    var completedJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserComplTargets);
+    if (completedJson != null && completedJson is String && completedJson.isNotEmpty) {
+      setState(() {
+        _completedJobs = DailyTarget.fromRawJson(completedJson);
       });
     }
   }

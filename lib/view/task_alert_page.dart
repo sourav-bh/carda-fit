@@ -5,6 +5,7 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/task.dart';
+import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -174,10 +175,41 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
+    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserComplTargets);
+    DailyTarget completedTarget;
+    if (complTargetJson != null && complTargetJson is String && complTargetJson.isNotEmpty) {
+      completedTarget = DailyTarget.fromRawJson(complTargetJson);
+    } else {
+      completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
+    }
+
+    switch (_taskType) {
+      case 0:
+        completedTarget.increaseWaterConsumption(1);
+        break;
+      case 1:
+        completedTarget.increaseStepsCount(100);
+        break;
+      case 2:
+        completedTarget.increaseExerciseCount(1);
+        break;
+      case 3:
+        completedTarget.increaseBreaksCount(1);
+        break;
+      default:
+        break;
+    }
+    SharedPref.instance.saveJsonValue(SharedPref.keyUserComplTargets, completedTarget.toRawJson());
+
     int score = DataLoader.getScoreForTask(_taskType ?? -1);
     String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
-      ApiManager().updateUserScore(userId, score);
+      await ApiManager().updateUserScore(userId, score);
+      Navigator.of(navigatorKey.currentState!.context).pop();
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+    } else {
+      Navigator.of(navigatorKey.currentState!.context).pop();
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
     }
   }
 
@@ -255,11 +287,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                   sliderButtonIconSize: 20,
                   onSubmit: () {
                     onSubmitScore();
-                    Future.delayed(const Duration(seconds: 1), () {
-                      Navigator.of(context).pop();
-                      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
-                    },
-                    );
+                    // Future.delayed(const Duration(seconds: 1), () {
+                    //   Navigator.of(context).pop();
+                    //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+                    // },);
                   },
                   innerColor: AppColor.primaryLight,
                   outerColor: Colors.white,

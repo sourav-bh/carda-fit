@@ -8,6 +8,7 @@ class SharedPref {
   static const keyUserServerId = "key_user_server_id";
   static const keyUserAvatar = "key_user_avatar";
   static const keyUserTargets = "key_user_targets";
+  static const keyUserComplTargets = "key_user_completed_targets";
   static const keyDeviceToken = "key_fcm_token";
 
   SharedPref._privateConstructor();

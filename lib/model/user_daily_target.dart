@@ -31,4 +31,24 @@ class DailyTarget {
     "water_glasses": waterGlasses,
     "breaks": breaks,
   };
+
+  void increaseWaterConsumption(int newVal) {
+    int oldVal = waterGlasses ?? 0;
+    waterGlasses = oldVal + newVal;
+  }
+
+  void increaseStepsCount(int newVal) {
+    int oldVal = steps ?? 0;
+    steps = oldVal + newVal;
+  }
+
+  void increaseExerciseCount(int newVal) {
+    int oldVal = exercises ?? 0;
+    exercises = oldVal + newVal;
+  }
+
+  void increaseBreaksCount(int newVal) {
+    int oldVal = breaks ?? 0;
+    breaks = oldVal + newVal;
+  }
 }

@@ -141,7 +141,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
         exercises: exercises,
         waterGlasses: waterGlasses,
         breaks: breaks);
-    AppCache.instance.dailyTarget = dailyTarget;
     SharedPref.instance
         .saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
   }

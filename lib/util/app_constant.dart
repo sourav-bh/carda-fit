@@ -14,7 +14,6 @@ class AppCache {
   String userServerId = '';
   int userDbId = 0;
   int quoteIndex = 0;
-  DailyTarget? dailyTarget;
   List<Exercise> exercises = [];
   List<LearningContent> contents = [];
   String authToken = "";
