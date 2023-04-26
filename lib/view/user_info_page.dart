@@ -354,7 +354,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                         onChanged: (List<String> condition) {
                                           setState(() {
                                             selected = condition;
-                                            String conditionValue =
+                                            conditionValue =
                                                 condition.join(', ');
                                             print(conditionValue);
                                           });
