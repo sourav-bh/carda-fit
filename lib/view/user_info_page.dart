@@ -14,6 +14,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:multiselect/multiselect.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({Key? key}) : super(key: key);
@@ -44,7 +45,10 @@ class _UserInfoPageState extends State<UserInfoPage> {
     'Bauch',
     'Augen',
   ];
+
   String conditionValue = "Wählen Sie Ihre Problemzonen";
+
+  List<String> selected = [];
 
   @override
   void initState() {
@@ -64,14 +68,16 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       UserInfo userInfo = UserInfo();
       userInfo.fullName = name;
-      if (_genderValue != null) userInfo.gender = _genderValue.toString().split('.').last;
+      if (_genderValue != null)
+        userInfo.gender = _genderValue.toString().split('.').last;
       userInfo.age = age;
       userInfo.weight = weight;
       userInfo.height = height;
       userInfo.designation = designation;
-      if (_jobTypeValue != null) userInfo.jobType = _jobTypeValue.toString().split('.').last;
-
-      if (conditionValue != conditionItems.first) userInfo.condition = conditionValue;
+      if (_jobTypeValue != null)
+        userInfo.jobType = _jobTypeValue.toString().split('.').last;
+      if (conditionValue != conditionItems.first)
+        userInfo.condition = conditionValue;
 
       // Sourav - here you need to save the selected dropdown value (user condition)
       // create another userInfo property for saving the condition.
@@ -86,18 +92,23 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       String? userServerId;
       try {
-        var userModel = UserApiModel(userName: name, deviceToken: AppCache.instance.fcmToken, score: Random().nextInt(100) + 10);
+        var userModel = UserApiModel(
+            userName: name,
+            deviceToken: AppCache.instance.fcmToken,
+            score: Random().nextInt(100) + 10);
         userServerId = await ApiManager().registerUser(userModel);
       } on Exception catch (_) {
         print('failed to connect with server');
       }
 
       if (userServerId != null) {
-        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
+        SharedPref.instance
+            .saveStringValue(SharedPref.keyUserServerId, userServerId);
         AppCache.instance.userServerId = userServerId;
       } else {
         const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+        ScaffoldMessenger.of(navigatorKey.currentState!.context)
+            .showSnackBar(snackBar);
       }
 
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
@@ -328,7 +339,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     padding: const EdgeInsets.only(
                                         top: 20, bottom: 10),
                                     child: Text(
-                                      'Medizinische Konditionen'.toUpperCase(),
+                                      'Medizinische Beeinträchtigungen'
+                                          .toUpperCase(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyText2
@@ -336,27 +348,21 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     ),
                                   ),
                                   SizedBox(
-                                    child: DropdownButton(
-                                      elevation: 10,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      onChanged: (String? condition) {
-                                        setState(() {
-                                          // Sourav - only set the value is not enough for updating the UI,
-                                          // you need to call setState block for updating the UI. See other page UI updates please
-                                          conditionValue = condition!;
-                                        });
-                                      },
-                                      value: conditionValue,
-                                      items: conditionItems
-                                          .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
+                                    child: DropDownMultiSelect(
+                                        //elevation: 10,
+                                        //borderRadius: BorderRadius.circular(20.0),
+                                        onChanged: (List<String> condition) {
+                                          setState(() {
+                                            selected = condition;
+                                            String conditionValue =
+                                                condition.join(', ');
+                                            print(conditionValue);
+                                          });
                                         },
-                                      ).toList(),
-                                    ),
+                                        // ignore: prefer_const_literals_to_create_immutables
+                                        options: conditionItems,
+                                        selectedValues: selected,
+                                        whenEmpty: 'Select Something'),
                                   ),
                                 ],
                               ),
