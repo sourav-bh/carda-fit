@@ -6,22 +6,18 @@ import 'package:app/model/exercise_steps.dart';
 import 'package:app/model/learning.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
-import 'package:app/service/task_alert_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
-import 'package:app/util/data_loader.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
-// import 'package:background_fetch/background_fetch.dart';
 import 'package:excel/excel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);

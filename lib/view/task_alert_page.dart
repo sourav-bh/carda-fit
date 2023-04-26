@@ -4,13 +4,17 @@ import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/exercise.dart';
+import 'package:app/model/exercise_steps.dart';
 import 'package:app/model/task.dart';
 import 'package:app/model/user_daily_target.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:slide_to_act/slide_to_act.dart';
@@ -59,11 +63,15 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     _loadIntent();
   }
 
-  _loadIntent() {
+  _loadIntent() async {
     _taskType = ModalRoute.of(context)?.settings.arguments as int;
 
     if (_taskType == TaskType.exercise.index || _taskType == TaskType.teamExercise.index) {
       List<Exercise> exerciseList = AppCache.instance.exercises;
+      if (exerciseList.isEmpty) {
+        await _loadExerciseDataFromAsset();
+        exerciseList = AppCache.instance.exercises;
+      }
 
       if (_taskType == TaskType.exercise.index) {
         exerciseList.shuffle();
@@ -113,7 +121,88 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
-  void _loadWebsiteMetaData(String url) async {
+  _loadExerciseDataFromAsset() async {
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    var userCondition = "";
+    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
+      userCondition = userInfo.condition ?? "";
+    }
+
+    ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
+    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    var excel = Excel.decodeBytes(bytes);
+
+    List<Exercise> exercises = [];
+    for (var table in excel.tables.keys) {
+      Sheet? sheet = excel.tables[table];
+      print(table); //sheet Name
+
+      if (table == "Übungen") {
+        String? exerciseName = "";
+        int? duration = 0;
+        String? url = "";
+        String? condition;
+        List<ExerciseStep> steps = [];
+        for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0); rowIndex++) {
+          Data? stepCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? detailsCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+          Data? durationCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+          Data? conditionCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
+
+          String stepVal = stepCell?.value.toString() ?? "";
+          if (stepVal == "Start") {
+            exerciseName = detailsCell?.value.toString();
+            duration = int.tryParse(durationCell?.value.toString() ?? "5");
+            url = linkCell?.value.toString();
+            condition = conditionCell?.value.toString();
+          }
+
+          ExerciseStep step = ExerciseStep();
+          step.serialNo = stepVal;
+          step.name = detailsCell?.value.toString();
+          step.duration = int.tryParse(durationCell?.value.toString() ?? "5");
+          step.media = linkCell?.value.toString();
+          steps.add(step);
+
+          if (stepVal == "End") {
+            Exercise exercise = Exercise();
+            exercise.condition = condition;
+            exercise.name = exerciseName;
+            exercise.duration = duration;
+            exercise.url = url;
+            exercise.steps = [];
+            exercise.steps?.addAll(steps);
+
+            bool addContent = false;
+            if (exercise.condition != null && userCondition.isNotEmpty &&
+                !exercise.condition!.contains(userCondition)) {
+              addContent = true;
+            } else if (userCondition.isEmpty) {
+              addContent = true;
+            } else {
+              // skip this learning content, since it is not useful for the user condition specified
+            }
+
+            if (addContent) exercises.add(exercise);
+            steps.clear();
+          }
+        }
+
+        print(">>>>>>>>>excercise list: ${exercises.length}");
+        AppCache.instance.exercises.clear();
+        AppCache.instance.exercises.addAll(exercises);
+        print(exercises.length);
+      }
+    }
+  }
+
+  _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
       link: url,
       cache: const Duration(days: 7),
