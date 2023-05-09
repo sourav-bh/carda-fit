@@ -84,7 +84,6 @@ class _UserLearningPageState extends State<UserLearningPage> {
           bool addContent = false;
           if (isFiltered) {
             if (content.condition != null &&
-                _userCondition != null &&
                 filerCondition != null &&
                 filerCondition.contains(content.condition ?? "")) {
               addContent = true;
