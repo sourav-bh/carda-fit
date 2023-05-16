@@ -34,7 +34,7 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void initState() {
-    _contentPages.add(HomePage(onTabSwitch: _switchFromHomeToLearning,));
+    _contentPages.add(HomePage(onTabSwitch: _switchFromHomeToAnotherTab));
     _contentPages.add(const UserActivityPage());
     _contentPages.add(const UserLearningPage());
     _contentPages.add(const LeaderBoardPage());
@@ -78,9 +78,9 @@ class _LandingPageState extends State<LandingPage> {
     Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
   }
 
-  void _switchFromHomeToLearning() {
-    _currentIndex = 2;
-    _pageController.jumpToPage(2);
+  void _switchFromHomeToAnotherTab(int tab) {
+    _currentIndex = tab;
+    _pageController.jumpToPage(tab);
 
     FocusScope.of(context).unfocus();
   }

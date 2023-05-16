@@ -1,12 +1,16 @@
+import 'dart:math';
+
 import 'package:app/main.dart';
+import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  final VoidCallback? onTabSwitch;
+  final void Function(int)? onTabSwitch;
 
   const HomePage({Key? key, this.onTabSwitch}) : super(key: key);
 
@@ -18,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials = List.empty(growable: true);
 
-  final double _completedJobs = 0 / 20;
+  double _currentUserProgress = 0;
 
   @override
   void initState() {
@@ -33,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    _loadCurrentProgress();
     _loadLearningContent();
   }
 
@@ -44,6 +49,21 @@ class _HomePageState extends State<HomePage> {
           _learningMaterials.add(info);
         });
       }
+    }
+  }
+
+  _loadCurrentProgress() async {
+    var completedJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
+    if (completedJson != null && completedJson is String && completedJson.isNotEmpty) {
+      var completedJobs = DailyTarget.fromRawJson(completedJson);
+      var totalTaskValues = AppConstant.waterTaskValue + AppConstant.exerciseTaskValue + AppConstant.stepsTaskValue + AppConstant.breakTaskValue;
+      double percentagePerTask = 100/(totalTaskValues * 8);
+      setState(() {
+        _currentUserProgress = (min(completedJobs.waterGlasses ?? 0, 8) * percentagePerTask)
+                              + (min(completedJobs.exercises ?? 0, 8) * percentagePerTask)
+                              + ((min(completedJobs.steps ?? 0, 800) / 100) * percentagePerTask)
+                              + (min(completedJobs.breaks ?? 0, 8) * percentagePerTask);
+      });
     }
   }
 
@@ -97,12 +117,17 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
-                          Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
-                          SizedBox(width: 10,),
-                          Text("Tagesziele"),
-                          Spacer(),
-                          Icon(Icons.more_horiz),
+                        children: [
+                          const Icon(Icons.crisis_alert_rounded, color: Colors.black54,),
+                          const SizedBox(width: 10,),
+                          const Text("Tagesziele"),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              widget.onTabSwitch?.call(1);
+                            },
+                            child: const Icon(Icons.more_horiz)
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10,),
@@ -119,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                             child: ClipRRect(
                               borderRadius: const BorderRadius.all(Radius.circular(10)),
                               child: LinearProgressIndicator(
-                                value: _completedJobs,
+                                value: _currentUserProgress/100,
                                 color: Colors.pink,
                                 backgroundColor: Colors.white,
                                 minHeight: 20,
@@ -127,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const SizedBox(width: 10,),
-                          Text("${_completedJobs*100} %",
+                          Text("${_currentUserProgress.round()} %",
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
                         ],
@@ -205,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                           GestureDetector(
                             onTap: () {
                               // switch tab
-                              widget.onTabSwitch?.call();
+                              widget.onTabSwitch?.call(2);
                               // CommonUtil.testApi();
                             },
                             child: Text("Alles",

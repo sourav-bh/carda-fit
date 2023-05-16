@@ -264,7 +264,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
-    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserComplTargets);
+    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
     if (complTargetJson != null && complTargetJson is String && complTargetJson.isNotEmpty) {
       completedTarget = DailyTarget.fromRawJson(complTargetJson);
@@ -288,7 +288,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       default:
         break;
     }
-    SharedPref.instance.saveJsonValue(SharedPref.keyUserComplTargets, completedTarget.toRawJson());
+    SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     int score = DataLoader.getScoreForTask(_taskType ?? -1);
     String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);

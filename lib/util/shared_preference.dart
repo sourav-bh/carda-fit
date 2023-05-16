@@ -8,7 +8,8 @@ class SharedPref {
   static const keyUserServerId = "key_user_server_id";
   static const keyUserAvatar = "key_user_avatar";
   static const keyUserTargets = "key_user_targets";
-  static const keyUserComplTargets = "key_user_completed_targets";
+  static const keyUserCompletedTargets = "key_user_completed_targets";
+  static const keyUserProgressToday = "key_user_progress_today";
   static const keyDeviceToken = "key_fcm_token";
 
   SharedPref._privateConstructor();
@@ -27,6 +28,16 @@ class SharedPref {
   saveIntValue(String key, int value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt(key, value);
+  }
+
+  saveDoubleValue(String key, double value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble(key, value);
+  }
+
+  saveBoolValue(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(key, value);
   }
 
   getValue(String key) async {

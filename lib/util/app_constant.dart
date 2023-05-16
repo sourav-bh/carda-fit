@@ -7,6 +7,11 @@ class AppConstant {
   static const productionBuild = false;
   // static const baseURL = "http://10.0.2.2:8075"; // local
   static const baseURL = "https://kontikat.de/cardafit"; // live
+
+  static const waterTaskValue = 1;
+  static const exerciseTaskValue = 3;
+  static const stepsTaskValue = 2;
+  static const breakTaskValue = 1;
 }
 
 class AppCache {

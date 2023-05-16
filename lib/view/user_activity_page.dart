@@ -36,7 +36,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
       });
     }
 
-    var completedJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserComplTargets);
+    var completedJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
     if (completedJson != null && completedJson is String && completedJson.isNotEmpty) {
       setState(() {
         _completedJobs = DailyTarget.fromRawJson(completedJson);

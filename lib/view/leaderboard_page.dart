@@ -102,9 +102,11 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     }
 
     for (var user in allUsers) {
-      setState(() {
-        _participantInfo.add(user);
-      });
+      if (mounted) {
+        setState(() {
+          _participantInfo.add(user);
+        });
+      }
     }
 
     setState(() {
