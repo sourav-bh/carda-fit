@@ -45,6 +45,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   int _totalSeconds = 0;
   int _secondsPassed = 0;
   double _showButton = 0.0;
+  int _timeLeft = 120;
+  bool _showTimer = false;
+  Duration duration = Duration();
+  double? _progressCountDown;
   // hide button if exercise is not finished
 
   String? _stepNo;
@@ -108,23 +112,50 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       _startTimer();
     } else if (_taskType == TaskType.water.index) {
       setState(() {
+        _showTimer = false;
         _title = 'Trinke jetzt ein Glas Wasser!';
         _subTitle = '8 Gläser Wasser pro Tag, halten den Arzt fern';
         _staticImage = 'assets/animations/anim_water.gif';
       });
     } else if (_taskType == TaskType.steps.index) {
       setState(() {
-        _title = 'Jetzt 100 Schritte gehen!';
+        _showTimer = true;
+        _title = 'Bleib nun zwei Minuten in Bewegung!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
+        _startCountDown();
       });
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
-        _title = 'Du solltest jetzt eine Pause einlegen';
+        _showTimer = true;
+        _title = 'Lege nun eine zwei minütige Pause ein!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
+        _startCountDown();
       });
     }
+  }
+
+  //newTimer
+
+  void _startCountDown() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (mounted && _timeLeft > 0) {
+        setState(() {
+          _timeLeft--;
+          if (_progress >= 1) {
+            _cancelTimer();
+          } else {
+            _progress += 1 / _timeLeft;
+          }
+        });
+      } else if (mounted) {
+        setState(() {
+          _showButton = 1.0;
+        });
+        timer.cancel();
+      }
+    });
   }
 
   _loadExerciseDataFromAsset() async {
@@ -193,7 +224,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             bool addContent = false;
             if (exercise.condition != null &&
                 userCondition.isNotEmpty &&
-                !exercise.condition!.contains(userCondition)) {
+                _checkUserConditionInDb(userCondition, exercise.condition!)) {
               //check if exercise.conditions match with items of the userConditionList
               addContent = true;
             } else if (userCondition.isEmpty) {
@@ -217,6 +248,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
 
   bool _checkUserConditionInDb(String userCondition, String dbCondition) {
     List<String> userConditionItems = userCondition.split(",");
+    //if (dbCondition.contains(userConditionItems)) {}
     return false;
   }
 
@@ -428,6 +460,38 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                       : Image.asset(
                           _staticImage,
                         )),
+            ),
+            const SizedBox(height: 20),
+            Visibility(
+              visible: _showTimer,
+              child: SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      width: 120,
+                      height: 120,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 20,
+                        backgroundColor: Colors.white,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.orange),
+                        value: _progress,
+                      ),
+                    ),
+                    Center(
+                        child: Text(
+                      CommonUtil.formatDuration(_timeLeft),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                      textAlign: TextAlign.center,
+                    ))
+                  ],
+                ),
+              ),
             ),
             Opacity(
               opacity: _showButton,
