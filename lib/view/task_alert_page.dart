@@ -18,6 +18,7 @@ import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:slide_to_act/slide_to_act.dart';
+import 'package:intl/intl.dart';
 
 enum TaskType {
   water,
@@ -49,6 +50,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   bool _showTimer = false;
   Duration duration = Duration();
   double? _progressCountDown;
+
   // hide button if exercise is not finished
 
   String? _stepNo;
@@ -62,6 +64,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
 
   @override
   void initState() {
+    // match function wether its a new day (build outside and call its inside)
     super.initState();
   }
 
@@ -116,6 +119,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         _title = 'Trinke jetzt ein Glas Wasser!';
         _subTitle = '8 Gläser Wasser pro Tag, halten den Arzt fern';
         _staticImage = 'assets/animations/anim_water.gif';
+        _showButton = 1.0;
       });
     } else if (_taskType == TaskType.steps.index) {
       setState(() {
@@ -249,6 +253,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   bool _checkUserConditionInDb(String userCondition, String dbCondition) {
     List<String> userConditionItems = userCondition.split(",");
     //if (dbCondition.contains(userConditionItems)) {}
+    // no good solution found
+    // for(var item in nums){
+    //if(item['a'] == a && item['b'] == b){
+    //print(item['c']); // => 29
     return false;
   }
 
@@ -438,30 +446,6 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             const SizedBox(
               height: 20,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                _subTitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .subtitle2
-                    ?.copyWith(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              color: Colors.transparent,
-              height: 150,
-              child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(5)),
-                  child: _image.isNotEmpty
-                      ? Image.network(_image)
-                      : Image.asset(
-                          _staticImage,
-                        )),
-            ),
-            const SizedBox(height: 20),
             Visibility(
               visible: _showTimer,
               child: SizedBox(
@@ -492,6 +476,30 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                _subTitle,
+                style: Theme.of(context)
+                    .textTheme
+                    .subtitle2
+                    ?.copyWith(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              color: Colors.transparent,
+              height: 150,
+              child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
+                  child: _image.isNotEmpty
+                      ? Image.network(_image)
+                      : Image.asset(
+                          _staticImage,
+                        )),
             ),
             Opacity(
               opacity: _showButton,
