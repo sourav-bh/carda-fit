@@ -38,8 +38,11 @@ class _UserLearningPageState extends State<UserLearningPage> {
   }
 
   _loadData() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    if (userInfo != null &&
+        userInfo.condition != null &&
+        userInfo.condition!.isNotEmpty) {
       setState(() {
         _showFilteredList = true;
         _userCondition = userInfo.condition;
@@ -80,8 +83,9 @@ class _UserLearningPageState extends State<UserLearningPage> {
 
           bool addContent = false;
           if (isFiltered) {
-            if (content.condition != null && _userCondition != null &&
-                content.condition == filerCondition) {
+            if (content.condition != null &&
+                filerCondition != null &&
+                filerCondition.contains(content.condition ?? "")) {
               addContent = true;
             } else if (filerCondition == null) {
               addContent = true;
@@ -141,8 +145,12 @@ class _UserLearningPageState extends State<UserLearningPage> {
               visible: _showFilteredList,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                child: Text('Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColor.darkBlue, fontSize: 20),
+                child: Text(
+                  'Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: AppColor.darkBlue, fontSize: 20),
                   textAlign: TextAlign.center,
                 ),
               ),

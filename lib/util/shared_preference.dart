@@ -73,5 +73,6 @@ class SharedPref {
     deleteValue(keyUserAvatar);
     deleteValue(keyUserTargets);
     deleteValue(keyDeviceToken);
+    deleteValue(keyUserCompletedTargets);
   }
 }

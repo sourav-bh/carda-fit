@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:math';
 
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/api/api_manager.dart';
@@ -44,12 +46,21 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   double _progress = 0;
   int _totalSeconds = 0;
   int _secondsPassed = 0;
+  double _showButton = 0.0;
+  int _timeLeft = 120;
+  bool _showTimer = false;
+  Duration duration = Duration();
+  double? _progressCountDown;
+  // hide button if exercise is not finished
 
   String? _stepNo;
   String _title = "";
   String _subTitle = "";
   String _image = '';
   String _staticImage = 'assets/animations/anim_fitness_2.gif';
+  List<String> splitConditionList = List.empty(growable: true);
+
+  /// not sure about this
 
   @override
   void initState() {
@@ -66,7 +77,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   _loadIntent() async {
     _taskType = ModalRoute.of(context)?.settings.arguments as int;
 
-    if (_taskType == TaskType.exercise.index || _taskType == TaskType.teamExercise.index) {
+    if (_taskType == TaskType.exercise.index ||
+        _taskType == TaskType.teamExercise.index) {
       List<Exercise> exerciseList = AppCache.instance.exercises;
       if (exerciseList.isEmpty) {
         await _loadExerciseDataFromAsset();
@@ -102,29 +114,39 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       _startTimer();
     } else if (_taskType == TaskType.water.index) {
       setState(() {
+        _showTimer = false;
         _title = 'Trinke jetzt ein Glas Wasser!';
         _subTitle = '8 Gläser Wasser pro Tag, halten den Arzt fern';
         _staticImage = 'assets/animations/anim_water.gif';
       });
     } else if (_taskType == TaskType.steps.index) {
       setState(() {
-        _title = 'Jetzt 100 Schritte gehen!';
+        _showTimer = true;
+        _title = 'Bleib nun zwei Minuten in Bewegung!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
+
+        _timeLeft = 120;
+        _startCountDown();
       });
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
-        _title = 'Du solltest jetzt eine Pause einlegen';
+        _showTimer = true;
+        _title = 'Lege nun eine zwei minütige Pause ein!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
+        _startCountDown();
       });
     }
   }
 
   _loadExerciseDataFromAsset() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
-    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
+    if (userInfo != null &&
+        userInfo.condition != null &&
+        userInfo.condition!.isNotEmpty) {
       userCondition = userInfo.condition ?? "";
     }
 
@@ -169,6 +191,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
           step.duration = int.tryParse(durationCell?.value.toString() ?? "5");
           step.media = linkCell?.value.toString();
           steps.add(step);
+          splitConditionList = userCondition.split(",");
+          // split the multi String in to a List of single Strings
 
           if (stepVal == "End") {
             Exercise exercise = Exercise();
@@ -180,8 +204,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             exercise.steps?.addAll(steps);
 
             bool addContent = false;
-            if (exercise.condition != null && userCondition.isNotEmpty &&
-                !exercise.condition!.contains(userCondition)) {
+            if (exercise.condition != null &&
+                userCondition.isNotEmpty &&
+                _checkUserConditionInDb(userCondition, exercise.condition!)) {
+              //check if exercise.conditions match with items of the userConditionList
               addContent = true;
             } else if (userCondition.isEmpty) {
               addContent = true;
@@ -202,12 +228,22 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+  bool _checkUserConditionInDb(String userCondition, String dbCondition) {
+    List<String> userConditionItems = userCondition.split(",");
+    for (String singleUserCondition in userConditionItems) {
+      if (dbCondition.contains(singleUserCondition)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
-      link: url,
-      cache: const Duration(days: 7),
-      proxyUrl: "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU"
-    );
+        link: url,
+        cache: const Duration(days: 7),
+        proxyUrl:
+            "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU");
     print(_metadata?.title);
     print(_metadata?.image);
     if (mounted) {
@@ -224,9 +260,32 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
           _secondsPassed -= 1;
           if (_progress >= 1) {
             _cancelTimer();
+          } else {
+            _progress += 1 / _totalSeconds;
           }
-          else {_progress += 1/_totalSeconds; }
         });
+      }
+    });
+  }
+
+  //newTimer
+  void _startCountDown() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (mounted && _timeLeft > 0) {
+        setState(() {
+          _timeLeft--;
+          if (_progress >= 1) {
+            // _cancelTimer();
+          } else {
+            _progress += 1 / _timeLeft;
+            print(_progress);
+          }
+        });
+      } else if (mounted) {
+        setState(() {
+          _showButton = 1.0;
+        });
+        timer.cancel();
       }
     });
   }
@@ -240,15 +299,22 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     if (mounted) {
       setState(() {
         _currentStep += 1;
-        if ((_exercise?.steps?.isNotEmpty ?? false) && (_exercise?.steps?.length ?? 0) - 1 > _currentStep) {
+
+        if ((_exercise?.steps?.isNotEmpty ?? false) &&
+            (_exercise?.steps?.length ?? 0) - 1 > _currentStep) {
           _stepNo = _exercise?.steps?.elementAt(_currentStep).serialNo;
           _subTitle = _exercise?.steps?.elementAt(_currentStep).name ?? "";
 
           _progress = 0;
-          _totalSeconds = _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
+          _totalSeconds =
+              _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
           _secondsPassed = _totalSeconds;
           _startTimer();
+        } else if ((_exercise?.steps?.length ?? 0) - 1 == _currentStep) {
+          _showButton = 1.0;
+          // else if show the button
         }
+        ;
       });
     }
   }
@@ -264,12 +330,16 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
-    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
+    var complTargetJson =
+        await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
-    if (complTargetJson != null && complTargetJson is String && complTargetJson.isNotEmpty) {
+    if (complTargetJson != null &&
+        complTargetJson is String &&
+        complTargetJson.isNotEmpty) {
       completedTarget = DailyTarget.fromRawJson(complTargetJson);
     } else {
-      completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
+      completedTarget =
+          DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
     }
 
     switch (_taskType) {
@@ -288,17 +358,21 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       default:
         break;
     }
-    SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
+    SharedPref.instance.saveJsonValue(
+        SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     int score = DataLoader.getScoreForTask(_taskType ?? -1);
-    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId =
+        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
       await ApiManager().updateUserScore(userId, score);
       Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          navigatorKey.currentState!.context, landingRoute, (r) => false);
     } else {
       Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          navigatorKey.currentState!.context, landingRoute, (r) => false);
     }
   }
 
@@ -316,9 +390,15 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Visibility(
-              visible: _isExerciseTask,
-              child: Text(_stepNo ?? "", style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 36, color: Colors.brown), textAlign: TextAlign.center,)
-            ),
+                visible: _isExerciseTask,
+                child: Text(
+                  _stepNo ?? "",
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption
+                      ?.copyWith(fontSize: 36, color: Colors.brown),
+                  textAlign: TextAlign.center,
+                )),
             const SizedBox(height: 30),
             Visibility(
               visible: _isExerciseTask,
@@ -333,15 +413,20 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                       child: CircularProgressIndicator(
                         strokeWidth: 20,
                         backgroundColor: Colors.white,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.orange),
                         value: _progress,
                       ),
                     ),
                     Center(
-                      child: Text(CommonUtil.formatDuration(_secondsPassed),
-                        style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue), textAlign: TextAlign.center,
-                      )
-                    )
+                        child: Text(
+                      CommonUtil.formatDuration(_secondsPassed),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                      textAlign: TextAlign.center,
+                    ))
                   ],
                 ),
               ),
@@ -349,12 +434,28 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(_title, style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue), textAlign: TextAlign.center,),
+              child: Text(
+                _title,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption
+                    ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                textAlign: TextAlign.center,
+              ),
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(_subTitle, style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20), textAlign: TextAlign.center,),
+              child: Text(
+                _subTitle,
+                style: Theme.of(context)
+                    .textTheme
+                    .subtitle2
+                    ?.copyWith(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
             ),
             const SizedBox(height: 20),
             Container(
@@ -362,32 +463,73 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
               height: 150,
               child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(5)),
-                  child: _image.isNotEmpty ? Image.network(_image) : Image.asset(_staticImage,)
+                  child: _image.isNotEmpty
+                      ? Image.network(_image)
+                      : Image.asset(
+                          _staticImage,
+                        )),
+            ),
+            const SizedBox(height: 20),
+            Visibility(
+              visible: _showTimer,
+              child: SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      width: 120,
+                      height: 120,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 20,
+                        backgroundColor: Colors.white,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.orange),
+                        value: _progress,
+                      ),
+                    ),
+                    Center(
+                        child: Text(
+                      CommonUtil.formatDuration(_timeLeft),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                      textAlign: TextAlign.center,
+                    ))
+                  ],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SlideAction(
-                  key: _key,
-                  text: 'Schieben zum\nBestätigen',
-                  textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
-                  sliderButtonIconSize: 20,
-                  onSubmit: () {
-                    onSubmitScore();
-                    // Future.delayed(const Duration(seconds: 1), () {
-                    //   Navigator.of(context).pop();
-                    //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
-                    // },);
-                  },
-                  innerColor: AppColor.primaryLight,
-                  outerColor: Colors.white,
+            Opacity(
+              opacity: _showButton,
+              // showButton if exercise done
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SlideAction(
+                    key: _key,
+                    text: 'Schieben zum\nBestätigen',
+                    textStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        ?.copyWith(fontSize: 18),
+                    sliderButtonIconSize: 20,
+                    onSubmit: () {
+                      onSubmitScore();
+                      // Future.delayed(const Duration(seconds: 1), () {
+                      //   Navigator.of(context).pop();
+                      //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+                      // },);
+                    },
+                    innerColor: AppColor.primaryLight,
+                    outerColor: Colors.white,
+                  ),
                 ),
               ),
             ),
           ],
-        )
-    );
+        ));
   }
 }
