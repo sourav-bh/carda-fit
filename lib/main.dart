@@ -1,5 +1,5 @@
-
 import 'dart:math';
+import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
 import 'package:app/util/app_constant.dart';
@@ -64,22 +64,28 @@ void main() async {
   print('FCM token: $token');
   if (token != null && token.isNotEmpty) {
     AppCache.instance.fcmToken = token;
-    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId =
+        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
       await ApiManager().updateDeviceToken(userId, token);
     }
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Remote notification message data whilst in the foreground: ${message.data}');
-
-    if (message.notification != null) {
+    print(
+        'Remote notification message data whilst in the foreground: ${message.data}');
+    // what I founf to make the notification snooze / don't know how to import the data and put in the seconds field
+    if (message.notification == null) {
+      sleep(const Duration(seconds: 5));
+    } else if (message.notification != null) {
       var data = message.data['text'];
       String payload = data ?? "0";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
-      print("-------> opening task alert page from FirebaseMessaging foregorund listener");
-      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
+      print(
+          "-------> opening task alert page from FirebaseMessaging foregorund listener");
+      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute,
+          arguments: taskType);
     }
   });
 
@@ -99,7 +105,6 @@ class MyFitApp extends StatefulWidget {
 }
 
 class _MyFitAppState extends State<MyFitApp> {
-
   @override
   void initState() {
     super.initState();
@@ -166,8 +171,11 @@ class _MyFitAppState extends State<MyFitApp> {
           return null;
       }
 
-      return MaterialPageRoute(builder: (BuildContext context) => screen,
-          settings: RouteSettings(arguments: arguments,));
+      return MaterialPageRoute(
+          builder: (BuildContext context) => screen,
+          settings: RouteSettings(
+            arguments: arguments,
+          ));
     };
   }
 }

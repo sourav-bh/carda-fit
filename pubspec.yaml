@@ -55,7 +55,7 @@ dependencies:
   firebase_core: ^2.8.0
   firebase_messaging: ^14.3.0
   multiselect: ^0.1.0
-  
+  file: ^6.1.4
 
 dev_dependencies:
   flutter_test:

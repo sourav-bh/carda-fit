@@ -26,6 +26,7 @@ class UserInfoPage extends StatefulWidget {
 class _UserInfoPageState extends State<UserInfoPage> {
   Gender? _genderValue;
   JobType? _jobTypeValue;
+  UserInfo? _userInfo;
   final TextEditingController _nameText = TextEditingController();
   final TextEditingController _ageText = TextEditingController();
   final TextEditingController _weightText = TextEditingController();
@@ -53,6 +54,40 @@ class _UserInfoPageState extends State<UserInfoPage> {
   @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    if (userInfo != null) {
+      setState(() {
+        _ageText.text = userInfo.age.toString();
+        _nameText.text = userInfo.fullName ?? '';
+        _weightText.text = userInfo.weight.toString();
+        _heightText.text = userInfo.height.toString();
+        _designationText.text = userInfo.designation ?? '';
+        if (userInfo.gender == "Männlich") {
+          _genderValue = Gender.Mannlich;
+        } else if (userInfo.gender == 'Weiblich') {
+          _genderValue = Gender.Weiblich;
+        } else if (userInfo.gender == 'Divers') {
+          _genderValue = Gender.Divers;
+        }
+        if (userInfo.jobType == "Vollzeit") {
+          _jobTypeValue = JobType.Vollzeit;
+        } else if (userInfo.gender == 'Teilzeit') {
+          _jobTypeValue = JobType.Teilzeit;
+        } else if (userInfo.gender == 'Außendienst') {
+          _jobTypeValue = JobType.HomeOffice;
+        }
+        selected = userInfo.condition!.replaceAll(" ", "").split(',');
+        // condition.join(', ');
+
+        // ageText missing to display
+        //debugPrint(userInfo.age.toString());
+      });
+    }
   }
 
   void _saveAction() async {
@@ -87,8 +122,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
       AppCache.instance.userName = name;
       SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
       AppCache.instance.userDbId = userDbId;
-
-      _createUserTargets(userInfo);
 
       String? userServerId;
       try {
@@ -146,6 +179,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
       waterGlasses = 4;
       breaks = 4;
     }
+
+    _createUserTargets(userInfo);
 
     DailyTarget dailyTarget = DailyTarget(
         steps: steps,
@@ -356,7 +391,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                             selected = condition;
                                             conditionValue =
                                                 condition.join(', ');
-                                            print(conditionValue);
+                                            print(selected);
                                           });
                                         },
                                         // ignore: prefer_const_literals_to_create_immutables

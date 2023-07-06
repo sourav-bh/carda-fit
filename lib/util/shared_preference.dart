@@ -11,6 +11,7 @@ class SharedPref {
   static const keyUserCompletedTargets = "key_user_completed_targets";
   static const keyUserProgressToday = "key_user_progress_today";
   static const keyDeviceToken = "key_fcm_token";
+  static const keyTimeoutNotification = "key_timeout_notification";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();

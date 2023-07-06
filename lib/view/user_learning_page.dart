@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:app/model/exercise.dart';
@@ -23,6 +24,75 @@ class UserLearningPage extends StatefulWidget {
   _UserLearningPageState createState() => _UserLearningPageState();
 }
 
+class CustomSearchDelegate extends SearchDelegate {
+  List<String> searchTerms = [];
+
+  CustomSearchDelegate(List<LearningMaterialInfo> learningMaterials);
+
+  @override
+  // Abteil um die Query zu löschen
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  //Leave and close the Searchbar
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          close(context, null);
+        });
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+
+    for (var recipe in searchTerms) {
+      if (recipe.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(recipe);
+        debugPrint(query);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var recipe in searchTerms) {
+      if (recipe.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(recipe);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+        );
+      },
+    );
+  }
+}
+
 class _UserLearningPageState extends State<UserLearningPage> {
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
@@ -35,6 +105,21 @@ class _UserLearningPageState extends State<UserLearningPage> {
     super.initState();
 
     _loadData();
+  }
+
+  /*  */
+  // The function needs to be called everytime something is getting searched
+  // The function gives out the list of recipes that mtach with the query
+  // The search function needs to be implemented in the MySearchDelegate class, which is not possible for me
+  _searchRecipes() {
+    var query = "Gemüse";
+    var results = [];
+    for (var recipe in _learningMaterials) {
+      if (recipe.title?.contains(query) ?? false) {
+        results.add(recipe);
+      }
+    }
+    return results;
   }
 
   _loadData() async {
@@ -108,11 +193,26 @@ class _UserLearningPageState extends State<UserLearningPage> {
         }
       }
     }
+    _searchRecipes();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(_learningMaterials),
+              );
+            },
+          )
+        ],
+      ),
       backgroundColor: AppColor.lightPink,
       body: Container(
         width: MediaQuery.of(context).size.width,
