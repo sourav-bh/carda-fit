@@ -190,7 +190,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                     children: [
                                       Text(_getTopUserInfo(2).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
                                       const SizedBox(width: 10,),
-                                      randomAvatar(_getTopUserInfo(2).avatarImage ?? "", width: 25, height: 25),
+                                      RandomAvatar(_getTopUserInfo(2).avatarImage ?? "", width: 25, height: 25),
                                     ],
                                   ),
                                   const SizedBox(width: 10,),
@@ -213,7 +213,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                     children: [
                                       Text(_getTopUserInfo(1).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
                                       const SizedBox(width: 10,),
-                                      randomAvatar(_getTopUserInfo(1).avatarImage ?? "", width: 25, height: 25),
+                                      RandomAvatar(_getTopUserInfo(1).avatarImage ?? "", width: 25, height: 25),
                                     ],
                                   ),
                                   const SizedBox(width: 10,),
@@ -237,7 +237,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                     children: [
                                       Text(_getTopUserInfo(3).avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
                                       const SizedBox(width: 10,),
-                                      randomAvatar(_getTopUserInfo(3).avatarImage ?? "", width: 25, height: 25),
+                                      RandomAvatar(_getTopUserInfo(3).avatarImage ?? "", width: 25, height: 25),
                                     ],
                                   ),
                                   const SizedBox(width: 10,),
@@ -274,7 +274,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                               const SizedBox(width: 10,),
                                               Text(participant.avatarName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
                                               const SizedBox(width: 10,),
-                                              randomAvatar(participant.avatarImage ?? "", width: 40, height: 40)
+                                              RandomAvatar(participant.avatarImage ?? "", width: 40, height: 40)
                                             ],
                                           ),
                                         ),

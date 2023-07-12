@@ -74,9 +74,19 @@ void main() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print(
         'Remote notification message data whilst in the foreground: ${message.data}');
+    // TODO: @Justin -- implement here your code to get the value from shared pref
+    // SharedPref.instance.getValue("sssaa");
+    // TODO: @Justin -- check the start time and duration with the current time
+    // if (condition is true) {
+    //   // do nothing
+    //   return
+    // } else {
+    //   // show like we do now
+    // }
+
     // what I founf to make the notification snooze / don't know how to import the data and put in the seconds field
     if (message.notification == null) {
-      sleep(const Duration(seconds: 5));
+      // sleep(const Duration(seconds: 5));
     } else if (message.notification != null) {
       var data = message.data['text'];
       String payload = data ?? "0";

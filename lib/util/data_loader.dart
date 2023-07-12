@@ -51,6 +51,7 @@ class LearningMaterialInfo {
   int? id;
   String? thumbnail;
   String? image;
+  // TODO: @Justin -- only use the title and description for search
   String? title;
   String? description;
   String? detailsUrl;

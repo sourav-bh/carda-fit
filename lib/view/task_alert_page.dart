@@ -19,7 +19,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:slide_to_act/slide_to_act.dart';
+import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 import 'package:intl/intl.dart';
 
 enum TaskType {
@@ -38,7 +38,6 @@ class TaskAlertPage extends StatefulWidget {
 }
 
 class _TaskAlertPageState extends State<TaskAlertPage> {
-  final GlobalKey<SlideActionState> _key = GlobalKey();
   int? _taskType;
   Exercise? _exercise;
   bool _isExerciseTask = false;
@@ -512,23 +511,27 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                 padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
                 child: Align(
                   alignment: Alignment.bottomCenter,
-                  child: SlideAction(
-                    key: _key,
-                    text: 'Schieben zum\nBestätigen',
-                    textStyle: Theme.of(context)
-                        .textTheme
-                        .bodyText2
-                        ?.copyWith(fontSize: 18),
-                    sliderButtonIconSize: 20,
-                    onSubmit: () {
+                  child: GradientSlideToAct(
+                    // width: 400,
+                    text: "Schieben zum\nBestätigen",
+                    dragableIconBackgroundColor: Colors.greenAccent,
+                    textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
+                    backgroundColor: Colors.white,
+                    onSubmit: (){
                       onSubmitScore();
                       // Future.delayed(const Duration(seconds: 1), () {
                       //   Navigator.of(context).pop();
                       //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
                       // },);
                     },
-                    innerColor: AppColor.primaryLight,
-                    outerColor: Colors.white,
+                    gradient:  const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColor.primary,
+                          AppColor.primaryLight,
+                        ]
+                    ),
                   ),
                 ),
               ),

@@ -1,6 +1,6 @@
 import 'package:app/util/app_style.dart';
 import 'package:flutter/material.dart';
-import 'package:slide_to_act/slide_to_act.dart';
+import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
 class NotificationAlertDialog extends StatelessWidget {
   final String? _image;
@@ -11,7 +11,7 @@ class NotificationAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<SlideActionState> _key = GlobalKey();
+    // final GlobalKey<SlideActionState> _key = GlobalKey();
 
     return Stack(
       children: <Widget>[
@@ -39,19 +39,25 @@ class NotificationAlertDialog extends StatelessWidget {
               const SizedBox(height: 15,),
               Align(
                 alignment: Alignment.bottomRight,
-                child: SlideAction(
-                  key: _key,
-                  text: 'Schieben zum\nBestätigen',
+                child: GradientSlideToAct(
+                  // width: 400,
+                  text: "Schieben zum\nBestätigen",
+                  dragableIconBackgroundColor: Colors.greenAccent,
                   textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
-                  sliderButtonIconSize: 20,
-                  onSubmit: () {
+                  backgroundColor: Colors.white,
+                  onSubmit: (){
                     Future.delayed(const Duration(seconds: 1), () {
-                        Navigator.of(context).pop();
-                      },
-                    );
+                      Navigator.of(context).pop();
+                    });
                   },
-                  innerColor: AppColor.primaryLight,
-                  outerColor: Colors.white,
+                  gradient:  const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColor.primary,
+                        AppColor.primaryLight,
+                      ]
+                  ),
                 ),
               ),
             ],

@@ -25,9 +25,11 @@ class UserLearningPage extends StatefulWidget {
 }
 
 class CustomSearchDelegate extends SearchDelegate {
-  List<String> searchTerms = [];
+  List<LearningMaterialInfo> searchTerms = [];
 
-  CustomSearchDelegate(List<LearningMaterialInfo> learningMaterials);
+  CustomSearchDelegate(List<LearningMaterialInfo> learningMaterials) {
+    this.searchTerms = learningMaterials;
+  }
 
   @override
   // Abteil um die Query zu löschen
@@ -54,13 +56,19 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
+    print(">>>>>>>>>>$query");
 
-    for (var recipe in searchTerms) {
-      if (recipe.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(recipe);
-        debugPrint(query);
-      }
+    List<String> matchQuery = [];
+    for (var learningMaterial in searchTerms) {
+      // TODO: @Justin -- implement here your code to search actually inside the learning material
+      // only use String? title; String? description;
+      // match the query object with for it
+
+
+      // if (recipe.toLowerCase().contains(query.toLowerCase())) {
+      //   matchQuery.add(recipe);
+      //   debugPrint(query);
+      // }
     }
     return ListView.builder(
       itemCount: matchQuery.length,
@@ -75,11 +83,13 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    print(">>>>>>>>>>$query");
+
     List<String> matchQuery = [];
     for (var recipe in searchTerms) {
-      if (recipe.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(recipe);
-      }
+      // if (recipe.toLowerCase().contains(query.toLowerCase())) {
+      //   matchQuery.add(recipe);
+      // }
     }
     return ListView.builder(
       itemCount: matchQuery.length,
@@ -193,7 +203,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
         }
       }
     }
-    _searchRecipes();
+    // _searchRecipes();
   }
 
   @override
@@ -262,6 +272,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
                   return GestureDetector(
                     child: UserLearningItemView(itemData: material),
                     onTap: () {
+                      // TODO: @Justin -- see here how to pass value to another page
                       Navigator.pushNamed(context, detailsWebRoute,
                           arguments: material.originalContent);
                       // CommonUtil.openUrl(material.videoUrl);

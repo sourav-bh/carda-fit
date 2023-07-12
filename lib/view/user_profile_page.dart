@@ -45,9 +45,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   // don't know how to safe my String in SharedPreference
   _getTime() async {
-    final SharedPreferences prefs = await _prefs;
+    // TODO: @Justin -- implement here your code to save the value
+    // SharedPref.instance.saveStringValue("asasa", valueChoose);
+    // TODO: @Justin -- also save the current time to indicate that user when saved the snooze time
 
-    final String? newValue = (prefs.getString('newValue'));
+    // final String? newValue = (prefs.getString('newValue'));
   }
 
   // List of times that can be selected for snooze the notifications
@@ -66,6 +68,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   _editProfile() async {
+    // TODO: @Justin -- implement here your code to send value to indicate as edit profile page
     Navigator.pushNamed(context, userInfoRoute);
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -115,7 +118,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         radius: (MediaQuery.of(context).size.width / 5.5),
                         child: ClipOval(
                             child: _userInfo?.avatarImage != null
-                                ? randomAvatar(_userInfo?.avatarImage ?? "")
+                                ? RandomAvatar(_userInfo?.avatarImage ?? "")
                                 : const Icon(
                                     Icons.person_outlined,
                                     size: 100,

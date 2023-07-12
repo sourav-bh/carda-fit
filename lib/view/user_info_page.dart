@@ -57,6 +57,16 @@ class _UserInfoPageState extends State<UserInfoPage> {
     _loadData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // TODO: @Justin -- implement here your code to receive value,
+    //  if it is a edit profile page or just a registration page
+
+
+  }
+
   void _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);

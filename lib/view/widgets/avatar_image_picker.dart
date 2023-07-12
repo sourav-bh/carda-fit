@@ -55,7 +55,7 @@ class _AvatarImagePickerState extends State<AvatarImagePickerView> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  randomAvatar(_avatarData[index], height: 50, width: 50),
+                  RandomAvatar(_avatarData[index], height: 50, width: 50),
                   Visibility(
                     visible: selectedAvatar == _avatarData[index],
                     child: Container(
