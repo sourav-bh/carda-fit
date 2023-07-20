@@ -1,3 +1,5 @@
+// ignore_for_file: iterable_contains_unrelated_type
+
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -28,7 +30,7 @@ class CustomSearchDelegate extends SearchDelegate {
   List<LearningMaterialInfo> searchTerms = [];
 
   CustomSearchDelegate(List<LearningMaterialInfo> learningMaterials) {
-    this.searchTerms = learningMaterials;
+    searchTerms = learningMaterials;
   }
 
   @override
@@ -57,18 +59,17 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     print(">>>>>>>>>>$query");
-
+// create a result List to show them
     List<String> matchQuery = [];
+    List<LearningMaterialInfo> learningMaterialResults = [];
+
+// TODO: @Justin -- implement here your code to search actually inside the learning material
     for (var learningMaterial in searchTerms) {
-      // TODO: @Justin -- implement here your code to search actually inside the learning material
-      // only use String? title; String? description;
-      // match the query object with for it
-
-
-      // if (recipe.toLowerCase().contains(query.toLowerCase())) {
-      //   matchQuery.add(recipe);
-      //   debugPrint(query);
-      // }
+      if (query.contains(learningMaterial.description.toString())) {
+        learningMaterialResults.add(learningMaterial);
+      } else if (query.contains(learningMaterial.title.toString())) {
+        learningMaterialResults.add(learningMaterial);
+      }
     }
     return ListView.builder(
       itemCount: matchQuery.length,
@@ -102,8 +103,9 @@ class CustomSearchDelegate extends SearchDelegate {
     );
   }
 }
-
+// how to switch the view of the list while seachring (no search / searching / search is over {3 cases})
 class _UserLearningPageState extends State<UserLearningPage> {
+  // show all the data
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
   int? _selectedTab = 1;

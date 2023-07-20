@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_api_model.dart';
@@ -27,6 +26,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Gender? _genderValue;
   JobType? _jobTypeValue;
   UserInfo? _userInfo;
+  bool? editProfile;
   final TextEditingController _nameText = TextEditingController();
   final TextEditingController _ageText = TextEditingController();
   final TextEditingController _weightText = TextEditingController();
@@ -48,6 +48,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   ];
 
   String conditionValue = "Wählen Sie Ihre Problemzonen";
+  String? userInfoPageTitle;
 
   List<String> selected = [];
 
@@ -62,41 +63,49 @@ class _UserInfoPageState extends State<UserInfoPage> {
     super.didChangeDependencies();
 
     // TODO: @Justin -- implement here your code to receive value,
+    editProfile = ModalRoute.of(context)?.settings.arguments as bool?;
+    setState(() {
+      if (editProfile = true) {
+        userInfoPageTitle = 'Profil bearbeiten';
+      } else {
+        userInfoPageTitle = 'Registrierung';
+      }
+    });
     //  if it is a edit profile page or just a registration page
-
-
   }
 
   void _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null) {
-      setState(() {
-        _ageText.text = userInfo.age.toString();
-        _nameText.text = userInfo.fullName ?? '';
-        _weightText.text = userInfo.weight.toString();
-        _heightText.text = userInfo.height.toString();
-        _designationText.text = userInfo.designation ?? '';
-        if (userInfo.gender == "Männlich") {
-          _genderValue = Gender.Mannlich;
-        } else if (userInfo.gender == 'Weiblich') {
-          _genderValue = Gender.Weiblich;
-        } else if (userInfo.gender == 'Divers') {
-          _genderValue = Gender.Divers;
-        }
-        if (userInfo.jobType == "Vollzeit") {
-          _jobTypeValue = JobType.Vollzeit;
-        } else if (userInfo.gender == 'Teilzeit') {
-          _jobTypeValue = JobType.Teilzeit;
-        } else if (userInfo.gender == 'Außendienst') {
-          _jobTypeValue = JobType.HomeOffice;
-        }
-        selected = userInfo.condition!.replaceAll(" ", "").split(',');
-        // condition.join(', ');
+    while (editProfile = true) {
+      if (userInfo != null) {
+        setState(() {
+          _ageText.text = userInfo.age.toString();
+          _nameText.text = userInfo.fullName ?? '';
+          _weightText.text = userInfo.weight.toString();
+          _heightText.text = userInfo.height.toString();
+          _designationText.text = userInfo.designation ?? '';
+          if (userInfo.gender == "Männlich") {
+            _genderValue = Gender.Mannlich;
+          } else if (userInfo.gender == 'Weiblich') {
+            _genderValue = Gender.Weiblich;
+          } else if (userInfo.gender == 'Divers') {
+            _genderValue = Gender.Divers;
+          }
+          if (userInfo.jobType == "Vollzeit") {
+            _jobTypeValue = JobType.Vollzeit;
+          } else if (userInfo.gender == 'Teilzeit') {
+            _jobTypeValue = JobType.Teilzeit;
+          } else if (userInfo.gender == 'Außendienst') {
+            _jobTypeValue = JobType.HomeOffice;
+          }
+          selected = userInfo.condition!.replaceAll(" ", "").split(',');
+          // condition.join(', ');
 
-        // ageText missing to display
-        //debugPrint(userInfo.age.toString());
-      });
+          // ageText missing to display
+          //debugPrint(userInfo.age.toString());
+        });
+      }
     }
   }
 
@@ -248,6 +257,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   ),
                 ),
               ),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back),
+              ),
               Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -258,7 +273,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 70, bottom: 10),
                         child: Text(
-                          'Anmeldung',
+                          userInfoPageTitle!,
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge

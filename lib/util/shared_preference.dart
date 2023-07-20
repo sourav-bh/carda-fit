@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
+  static const keySnoozeEndTime = 'key_snooze_end_time';
+  static const keySnoozeDecision = "key_snooze_decision";
+  static const keySnoozeDuration = "key_snooze_duration";
+  static const keySnoozeActualTime = "key_snooze_actual_time";
   static const keyUserName = "key_user_name";
   static const keyUserDbId = "key_user_db_id";
   static const keyUserServerId = "key_user_server_id";

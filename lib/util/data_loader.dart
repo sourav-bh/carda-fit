@@ -87,6 +87,10 @@ class LearningMaterialInfo {
     // data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
     return data;
   }
+
+  bool? contains(String lowerCase) {}
+
+  void add(List<String> learningMaterialResults) {}
 }
 
 class LeaderboardParticipantInfo {

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:app/view/user_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
@@ -8,9 +9,11 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:multiselect/multiselect.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app/view/user_info_page.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -19,12 +22,26 @@ class UserProfilePage extends StatefulWidget {
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
+class TimeSaver {
+  static int? currentTime;
+  // TODO: curentTime has to be converted to int
+  static void saveCurrentTime() {
+    currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (kDebugMode) {
+      print('Current time saved: $currentTime');
+    }
+  }
+}
+
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
   String? valueChoose;
   List listItem = ["5 min", '10 min', '30 min', '60 min', '120 min', '1 Tag'];
-  final _prefs = SharedPreferences.getInstance();
-  late Future<String> _newValue;
+  late String _newValue;
+  int? snoozeTimeBySelect;
+  String time = "";
+  late bool userEditProfile;
+  bool? SnoozeDecision;
 
   @override
   void initState() {
@@ -43,13 +60,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  // don't know how to safe my String in SharedPreference
   _getTime() async {
     // TODO: @Justin -- implement here your code to save the value
-    // SharedPref.instance.saveStringValue("asasa", valueChoose);
+    SharedPref.instance
+        .saveStringValue(SharedPref.keySnoozeDuration, _newValue);
     // TODO: @Justin -- also save the current time to indicate that user when saved the snooze time
-
-    // final String? newValue = (prefs.getString('newValue'));
+    SharedPref.instance
+        .saveIntValue(SharedPref.keySnoozeActualTime, TimeSaver.currentTime!);
+    // Send Bool
+    SharedPref.instance
+        .saveBoolValue(SharedPref.keySnoozeDecision, SnoozeDecision!);
   }
 
   // List of times that can be selected for snooze the notifications
@@ -67,11 +87,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     Navigator.pushNamed(context, userInfoRoute);
   }
 
+  // sending
   _editProfile() async {
     // TODO: @Justin -- implement here your code to send value to indicate as edit profile page
-    Navigator.pushNamed(context, userInfoRoute);
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    Navigator.pushNamed(context, userInfoRoute, arguments: true);
   }
 
   @override
@@ -269,6 +288,29 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       height: 30,
                     ),
                     Container(
+                      child: DropdownButton(
+                        hint:
+                            const Text('Pausieren Sie die Benachrichtigungen'),
+                        dropdownColor: Colors.grey,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        value: valueChoose,
+                        onChanged: (newValue) {
+                          setState(() {
+                            valueChoose = newValue as String?;
+                            TimeSaver.saveCurrentTime();
+                            debugPrint(newValue);
+                            SnoozeDecision = true;
+                          });
+                        },
+                        items: listItem.map((valueItem) {
+                          return DropdownMenuItem(
+                            value: valueItem,
+                            child: Text(valueItem),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: TextButton(
                           style: ButtonStyle(
@@ -281,6 +323,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                           onPressed: () {
                             _logoutAction();
+                            _editProfile();
                           },
                           child: Ink(
                             decoration: const BoxDecoration(
@@ -335,27 +378,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                           )),
-                    ),
-                    Container(
-                      child: DropdownButton(
-                        hint:
-                            const Text('Pausieren Sie die Benachrichtigungen'),
-                        dropdownColor: Colors.grey,
-                        icon: const Icon(Icons.arrow_drop_down),
-                        value: valueChoose,
-                        onChanged: (newValue) {
-                          setState(() {
-                            valueChoose = newValue as String?;
-                            debugPrint(newValue);
-                          });
-                        },
-                        items: listItem.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: Text(valueItem),
-                          );
-                        }).toList(),
-                      ),
                     ),
                   ],
                 ),
