@@ -43,45 +43,45 @@ var snoozeDuration = SharedPref.instance.getValue(SharedPref.keySnoozeDuration);
 int? timeToSnooze;
 int? snoozeEndTime;
 
-class TimeSaver {
-  static int? currentTime;
-  static void saveCurrentTime() {
-    snoozeTime = DateTime.now().millisecondsSinceEpoch;
-    if (kDebugMode) {
-      print('Current time saved: $snoozeTime');
-    }
-  }
-
-  int addMinutesToCurrentTime(int minutesToAdd) {
-    if (snoozeTime != null) {
-      return snoozeTime + (minutesToAdd * 60 * 1000);
-    } else {
-      return 0; // Return 0 or some default value if currentTime is null
-    }
-  }
-
-  int? whenSnoozeEnds(int snoozeDurationInMinutes) {
-    snoozeEndTime =
-        (DateTime.now().millisecondsSinceEpoch + snoozeDurationInMinutes);
-    SharedPref.instance
-        .saveIntValue(SharedPref.keySnoozeEndTime, snoozeEndTime!);
-    return snoozeEndTime;
-  }
-
-  // Function to check if the snooze period is over
-  Future<bool> isSnoozeOver() async {
-    int? snoozeEndTime =
-        await SharedPref.instance.getValue(SharedPref.keySnoozeEndTime);
-    if (snoozeEndTime != null &&
-        snoozeEndTime <= DateTime.now().millisecondsSinceEpoch) {
-      // Snooze period is over
-      return true;
-    } else {
-      // Snooze period is not over yet
-      return false;
-    }
-  }
-}
+// class TimeSaver {
+//   static int? currentTime;
+//   static void saveCurrentTime() {
+//     snoozeTime = DateTime.now().millisecondsSinceEpoch;
+//     if (kDebugMode) {
+//       print('Current time saved: $snoozeTime');
+//     }
+//   }
+//
+//   int addMinutesToCurrentTime(int minutesToAdd) {
+//     if (snoozeTime != null) {
+//       return snoozeTime + (minutesToAdd * 60 * 1000);
+//     } else {
+//       return 0; // Return 0 or some default value if currentTime is null
+//     }
+//   }
+//
+//   int? whenSnoozeEnds(int snoozeDurationInMinutes) {
+//     snoozeEndTime =
+//         (DateTime.now().millisecondsSinceEpoch + snoozeDurationInMinutes);
+//     SharedPref.instance
+//         .saveIntValue(SharedPref.keySnoozeEndTime, snoozeEndTime!);
+//     return snoozeEndTime;
+//   }
+//
+//   // Function to check if the snooze period is over
+//   Future<bool> isSnoozeOver() async {
+//     int? snoozeEndTime =
+//         await SharedPref.instance.getValue(SharedPref.keySnoozeEndTime);
+//     if (snoozeEndTime != null &&
+//         snoozeEndTime <= DateTime.now().millisecondsSinceEpoch) {
+//       // Snooze period is over
+//       return true;
+//     } else {
+//       // Snooze period is not over yet
+//       return false;
+//     }
+//   }
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -117,41 +117,42 @@ void main() async {
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print(
-        'Remote notification message data whilst in the foreground: ${message.data}');
-    // TODO: @Justin -- implement here your code to get the value from shared pref
-    bool snoozeBool =
-        SharedPref.instance.getValue(SharedPref.keySnoozeDecision);
-    TimeSaver timeSaver = TimeSaver();
-    bool isSnoozeOver = await timeSaver.isSnoozeOver();
-    // TODO: @Justin -- check the start time and duration with the current time
-    //Conditions must have a static type of 'bool'. Try changing the condition.
-    while (snoozeBool == true) {
-      if (snoozeDuration == '5 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(5);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '10 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(10);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '30 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(30);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '60 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '120 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 2);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '1 Tag') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 24);
-        print('The time to Snooze is: $timeToSnooze');
-      } else {
-        snoozeBool = false;
-      }
-    }
-    if (isSnoozeOver == false) {
-      return;
-    } else if (message.notification != null) {
+    // print(
+    //     'Remote notification message data whilst in the foreground: ${message.data}');
+    // // TODO: @Justin -- implement here your code to get the value from shared pref
+    // bool snoozeBool =
+    //     SharedPref.instance.getValue(SharedPref.keySnoozeDecision);
+    // TimeSaver timeSaver = TimeSaver();
+    // bool isSnoozeOver = await timeSaver.isSnoozeOver();
+    // // TODO: @Justin -- check the start time and duration with the current time
+    // //Conditions must have a static type of 'bool'. Try changing the condition.
+    // while (snoozeBool == true) {
+    //   if (snoozeDuration == '5 min') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(5);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else if (snoozeDuration == '10 min') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(10);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else if (snoozeDuration == '30 min') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(30);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else if (snoozeDuration == '60 min') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(60);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else if (snoozeDuration == '120 min') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 2);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else if (snoozeDuration == '1 Tag') {
+    //     timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 24);
+    //     print('The time to Snooze is: $timeToSnooze');
+    //   } else {
+    //     snoozeBool = false;
+    //   }
+    // }
+    // if (isSnoozeOver == false) {
+    //   return;
+    // } else
+      if (message.notification != null) {
       var data = message.data['text'];
       String payload = data ?? "0";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
@@ -164,36 +165,6 @@ void main() async {
   });
 
   runApp(const MyFitApp());
-   bool snoozeBool =
-        SharedPref.instance.getValue(SharedPref.keySnoozeDecision);
-    TimeSaver timeSaver = TimeSaver();
-    bool isSnoozeOver = await timeSaver.isSnoozeOver();
-    // TODO: @Justin -- check the start time and duration with the current time
-    //Conditions must have a static type of 'bool'. Try changing the condition.
-    while (snoozeBool == true) {
-      if (snoozeDuration == '5 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(5);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '10 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(10);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '30 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(30);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '60 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '120 min') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 2);
-        print('The time to Snooze is: $timeToSnooze');
-      } else if (snoozeDuration == '1 Tag') {
-        timeToSnooze = timeSaver.addMinutesToCurrentTime(60 * 24);
-        print('The time to Snooze is: $timeToSnooze');
-      } else {
-        snoozeBool = false;
-      }
-    }
-   print(isSnoozeOver);
 }
 
 _checkIfUserLoggedIn() async {

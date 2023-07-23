@@ -55,24 +55,24 @@ class _UserInfoPageState extends State<UserInfoPage> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // _loadData();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    // TODO: @Justin -- implement here your code to receive value,
-    editProfile = ModalRoute.of(context)?.settings.arguments as bool?;
-    setState(() {
-      if (editProfile = true) {
-        userInfoPageTitle = 'Profil bearbeiten';
-      } else {
-        userInfoPageTitle = 'Registrierung';
-      }
-    });
-    //  if it is a edit profile page or just a registration page
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //
+  //   // TODO: @Justin -- implement here your code to receive value,
+  //   editProfile = ModalRoute.of(context)?.settings.arguments as bool?;
+  //   setState(() {
+  //     if (editProfile ?? false) {
+  //       userInfoPageTitle = 'Profil bearbeiten';
+  //     } else {
+  //       userInfoPageTitle = 'Registrierung';
+  //     }
+  //   });
+  //   //  if it is a edit profile page or just a registration page
+  // }
 
   void _loadData() async {
     UserInfo? userInfo =
@@ -257,12 +257,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back),
-              ),
+              // IconButton(
+              //   onPressed: () {
+              //     Navigator.of(context).pop();
+              //   },
+              //   icon: const Icon(Icons.arrow_back),
+              // ),
               Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -273,7 +273,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 70, bottom: 10),
                         child: Text(
-                          userInfoPageTitle!,
+                          "userInfoPageTitle!",
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
