@@ -163,7 +163,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
             .showSnackBar(snackBar);
       }
 
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+      // ignore: use_build_context_synchronously
+      Navigator.pushNamedAndRemoveUntil(context, workingScheduleRoute, (r) => false);
     }
   }
 

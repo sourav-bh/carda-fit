@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:io';
-
+import 'package:app/view/working_schedule_page.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:app/api/api_manager.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
@@ -36,6 +37,7 @@ const leaderboardRoute = '/leaderboard';
 const profileRoute = '/profile';
 const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
+const workingScheduleRoute = '/working/schedules';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 int snoozeTime = SharedPref.instance.getValue(SharedPref.keySnoozeActualTime);
@@ -85,6 +87,7 @@ int? snoozeEndTime;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await TaskAlertService.instance.setup();
 
   await Firebase.initializeApp(
@@ -152,7 +155,7 @@ void main() async {
     // if (isSnoozeOver == false) {
     //   return;
     // } else
-      if (message.notification != null) {
+    if (message.notification != null) {
       var data = message.data['text'];
       String payload = data ?? "0";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
@@ -206,6 +209,9 @@ class _MyFitAppState extends State<MyFitApp> {
       final dynamic arguments = settings.arguments;
       Widget screen;
       switch (settings.name) {
+        case workingScheduleRoute:
+          screen = const WorkingSchedulePage();
+          break;
         case splashRoute:
           screen = const SplashPage();
           break;

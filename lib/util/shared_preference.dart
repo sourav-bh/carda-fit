@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
@@ -16,6 +15,9 @@ class SharedPref {
   static const keyUserProgressToday = "key_user_progress_today";
   static const keyDeviceToken = "key_fcm_token";
   static const keyTimeoutNotification = "key_timeout_notification";
+  static const keyStartTime = "key_start_time";
+  static const keyEndTime = "key_end_time";
+  static const keySelectedDays = "key_selected_days";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();
