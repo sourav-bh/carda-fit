@@ -25,8 +25,10 @@ class UserInfoPage extends StatefulWidget {
 class _UserInfoPageState extends State<UserInfoPage> {
   Gender? _genderValue;
   JobType? _jobTypeValue;
-  UserInfo? _userInfo;
+  UserInfo? userInfo;
   bool? editProfile;
+  bool? isVisible = true;
+  String? userInfoPageTitle;
   final TextEditingController _nameText = TextEditingController();
   final TextEditingController _ageText = TextEditingController();
   final TextEditingController _weightText = TextEditingController();
@@ -48,31 +50,31 @@ class _UserInfoPageState extends State<UserInfoPage> {
   ];
 
   String conditionValue = "Wählen Sie Ihre Problemzonen";
-  String? userInfoPageTitle;
 
   List<String> selected = [];
 
   @override
   void initState() {
     super.initState();
-    // _loadData();
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //
-  //   // TODO: @Justin -- implement here your code to receive value,
-  //   editProfile = ModalRoute.of(context)?.settings.arguments as bool?;
-  //   setState(() {
-  //     if (editProfile ?? false) {
-  //       userInfoPageTitle = 'Profil bearbeiten';
-  //     } else {
-  //       userInfoPageTitle = 'Registrierung';
-  //     }
-  //   });
-  //   //  if it is a edit profile page or just a registration page
-  // }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // TODO: @Justin -- implement here your code to receive value,
+    editProfile = ModalRoute.of(context)?.settings.arguments as bool?;
+    setState(() {
+      if (editProfile ?? false) {
+        userInfoPageTitle = 'Profil bearbeiten';
+        _loadData();
+      } else {
+        userInfoPageTitle = 'Registrierung';
+        isVisible = false;
+      }
+    });
+    //  if it is a edit profile page or just a registration page
+  }
 
   void _loadData() async {
     UserInfo? userInfo =
@@ -164,7 +166,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
       }
 
       // ignore: use_build_context_synchronously
-      Navigator.pushNamedAndRemoveUntil(context, workingScheduleRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          context, workingScheduleRoute, (r) => false);
     }
   }
 
@@ -258,12 +261,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   ),
                 ),
               ),
-              // IconButton(
-              //   onPressed: () {
-              //     Navigator.of(context).pop();
-              //   },
-              //   icon: const Icon(Icons.arrow_back),
-              // ),
+              Visibility(
+                visible: isVisible!,
+                child: Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                  ],
+                ),
+              ),
               Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -274,7 +284,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 70, bottom: 10),
                         child: Text(
-                          "userInfoPageTitle!",
+                          userInfoPageTitle!,
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge

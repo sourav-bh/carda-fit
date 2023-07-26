@@ -70,6 +70,7 @@ class CustomSearchDelegate extends SearchDelegate {
       } else if (query.contains(learningMaterial.title.toString())) {
         learningMaterialResults.add(learningMaterial);
       }
+
     }
     return ListView.builder(
       itemCount: matchQuery.length,
@@ -103,7 +104,7 @@ class CustomSearchDelegate extends SearchDelegate {
     );
   }
 }
-// how to switch the view of the list while seachring (no search / searching / search is over {3 cases})
+// TODO: how to switch the view of the list while seachring (no search / searching / search is over {3 cases})
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
   final List<LearningMaterialInfo> _learningMaterials =

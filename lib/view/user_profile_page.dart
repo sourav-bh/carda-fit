@@ -19,35 +19,17 @@ class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
 
   @override
-  _UserProfilePageState createState() => _UserProfilePageState();
-}
-
-class TimeSaver {
-  static int? currentTime;
-  // TODO: curentTime has to be converted to int
-  static void saveCurrentTime() {
-    currentTime = DateTime.now().millisecondsSinceEpoch;
-    if (kDebugMode) {
-      print('Current time saved: $currentTime');
-    }
-  }
+  State<UserProfilePage> createState() => _UserProfilePageState();
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
-  String? valueChoose;
-  List listItem = ["5 min", '10 min', '30 min', '60 min', '120 min', '1 Tag'];
-  late String _newValue;
-  int? snoozeTimeBySelect;
-  String time = "";
-  late bool userEditProfile;
-  bool? SnoozeDecision;
+  String? selectedValue;
 
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
-    _getTime();
   }
 
   _loadUserInfo() async {
@@ -63,23 +45,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
   _getTime() async {
     // TODO: @Justin -- implement here your code to save the value
     SharedPref.instance
-        .saveStringValue(SharedPref.keySnoozeDuration, _newValue);
+        .saveStringValue(SharedPref.keySnoozeDuration, selectedValue!);
     // TODO: @Justin -- also save the current time to indicate that user when saved the snooze time
-    SharedPref.instance
-        .saveIntValue(SharedPref.keySnoozeActualTime, TimeSaver.currentTime!);
-    // Send Bool
-    SharedPref.instance
-        .saveBoolValue(SharedPref.keySnoozeDecision, SnoozeDecision!);
+    SharedPref.instance.saveIntValue(
+        SharedPref.keySnoozeActualTime, DateTime.now().millisecondsSinceEpoch);
+    print("Called");
   }
 
   // List of times that can be selected for snooze the notifications
-  List<String> list = <String>[
+  List<String> items = <String>[
     '5 min',
     '10 min',
     '30 min',
     '60 min',
     '120 min',
-    '1 Tag'
+    '1440 min'
   ];
 
   _logoutAction() async {
@@ -288,24 +268,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       height: 30,
                     ),
                     Container(
-                      child: DropdownButton(
+                      child: DropdownButton<String>(
                         hint:
                             const Text('Pausieren Sie die Benachrichtigungen'),
                         dropdownColor: Colors.grey,
                         icon: const Icon(Icons.arrow_drop_down),
-                        value: valueChoose,
+                        value: selectedValue,
                         onChanged: (newValue) {
                           setState(() {
-                            valueChoose = newValue as String?;
-                            TimeSaver.saveCurrentTime();
-                            debugPrint(newValue);
-                            SnoozeDecision = true;
+                            selectedValue = newValue;
+                            debugPrint(selectedValue);
+                            _getTime();
                           });
                         },
-                        items: listItem.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: Text(valueItem),
+                        items: items.map((String item) {
+                          return DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(item),
                           );
                         }).toList(),
                       ),
@@ -323,7 +302,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                           onPressed: () {
                             _logoutAction();
-                            _editProfile();
                           },
                           child: Ink(
                             decoration: const BoxDecoration(

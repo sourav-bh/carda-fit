@@ -15,8 +15,8 @@ class WorkingSchedulePage extends StatefulWidget {
 
 class _WorkingSchedulePageState extends State<WorkingSchedulePage> {
   List<bool> selectedDays = [false, false, false, false, false, false, false];
-  TextEditingController startTimeController = TextEditingController();
-  TextEditingController endTimeController = TextEditingController();
+  String? startingTime = '';
+  String? endingTime = '';
 
   String _getWeekdayName(int index) {
     return [
@@ -30,22 +30,46 @@ class _WorkingSchedulePageState extends State<WorkingSchedulePage> {
     ][index];
   }
 
+  Future<void> _selectStartTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null && pickedTime != TimeOfDay.now()) {
+      setState(() {
+        startingTime = '${pickedTime.hour}:${pickedTime.minute}';
+      });
+    }
+  }
+
+  Future<void> _selectEndTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null && pickedTime != TimeOfDay.now()) {
+      setState(() {
+        endingTime = '${pickedTime.hour}:${pickedTime.minute}';
+      });
+    }
+  }
+
   void _saveAction() async {
     // Convert the selectedDays list to a comma-separated string
     String selectedDaysString =
         selectedDays.map((selected) => selected ? '1' : '0').join(',');
-
+    print(selectedDaysString);
     // save selectedDaysString
     SharedPref.instance
         .saveStringValue(SharedPref.keySelectedDays, selectedDaysString);
 
     // Save the start time
-    SharedPref.instance
-        .saveStringValue(SharedPref.keyStartTime, startTimeController.text);
+    SharedPref.instance.saveStringValue(SharedPref.keyStartTime, startingTime!);
 
     // Save the end time
-    SharedPref.instance
-        .saveStringValue(SharedPref.keyEndTime, endTimeController.text);
+    SharedPref.instance.saveStringValue(SharedPref.keyEndTime, endingTime!);
 
     // Show a snackbar to indicate that the data has been saved
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -165,39 +189,33 @@ class _WorkingSchedulePageState extends State<WorkingSchedulePage> {
                                     ),
                           ),
                         ),
-                        TextField(
-                          decoration: InputDecoration(
-                            labelText:
-                                'Startzeit (hh:mm)', // <-- Update the label for Startzeit
-                            prefixText: 'Von: ',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade300,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        TextField(
-                          decoration: InputDecoration(
-                            labelText:
-                                'Endzeit (hh:mm)', // <-- Update the label for Endzeit
-                            prefixText: 'Bis: ',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade300,
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () => _selectStartTime(context),
+                                    child: Text('Select Start Time'),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text('Starting Time: $startingTime'),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () => _selectEndTime(context),
+                                    child: Text('Select End Time'),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text('Ending Time: $endingTime'),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
