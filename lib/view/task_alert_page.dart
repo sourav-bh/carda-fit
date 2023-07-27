@@ -94,6 +94,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       }
       Exercise exerciseNow = exerciseList.first;
       print(exerciseNow.toRawJson());
+      Navigator.pushNamed(context, summaryPageRoute, arguments: exerciseNow);
 
       _loadWebsiteMetaData(exerciseNow.url ?? "");
 
@@ -333,8 +334,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
-    var complTargetJson =
-        await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
+    var complTargetJson = await SharedPref.instance
+        .getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
     if (complTargetJson != null &&
         complTargetJson is String &&
@@ -515,23 +516,25 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                     // width: 400,
                     text: "Schieben zum\nBestätigen",
                     dragableIconBackgroundColor: Colors.greenAccent,
-                    textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
+                    textStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        ?.copyWith(fontSize: 18),
                     backgroundColor: Colors.white,
-                    onSubmit: (){
+                    onSubmit: () {
                       onSubmitScore();
                       // Future.delayed(const Duration(seconds: 1), () {
                       //   Navigator.of(context).pop();
                       //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
                       // },);
                     },
-                    gradient:  const LinearGradient(
+                    gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
                           AppColor.primary,
                           AppColor.primaryLight,
-                        ]
-                    ),
+                        ]),
                   ),
                 ),
               ),

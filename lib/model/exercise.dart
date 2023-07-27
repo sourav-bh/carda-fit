@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:app/model/exercise_steps.dart';
 
 class Exercise {

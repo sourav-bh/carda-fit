@@ -15,6 +15,10 @@ class CommonUtil {
   static getEmptyIfNull(String? value) {
     return value ?? '';
   }
+  
+  static showSnoozedIfActive(bool? value) {
+    
+  }
 
   static MaterialColor createMaterialColor(Color color) {
     List strengths = <double>[.05];

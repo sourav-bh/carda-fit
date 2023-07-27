@@ -24,6 +24,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:app/view/summary_page.dart';
 
 const splashRoute = '/';
 const landingRoute = '/landing';
@@ -37,11 +38,10 @@ const leaderboardRoute = '/leaderboard';
 const profileRoute = '/profile';
 const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
-const workingScheduleRoute = '/working/schedules';
+const workingScheduleRoute = '/working/schedule';
+const summaryPageRoute = '/summary/page/';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-int snoozeTime = SharedPref.instance.getValue(SharedPref.keySnoozeActualTime);
-var snoozeDuration = SharedPref.instance.getValue(SharedPref.keySnoozeDuration);
 int? timeToSnooze;
 int? snoozeEndTime;
 int selectedSnoozeTime = 0;
@@ -128,6 +128,9 @@ void main() async {
       isUserSnoozedNow = false;
     }
 
+    SharedPref.instance
+        .saveBoolValue(SharedPref.keyIsSnoozed, isUserSnoozedNow!);
+
     if (isUserSnoozedNow == false) {
       return;
     } else if (message.notification != null) {
@@ -184,6 +187,9 @@ class _MyFitAppState extends State<MyFitApp> {
       final dynamic arguments = settings.arguments;
       Widget screen;
       switch (settings.name) {
+        case summaryPageRoute:
+          screen = SummaryPage();
+          break;
         case workingScheduleRoute:
           screen = const WorkingSchedulePage();
           break;

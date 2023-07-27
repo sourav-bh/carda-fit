@@ -25,22 +25,22 @@ class ExerciseStep {
   String toRawJson() => json.encode(toMap());
 
   factory ExerciseStep.fromMap(Map<String, dynamic> json) => ExerciseStep(
-    id: json["id"],
-    name: json["name"],
-    details: json["details"],
-    media: json["media"],
-    duration: json["duration"],
-    serialNo: json["serial_no"],
-    createdAt: json["created_at"],
-  );
+        id: json["id"],
+        name: json["name"],
+        details: json["details"] ?? "",
+        media: json["media"],
+        duration: json["duration"] ?? 0,
+        serialNo: json["serial_no"],
+        createdAt: json["created_at"],
+      );
 
   Map<String, dynamic> toMap() => {
-    "id": id,
-    "name": name,
-    "details": details,
-    "media": media,
-    "duration": duration,
-    "serial_no": serialNo,
-    "created_at": createdAt,
-  };
+        "id": id,
+        "name": name,
+        "details": details,
+        "media": media,
+        "duration": duration,
+        "serial_no": serialNo,
+        "created_at": createdAt,
+      };
 }

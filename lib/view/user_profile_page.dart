@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:app/view/user_info_page.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +26,38 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
   String? selectedValue;
+  bool? isUserSnoozedNow = false;
+  Timer? _snoozeTimer;
+  int selectedSnoozeTime = 0;
+  int? snoozeEndTime; // Speichert das Ende der Snooze-Dauer als Millisekunden seit Epoch
 
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
+    getSnoozeStatus();
+    // Start the timer to check snooze status every 1 minute
+    _snoozeTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      checkSnoozeStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _snoozeTimer?.cancel();
+  }
+
+  void checkSnoozeStatus() async {
+    bool? isUserSnoozedNow = await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (isUserSnoozedNow != null && isUserSnoozedNow && currentTime >= snoozeEndTime!) {
+      setState(() {
+        isUserSnoozedNow = false;
+        selectedValue = null;
+      });
+      // TODO: @Justin -- Add code here to handle resuming notifications.
+    }
   }
 
   _loadUserInfo() async {
@@ -41,6 +69,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
       });
     }
   }
+    
+  int extractNumbersAndCombine(String selectedValue) {
+    int selectedSnoozeTime = 0;
+    String currentNumber = '';
+
+    for (int i = 0; i < selectedValue.length; i++) {
+      if (selectedValue[i].contains(RegExp(r'[0-9]'))) {
+        currentNumber += selectedValue[i];
+      } else {
+        if (currentNumber.isNotEmpty) {
+          int num = int.tryParse(currentNumber) ?? 0;
+          selectedSnoozeTime = selectedSnoozeTime * 10 + num;
+          currentNumber = '';
+        }
+      }
+    }
+
+    if (currentNumber.isNotEmpty) {
+      int num = int.tryParse(currentNumber) ?? 0;
+      selectedSnoozeTime = selectedSnoozeTime * 10 + num;
+    }
+
+    return selectedSnoozeTime;
+  }
 
   _getTime() async {
     // TODO: @Justin -- implement here your code to save the value
@@ -49,7 +101,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     // TODO: @Justin -- also save the current time to indicate that user when saved the snooze time
     SharedPref.instance.saveIntValue(
         SharedPref.keySnoozeActualTime, DateTime.now().millisecondsSinceEpoch);
-    print("Called");
   }
 
   // List of times that can be selected for snooze the notifications
@@ -62,20 +113,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
     '1440 min'
   ];
 
+  // Get the snooze status from SharedPref
+  Future<void> getSnoozeStatus() async {
+    bool? isUserSnoozedNow =
+        await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (isUserSnoozedNow != null && isUserSnoozedNow) {
+      setState(() {
+        selectedValue = "Benachrichtigungen sind stummgeschaltet";
+      });
+    }
+  }
+
   _logoutAction() async {
     SharedPref.instance.clearCache();
     Navigator.pushNamed(context, userInfoRoute);
   }
 
-  // sending
   _editProfile() async {
     // TODO: @Justin -- implement here your code to send value to indicate as edit profile page
     Navigator.pushNamed(context, userInfoRoute, arguments: true);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -150,7 +207,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       margin: const EdgeInsets.only(top: 30),
                       child: Column(
                         children: <Widget>[
-                          Row(
+                         Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               const Icon(Icons.person_pin_rounded,
@@ -269,16 +326,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     Container(
                       child: DropdownButton<String>(
-                        hint:
-                            const Text('Pausieren Sie die Benachrichtigungen'),
+                        hint: const Text('Pausieren Sie die Benachrichtigungen'),
                         dropdownColor: Colors.grey,
                         icon: const Icon(Icons.arrow_drop_down),
                         value: selectedValue,
                         onChanged: (newValue) {
                           setState(() {
                             selectedValue = newValue;
-                            debugPrint(selectedValue);
+                            selectedSnoozeTime = extractNumbersAndCombine(newValue!);
+                            snoozeEndTime = DateTime.now().millisecondsSinceEpoch + (selectedSnoozeTime * 60000);
                             _getTime();
+                            isUserSnoozedNow = true;
                           });
                         },
                         items: items.map((String item) {
@@ -289,7 +347,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }).toList(),
                       ),
                     ),
-                    Container(
+                                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: TextButton(
                           style: ButtonStyle(

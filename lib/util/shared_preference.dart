@@ -18,6 +18,7 @@ class SharedPref {
   static const keyStartTime = "key_start_time";
   static const keyEndTime = "key_end_time";
   static const keySelectedDays = "key_selected_days";
+  static const keyIsSnoozed = "key_is_snoozed";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();
