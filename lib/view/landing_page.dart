@@ -8,6 +8,7 @@ import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/task_alert_page.dart';
@@ -88,8 +89,8 @@ class _LandingPageState extends State<LandingPage> {
   _loadExerciseDataFromAsset() async {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
-    if (userInfo != null && userInfo.condition != null && userInfo.condition!.isNotEmpty) {
-      userCondition = userInfo.condition ?? "";
+    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+      userCondition = userInfo.medicalConditions!;
     }
 
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");

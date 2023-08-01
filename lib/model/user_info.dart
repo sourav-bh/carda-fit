@@ -1,79 +1,102 @@
 import 'dart:convert';
-import 'dart:math';
-import 'user_allergy.dart';
 
 class UserInfo {
-  UserInfo(
-      {this.id,
-      this.fullName,
-      this.avatar,
-      this.avatarImage,
-      this.gender,
-      this.age,
-      this.weight,
-      this.designation,
-      this.jobType,
-      this.createdAt,
-      this.allergies,
-      this.diseases,
-      this.height,
-      this.condition});
+  UserInfo({
+    this.id,
+    this.userName,
+    this.password,
+    this.avatarImage,
+    this.deviceToken,
+    this.age,
+    this.gender,
+    this.weight,
+    this.height,
+    this.teamName,
+    this.score,
+    this.jobPosition,
+    this.jobType,
+    this.workingDays,
+    this.workStartTime,
+    this.workEndTime,
+    this.medicalConditions,
+    this.diseases,
+    this.preferredAlerts,
+    this.isMergedAlertSet
+  });
 
   String? id;
-  String? fullName;
-  String? avatar;
+  String? userName;
+  String? password;
   String? avatarImage;
-  String? gender;
+  String? deviceToken;
+
   int? age;
+  String? gender;
   int? weight;
   int? height;
-  String? designation;
+
+  String? teamName;
+  int? score;
+
+  String? jobPosition;
   String? jobType;
-  double? createdAt;
-  List<String>? diseases;
-  List<UserAllergy>? allergies;
-  String? condition;
+  String? workingDays; // comma separated days as 2-letter initial
+  String? workStartTime;
+  String? workEndTime;
 
-  // Sourav - create a new variable to store the condition value from user info page
+  String? medicalConditions; // comma separated conditions string
+  String? diseases; // comma separated disease string
+  String? preferredAlerts; // comma separated string containing alert type enum values
+  bool? isMergedAlertSet; // indicate if the user wants to merge the alert types, like water + break and exercise + steps
 
-  factory UserInfo.fromRawJson(String str) =>
-      UserInfo.fromMap(json.decode(str));
+  factory UserInfo.fromRawJson(String str) => UserInfo.fromMap(json.decode(str));
 
   String toRawJson() => json.encode(toMap());
 
   factory UserInfo.fromMap(Map<String, dynamic> json) => UserInfo(
-        id: json["id"].toString(),
-        fullName: json["fullName"],
-        avatar: json["avatar"],
-        avatarImage: json["avatar_image"],
-        gender: json["gender"],
-        age: json["age"],
-        jobType: json["job_type"],
-        weight: json["weight"],
-        height: json["height"],
-        designation: json["designation"],
-        createdAt: json['created_at'],
-        condition: json["condition"],
-        //allergies: List<UserAllergy>.from(json["allergies"].map((x) => x)),
-        //diseases: List<String>.from(json["diseases"].map((x) => x)),
-      );
+    id: json["id"],
+    userName: json["userName"],
+    password: json["password"],
+    avatarImage: json["avatarImage"],
+    deviceToken: json["deviceToken"],
+    age: json["age"],
+    gender: json["gender"],
+    weight: json["weight"],
+    height: json["height"],
+    teamName: json["teamName"],
+    score: json["score"],
+    jobPosition: json["jobPosition"],
+    jobType: json["jobType"],
+    workingDays: json["workingDays"],
+    workStartTime: json["workStartTime"],
+    workEndTime: json["workEndTime"],
+    medicalConditions: json["medicalConditions"],
+    diseases: json["diseases"],
+    preferredAlerts: json["preferredAlerts"],
+    isMergedAlertSet: json["isMergedAlertSet"],
+  );
 
   Map<String, dynamic> toMap() => {
-        "id": id != null ? id.toString() : Random().nextInt(999),
-        "fullName": fullName,
-        "avatar": avatar,
-        "avatar_image": avatarImage,
-        "gender": gender,
-        "age": age,
-        "job_type": jobType,
-        "weight": weight,
-        "height": height,
-        "designation": designation,
-        "created_at": createdAt,
-        "condition": condition,
-        // "diseases": diseases != null? List<dynamic>.from(diseases!.map((x) => x)) : null,
-        // "allergies": allergies != null ? List<dynamic>.from(allergies!.map((x) => x)): null,
-      };
+    "userName": userName,
+    "password": password,
+    "avatarImage": avatarImage,
+    "deviceToken": deviceToken,
+    "age": age,
+    "gender": gender,
+    "weight": weight,
+    "height": height,
+    "teamName": teamName,
+    "score": score,
+    "jobPosition": jobPosition,
+    "jobType": jobType,
+    "workingDays": workingDays,
+    "workStartTime": workStartTime,
+    "workEndTime": workEndTime,
+    "medicalConditions": medicalConditions,
+    "diseases": diseases,
+    "preferredAlerts": preferredAlerts,
+    "isMergedAlertSet": isMergedAlertSet,
+  };
 }
 
 enum Gender {

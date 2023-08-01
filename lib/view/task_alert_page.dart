@@ -94,27 +94,29 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       }
       Exercise exerciseNow = exerciseList.first;
       print(exerciseNow.toRawJson());
-      Navigator.pushNamed(context, summaryPageRoute, arguments: exerciseNow);
+      Navigator.pushNamed(context, summaryPageRoute, arguments: exerciseNow).then((value) {
+        // do some action in this page
+        // start the steps countdown timer
+        _loadWebsiteMetaData(exerciseNow.url ?? "");
 
-      _loadWebsiteMetaData(exerciseNow.url ?? "");
+        setState(() {
+          _isExerciseTask = true;
+          _exercise = exerciseNow;
+          _title = exerciseNow.name ?? "";
+        });
 
-      setState(() {
-        _isExerciseTask = true;
-        _exercise = exerciseNow;
-        _title = exerciseNow.name ?? "";
+        if ((exerciseNow.steps?.length ?? 0) > 1) {
+          _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
+          _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
+          _currentStep = 1;
+          _totalSeconds = exerciseNow.steps?.elementAt(1).duration ?? 5;
+        } else {
+          _totalSeconds = exerciseNow.duration ?? 10;
+        }
+
+        _secondsPassed = _totalSeconds;
+        _startTimer();
       });
-
-      if ((exerciseNow.steps?.length ?? 0) > 1) {
-        _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
-        _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
-        _currentStep = 1;
-        _totalSeconds = exerciseNow.steps?.elementAt(1).duration ?? 5;
-      } else {
-        _totalSeconds = exerciseNow.duration ?? 10;
-      }
-
-      _secondsPassed = _totalSeconds;
-      _startTimer();
     } else if (_taskType == TaskType.water.index) {
       setState(() {
         _showTimer = false;
@@ -148,10 +150,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
-    if (userInfo != null &&
-        userInfo.condition != null &&
-        userInfo.condition!.isNotEmpty) {
-      userCondition = userInfo.condition ?? "";
+    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+      userCondition = userInfo.medicalConditions!;
     }
 
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
@@ -366,17 +366,14 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     int score = DataLoader.getScoreForTask(_taskType ?? -1);
-    String? userId =
-        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
       await ApiManager().updateUserScore(userId, score);
       Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(
-          navigatorKey.currentState!.context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
     } else {
       Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(
-          navigatorKey.currentState!.context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
     }
   }
 

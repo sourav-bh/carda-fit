@@ -9,6 +9,7 @@ import 'package:app/service/database_helper.dart';
 import 'package:app/main.dart';
 import 'package:app/model/learning.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/view/widgets/user_learning_item.dart';
 import 'package:excel/excel.dart';
@@ -138,12 +139,10 @@ class _UserLearningPageState extends State<UserLearningPage> {
   _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null &&
-        userInfo.condition != null &&
-        userInfo.condition!.isNotEmpty) {
+    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       setState(() {
         _showFilteredList = true;
-        _userCondition = userInfo.condition;
+        _userCondition = userInfo.medicalConditions;
       });
     }
 

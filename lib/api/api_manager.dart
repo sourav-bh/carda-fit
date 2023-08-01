@@ -1,34 +1,50 @@
 import 'dart:convert';
 
 import 'package:app/api/api_client.dart';
-import 'package:app/model/user_api_model.dart';
+import 'package:app/model/user_info.dart';
 
 class ApiManager {
   ApiManager();
 
-  Future<List<UserApiModel>> getAllUsers() async {
+  Future<UserInfo?> loginUser(String userName, String password) async {
+    var reqBody = <String, dynamic> {
+      'userName': userName,
+      'password': password
+    };
+    var response = await ApiClient.instance.postRequest('/login', reqBody);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      var jsonRes = json.decode(response.body);
+      var user = jsonRes["user"];
+      return UserInfo.fromMap(user);
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<UserInfo>> getAllUsers() async {
     var response = await ApiClient.instance.getRequest('/user');
     if (response.statusCode == 200) {
       var jsonRes = json.decode(response.body);
       var userJson = jsonRes["_embedded"];
-      return List<UserApiModel>.from(userJson["user"].map((x) => UserApiModel.fromJson(x)));
+      return List<UserInfo>.from(userJson["user"].map((x) => UserInfo.fromMap(x)));
     } else {
       return [];
     }
   }
 
-  Future<UserApiModel?> getUser(String id) async {
+  Future<UserInfo?> getUser(String id) async {
     var response = await ApiClient.instance.getRequest('/user/$id');
     if (response.statusCode == 200) {
-      return UserApiModel.fromJson(json.decode(response.body));
+      return UserInfo.fromMap(json.decode(response.body));
     } else {
       return null;
     }
   }
 
   // return user id
-  Future<String?> registerUser(UserApiModel userModel) async {
-    var reqBody = userModel.toJson();
+  Future<String?> registerUser(UserInfo userModel) async {
+    var reqBody = userModel.toMap();
     var response = await ApiClient.instance.postRequest('/user', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -48,8 +64,8 @@ class ApiManager {
     }
   }
 
-  Future<bool> updateUser(UserApiModel userModel) async {
-    var reqBody = userModel.toJson();
+  Future<bool> updateUser(UserInfo userModel) async {
+    var reqBody = userModel.toMap();
     var response = await ApiClient.instance.putRequest('/user/${userModel.id}', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 204) {

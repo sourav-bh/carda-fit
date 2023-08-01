@@ -2,10 +2,14 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:app/api/api_manager.dart';
-import 'package:app/model/user_api_model.dart';
+import 'package:app/model/user_info.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+typedef StringCallback = void Function(String?);
 
 class CommonUtil {
   static isNullOrEmpty(String? value) {
@@ -80,6 +84,20 @@ class CommonUtil {
     return '$minutesString:$secondsString';
   }
 
+  static String convert12HourTimeTo24HourFormat(BuildContext context, TimeOfDay time) {
+    var df = DateFormat("h:mm a");
+    var dt = df.parse(time.format(context));
+    return DateFormat('HH:mm').format(dt);
+  }
+
+  static double getSmallDiameter(BuildContext context) {
+    return MediaQuery.of(context).size.width * 2 / 3;
+  }
+
+  static double getBigDiameter(BuildContext context) {
+    return MediaQuery.of(context).size.width * 7 / 8;
+  }
+
   static getFitnessItemBasedColor(int id) {
     switch (id) {
       case 12920:
@@ -114,25 +132,32 @@ class CommonUtil {
     return Random().nextInt(max);
   }
 
-  static testApi() async {
-    // ApiManager apiManager = ApiManager();
-    
-    // List<UserApiModel> users = await apiManager.getAllUsers();
-    // print(users.length);
-    //
-    // UserApiModel? uu = await apiManager.getUser("64217ad63ad8a5050d827b11");
-    // print(uu?.userName);
-    
-    // UserApiModel umd = UserApiModel(userName: "anna", avatarName: "ava", deviceToken: "deviceToken", score: 100, avatarImage: "abcdef");
-    // String? id = await apiManager.createUser(umd);
-    // print(id);
+  static const List<String> weekdayNames = [
+    'Mo',
+    'Di',
+    'Mi',
+    'Do',
+    'Fr',
+  ];
 
-    // bool suc = await apiManager.updateDeviceToken("64234ba6ef6d890cde2ad446", "fcmToken");
-    // print(suc);
+  static String getWeekDaySelectionStr(List<bool> selections) {
+    String result = "";
+    for (int i=0 ; i<selections.length ; i++) {
+      if (selections[i] == true) {
+        result += weekdayNames[i];
+        result += ', ';
+      }
+    }
+    return result.substring(0, result.length - 2);
+  }
 
-    // umd.id = "64234ba6ef6d890cde2ad446";
-    // bool usu = await apiManager.updateUser(umd);
-    // print(usu);
+  static String getPreferredAlertStr(List<TaskType> selections) {
+    String result = "";
+    for (TaskType selection in selections) {
+      result += selection.name;
+      result += ', ';
+    }
+    return result.substring(0, result.length - 2);
   }
 }
 

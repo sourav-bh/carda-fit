@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 
 class AppTextStyle {
-  static const double captionTextSize = 26;
-  static const double headerTextSize = 20;
-  static const double subHeaderTextSize = 18;
-  static const double titleTextSize = 17;
-  static const double subTitleTextSize = 16;
+  static const double captionTextSize = 32;
+  static const double headerTextSize = 24;
+  static const double subHeaderTextSize = 20;
+  static const double titleTextSize = 18;
+  static const double subTitleTextSize = 17;
   static const double bodyTextSize = 15;
   static const double smallTextSize = 14;
   static const double extraSmallTextSize = 12;
   
   static const TextTheme appTextTheme = TextTheme(
-    caption: TextStyle(color: AppColor.primary, fontWeight: FontWeight.bold, fontSize: captionTextSize),
-    headline1: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: headerTextSize),
-    subtitle1: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: titleTextSize),
-    bodyText1: TextStyle(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: bodyTextSize, fontFamily: 'Roboto'),
-    bodyText2: TextStyle(color: Colors.black54, fontWeight: FontWeight.normal, fontSize: smallTextSize, fontFamily: 'Roboto'),
-    button: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: subTitleTextSize, fontFamily: 'Roboto'),
-    subtitle2: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: subTitleTextSize),
-    headline2: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: subHeaderTextSize),
-    headline3: TextStyle(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: titleTextSize, fontFamily: 'Roboto'),
-    headline4: TextStyle(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: subTitleTextSize, fontFamily: 'Roboto'),
-    overline: TextStyle(color: AppColor.secondary, fontWeight: FontWeight.normal, fontSize: subTitleTextSize),
+    displayLarge: TextStyle(color: AppColor.primary, fontWeight: FontWeight.bold, fontSize: 36),
+    displayMedium: TextStyle(color: AppColor.primary, fontWeight: FontWeight.bold, fontSize: 30),
+    displaySmall: TextStyle(color: AppColor.primary, fontWeight: FontWeight.bold, fontSize: 24),
+    headlineLarge: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: 28),
+    headlineMedium: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: 22),
+    headlineSmall: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: 18),
+    titleLarge: TextStyle(color: AppColor.primary, fontWeight: FontWeight.bold, fontSize: 24),
+    titleMedium: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: 20),
+    titleSmall: TextStyle(color: AppColor.primary, fontWeight: FontWeight.normal, fontSize: 18),
+    bodyLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: 16, fontFamily: 'Roboto'),
+    bodyMedium: TextStyle(color: Colors.black54, fontWeight: FontWeight.normal, fontSize: 15, fontFamily: 'Roboto'),
+    bodySmall: TextStyle(color: Colors.black54, fontWeight: FontWeight.normal, fontSize: 14, fontFamily: 'Roboto'),
+    labelLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: 16, fontFamily: 'NotoSans'),
+    labelMedium: TextStyle(color: Colors.black54, fontWeight: FontWeight.normal, fontSize: 15, fontFamily: 'NotoSans'),
+    labelSmall: TextStyle(color: Colors.black54, fontWeight: FontWeight.normal, fontSize: 14, fontFamily: 'NotoSans'),
   );
 }
 

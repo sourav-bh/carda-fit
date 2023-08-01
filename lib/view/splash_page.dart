@@ -47,7 +47,7 @@ class _SplashPageState extends State<SplashPage> {
     if (isUserExist && mounted) {
       Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
     } else {
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, userInfoRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, loginRoute, (r) => false);
     }
   }
 

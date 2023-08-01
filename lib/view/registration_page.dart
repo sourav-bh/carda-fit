@@ -1,0 +1,942 @@
+import 'dart:io';
+
+import 'package:app/api/api_manager.dart';
+import 'package:app/main.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/service/database_helper%202.dart';
+import 'package:app/util/app_constant.dart';
+import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
+import 'package:app/util/shared_preference.dart';
+import 'package:app/view/task_alert_page.dart';
+import 'package:app/view/widgets/avatar_picker_dialog.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:random_avatar/random_avatar.dart';
+
+enum RegisterPageViewState {
+  mandatoryInfo,
+  optionalOneBioInfo,
+  optionalTwoWorkInfo,
+  optionalThreeConditionAlert,
+  allInfoToSubmit,
+}
+
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
+
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final _formKey = GlobalKey<FormState>();
+  RegisterPageViewState _viewState = RegisterPageViewState.mandatoryInfo;
+
+  final TextEditingController _userNameText = TextEditingController();
+  final TextEditingController _passwordText = TextEditingController();
+  final TextEditingController _confirmPasswordText = TextEditingController();
+
+  final TextEditingController _ageText = TextEditingController();
+  final TextEditingController _weightText = TextEditingController();
+  final TextEditingController _heightText = TextEditingController();
+  final TextEditingController _designationText = TextEditingController();
+
+  Gender? _genderValue;
+  JobType? _jobTypeValue;
+  String? _avatarImage;
+
+  bool _obscureText = true, _confirmObscureText = true;
+  IconData _iconVisible = Icons.visibility_off;
+
+  IconData _confirmIconVisible = Icons.visibility_off;
+  final List<bool> _selectedWeekdays = List.filled(CommonUtil.weekdayNames.length, false);
+  String? _startTime = '';
+  String? _endTime = '';
+
+  final List<String> _conditionItems = [
+    'Herz', 'Beine', 'Knie', 'Schulter', 'Nacken', 'Rücken', 'Arme', 'Hände', 'Bauch', 'Augen',
+  ];
+  List<String> _selectedConditions = [];
+
+  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water];
+  List<TaskType> _selectedAlerts = [];
+  List<MultiSelectItem<TaskType?>> _items = [];
+  bool _isMergeAlertSelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _items = _alertTypes.map((animal) => MultiSelectItem<TaskType?>(animal, animal?.name ?? "")).toList();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _toggleObscureText() {
+    setState(() {
+      _obscureText = !_obscureText;
+      if (_obscureText == true) {
+        _iconVisible = Icons.visibility_off;
+      } else {
+        _iconVisible = Icons.visibility;
+      }
+    });
+  }
+
+  void _toggleConfirmObscureText() {
+    setState(() {
+      _confirmObscureText = !_confirmObscureText;
+      if (_confirmObscureText == true) {
+        _confirmIconVisible = Icons.visibility_off;
+      } else {
+        _confirmIconVisible = Icons.visibility;
+      }
+    });
+  }
+
+  Future<void> _selectStartTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColor.primaryLight, // header background color
+              onPrimary: Colors.black, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColor.orange, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedTime != null && pickedTime != TimeOfDay.now()) {
+      setState(() {
+        _startTime = CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
+      });
+    }
+  }
+
+  Future<void> _selectEndTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColor.primaryLight, // header background color
+              onPrimary: Colors.black, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColor.orange, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedTime != null && pickedTime != TimeOfDay.now()) {
+      setState(() {
+        _endTime = CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
+      });
+    }
+  }
+
+  void _nextAction() async {
+    if (_viewState == RegisterPageViewState.mandatoryInfo) {
+      if (_formKey.currentState!.validate()) {
+        if (await _checkUserNameAvailability()) {
+          _updateViewState(RegisterPageViewState.optionalOneBioInfo);
+        } else {
+          // show error that username is not available
+          const snackBar = SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      }
+    } else if (_viewState == RegisterPageViewState.optionalOneBioInfo) {
+      _updateViewState(RegisterPageViewState.optionalTwoWorkInfo);
+    } else if (_viewState == RegisterPageViewState.optionalTwoWorkInfo) {
+      _updateViewState(RegisterPageViewState.optionalThreeConditionAlert);
+    } else if (_viewState == RegisterPageViewState.optionalThreeConditionAlert) {
+      _updateViewState(RegisterPageViewState.allInfoToSubmit);
+      // _submitAction();
+    } else if (_viewState == RegisterPageViewState.allInfoToSubmit) {
+      // submit values for registration to server
+    } else {
+      _updateViewState(RegisterPageViewState.mandatoryInfo);
+    }
+  }
+
+  Future<bool> _checkUserNameAvailability() async {
+    return true;
+  }
+
+  void _submitAction() async {
+    String userName = _userNameText.value.text;
+    String password = _passwordText.value.text;
+    int age = int.tryParse(_ageText.value.text) ?? 0;
+    int weight = int.tryParse(_weightText.value.text) ?? 0;
+    int height = int.tryParse(_heightText.value.text) ?? 0;
+    String designation = _designationText.value.text;
+
+    String conditionValue = "";
+    for (String condition in _selectedConditions) {
+      conditionValue += condition;
+      conditionValue += ', ';
+    }
+
+    var userInfo = UserInfo(
+      userName: userName,
+      password: password,
+      avatarImage: _avatarImage,
+      age: age,
+      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
+      weight: weight,
+      height: height,
+      score: 0,
+      jobPosition: designation,
+      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
+      workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
+      workStartTime: _startTime,
+      workEndTime: _endTime,
+      medicalConditions: conditionValue.substring(0, conditionValue.length - 2),
+      preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
+      isMergedAlertSet: _isMergeAlertSelected,
+      deviceToken: AppCache.instance.fcmToken,);
+
+    int userDbId = await DatabaseHelper.instance.addUser(userInfo);
+    SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
+    AppCache.instance.userName = userName;
+    SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
+    AppCache.instance.userDbId = userDbId;
+
+    String? userServerId;
+    try {
+      userServerId = await ApiManager().registerUser(userInfo);
+    } on Exception catch (_) {
+      print('failed to connect with server');
+    }
+
+    if (mounted) {
+      if (userServerId != null) {
+        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
+        AppCache.instance.userServerId = userServerId;
+      } else {
+        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+      }
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+    }
+  }
+
+  void _updateViewState(RegisterPageViewState viewState) {
+    setState(() {
+      _viewState = viewState;
+    });
+  }
+
+  void onAvatarSelected(String? avatar) {
+    setState(() {
+      _avatarImage = avatar;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: AppColor.lightPink,
+        body: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: Platform.isIOS
+              ? SystemUiOverlayStyle.light
+              : const SystemUiOverlayStyle(
+              statusBarIconBrightness: Brightness.light),
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                top: 110,
+                left: -CommonUtil.getSmallDiameter(context) / 3,
+                child: Container(
+                    width: CommonUtil.getSmallDiameter(context),
+                    height: CommonUtil.getSmallDiameter(context),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColor.lightOrange,
+                    )),
+              ),
+              Positioned(
+                bottom: 50,
+                right: -CommonUtil.getSmallDiameter(context) / 3,
+                child: Container(
+                  width: CommonUtil.getSmallDiameter(context),
+                  height: CommonUtil.getSmallDiameter(context),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.lightBlue,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 60,
+                left: 0,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.arrow_back, color: Colors.black, size: 30,),
+                  )
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    padding: const EdgeInsets.only(bottom: 0),
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 70, bottom: 10),
+                        child: Text('Registrierung',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontSize: 30),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      buildMainBody(context, _viewState),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                        child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) => Colors.transparent,),
+                              overlayColor:
+                              MaterialStateProperty.all(Colors.transparent),
+                            ),
+                            onPressed: () {
+                              _nextAction();
+                            },
+                            child: Ink(
+                              decoration: const BoxDecoration(
+                                color: Colors.orangeAccent,
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                    minHeight:
+                                    50), // min sizes for Material buttons
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Weiter".toUpperCase(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  Container buildMainBody(BuildContext context, RegisterPageViewState viewState) {
+    if (viewState == RegisterPageViewState.mandatoryInfo) {
+      return buildMandatoryInfoView(context);
+    } else if (viewState == RegisterPageViewState.optionalOneBioInfo) {
+      return buildOptional1BioInfoView(context);
+    } else if (viewState == RegisterPageViewState.optionalTwoWorkInfo) {
+      return buildOptional2WorkInfoView(context);
+    } else if (viewState == RegisterPageViewState.optionalThreeConditionAlert) {
+      return buildOptional3CondAlertInfoView(context);
+    } else if (viewState == RegisterPageViewState.allInfoToSubmit) {
+      return buildAllInfoSubmitView(context);
+    } else {
+      return buildMandatoryInfoView(context);
+    }
+  }
+
+  Container buildMandatoryInfoView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      'Bitte geben Sie Ihren eindeutigen Nutzername ein und legen Sie Ihr Passwort unten fest',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20,),
+                  TextFormField(
+                    controller: _userNameText,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.orange,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      fillColor: Colors.grey.shade300,
+                      filled: true,
+                      labelText: 'Nutzername',
+                      labelStyle: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    validator: (value) {
+                      if (value?.isEmpty ?? false) {
+                        return 'Nutzername ist erforderlich.';
+                      } else if ((value?.length ?? 0) < 5) {
+                        return 'Muss mindestens 5 Zeichen lang sein.';
+                      } else if ((value?.length ?? 0) > 15) {
+                        return 'Darf maximal 15 Zeichen lang sein.';
+                      } else if ((value ?? "").contains(' ')) {
+                        return 'Darf keine Leerzeichen enthalten.';
+                      } else {
+                        return null;
+                      }
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TextButton(
+                            style: ButtonStyle(
+                                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                backgroundColor: MaterialStateProperty.all<Color>(AppColor.primary),
+                                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.fromLTRB(30, 10, 30, 10)),
+                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                    const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                        side: BorderSide(color: AppColor.primary)
+                                    )
+                                )
+                            ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AvatarPickerDialog(selectionCallback: onAvatarSelected,);
+                                },
+                              );
+                            },
+                            child: Text("Avatar wählen",
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: _avatarImage != null,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: RandomAvatar(_avatarImage ?? "", height: 50, width: 50),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  TextFormField(
+                    controller: _passwordText,
+                    obscureText: _obscureText,
+                    cursorColor: Colors.orange,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      fillColor: Colors.grey.shade300,
+                      filled: true,
+                      labelText: 'Passwort',
+                      labelStyle: Theme.of(context).textTheme.bodyLarge,
+                      suffixIcon: IconButton(
+                          icon: Icon(_iconVisible, color: Colors.grey[400], size: 20),
+                          onPressed: () {
+                            _toggleObscureText();
+                          }),
+                    ),
+                    validator: (value) {
+                      if (value?.isEmpty ?? false) {
+                        return 'Passwort ist erforderlich.';
+                      } else if ((value?.length ?? 0) < 8) {
+                        return 'Muss mindestens 8 Zeichen lang sein.';
+                      } else if ((value?.length ?? 0) > 14) {
+                        return 'Darf maximal 14 Zeichen lang sein.';
+                      } else if ((value ?? "").contains(' ')) {
+                        return 'Darf keine Leerzeichen enthalten.';
+                      } else {
+                        return null;
+                      }
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                  ),
+                  const SizedBox(height: 10,),
+                  TextFormField(
+                    controller: _confirmPasswordText,
+                    obscureText: _confirmObscureText,
+                    cursorColor: Colors.orange,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      fillColor: Colors.grey.shade300,
+                      filled: true,
+                      labelText: 'Passwort bestätigen',
+                      labelStyle: Theme.of(context).textTheme.bodyLarge,
+                      suffixIcon: IconButton(
+                          icon: Icon(_confirmIconVisible, color: Colors.grey[400], size: 20),
+                          onPressed: () {
+                            _toggleConfirmObscureText();
+                          }),
+                    ),
+                    validator: (value) {
+                      debugPrint(_passwordText.text);
+                      if (value != _passwordText.text) {
+                        return 'Passwort nicht übereinstimmend!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container buildOptional1BioInfoView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Bitte geben Sie unten Ihre biologischen Daten ein\n(optional)',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                TextField(
+                  controller: _ageText,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.orange,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    labelText: 'Alter',
+                    labelStyle: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text('Geschlecht',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: CupertinoSlidingSegmentedControl<Gender>(
+                    groupValue: _genderValue,
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    children: const {
+                      Gender.Mannlich: Text('Männlich'),
+                      Gender.Weiblich: Text('Weiblich'),
+                      Gender.Divers: Text('Divers'),
+                    },
+                    onValueChanged: (groupValue) {
+                      setState(() {
+                        _genderValue = groupValue;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 15,),
+                TextField(
+                  controller: _weightText,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.orange,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    labelText: 'Gewicht (kg)',
+                    labelStyle: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                const SizedBox(height: 15,),
+                TextField(
+                  controller: _heightText,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.orange,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    labelText: 'Größe (cm)',
+                    labelStyle: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container buildOptional2WorkInfoView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Bitte geben Sie unten Ihre arbeitsbezogenen Informationen und Ihren Wochenplan ein\n(optional)',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                TextField(
+                  controller: _designationText,
+                  keyboardType: TextInputType.text,
+                  cursorColor: Colors.orange,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    labelText: 'Berufposition',
+                    labelStyle: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15, bottom: 10),
+                  child: Text('Arbeitszeitmodell',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: CupertinoSlidingSegmentedControl<JobType>(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    groupValue: _jobTypeValue,
+                    children: const {
+                      JobType.Vollzeit: Text('Vollzeit'),
+                      JobType.Teilzeit: Text('Teilzeit'),
+                      JobType.HomeOffice: Text('Außendienst'),
+                    },
+                    onValueChanged: (groupValue) {
+                      setState(() {
+                        _jobTypeValue = groupValue;
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15, bottom: 10),
+                  child: Text('Arbeitszeitplan',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      ToggleButtons(
+                        onPressed: (int index) {
+                          setState(() {
+                            _selectedWeekdays[index] = !_selectedWeekdays[index];
+                          });
+                        },
+                        selectedColor: AppColor.orange,
+                        borderRadius: BorderRadius.circular(10),
+                        isSelected: _selectedWeekdays,
+                        constraints: const BoxConstraints(minWidth: 55, minHeight: 50),
+                        children: [
+                          for (int i = 1; i <= 5; i++)
+                            Text(CommonUtil.weekdayNames[i - 1],
+                                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15, bottom: 10),
+                  child: Text('Arbeitszeiten',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(CommonUtil.isNullOrEmpty(_startTime) ? 'Startzeit wählen' : 'Startzeit: $_startTime',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _selectStartTime(context);
+                      },
+                      icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(CommonUtil.isNullOrEmpty(_endTime) ? 'Endzeit wählen' : 'Endzeit: $_endTime',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          _selectEndTime(context);
+                        },
+                        icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container buildOptional3CondAlertInfoView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Bitte geben Sie unten Ihre medizinischen Bedingungen und die Auswahl der Ausschreibungen\n(optional)',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 10),
+                  child: Text('Medizinische Beeinträchtigungen',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  child: MultiSelectDialogField<String>(
+                    items: _conditionItems.map((e) => MultiSelectItem(e, e)).toList(),
+                    listType: MultiSelectListType.CHIP,
+                    onConfirm: (values) {
+                      _selectedConditions = values;
+                    },
+                    title: const Text("Wählen Sie ein Element"),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      border: Border.all(color: Colors.white12, width: 1,),
+                    ),
+                    selectedColor: AppColor.orange,
+                    buttonText: const Text('Wählen Sie ein Element'),
+                    buttonIcon: const Icon(Icons.filter_list),
+                    checkColor: AppColor.orange,
+                    itemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.black),
+                    selectedItemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                SizedBox(
+                  child: MultiSelectChipField<TaskType?>(
+                    items: _items,
+                    title: Text('Alarme auswählen',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                    ),
+                    headerColor: Colors.white,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(color: Colors.white, width: 1,),
+                    ),
+                    selectedChipColor: AppColor.orange,
+                    selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                    onTap: (values) {
+                      //_selectedAnimals4 = values;
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  child: MergeSemantics(
+                    child: ListTile(
+                      title: Text('Zusammenführen von Alarmen wie Wasser mit Pausen und Schritte mit Bewegung',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      trailing: CupertinoSwitch(
+                        value: _isMergeAlertSelected,
+                        activeColor: AppColor.primary,
+                        thumbColor: Colors.white,
+                        trackColor: Colors.black26,
+                        onChanged: (bool value) { setState(() { _isMergeAlertSelected = value; }); },
+                      ),
+                      onTap: () { setState(() { _isMergeAlertSelected = !_isMergeAlertSelected; }); },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container buildAllInfoSubmitView(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Bitte bestätigen Sie alle eingegebenen Informationen und klicken Sie auf die Schaltfläche "Senden", um ein Konto zu erstellen.',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20,),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

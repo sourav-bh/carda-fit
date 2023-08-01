@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'dart:io';
+import 'package:app/view/edit_profile_page.dart';
+import 'package:app/view/login_page.dart';
+import 'package:app/view/registration_page.dart';
 import 'package:app/view/working_schedule_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:app/api/api_manager.dart';
@@ -16,7 +19,6 @@ import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/learning_details_page.dart';
 import 'package:app/view/splash_page.dart';
 import 'package:app/view/user_activity_page.dart';
-import 'package:app/view/user_info_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,13 +31,15 @@ import 'package:app/view/summary_page.dart';
 const splashRoute = '/';
 const landingRoute = '/landing';
 const homeRoute = '/home';
-const userInfoRoute = '/userInfo';
+const registerRoute = '/register';
+const loginRoute = '/login';
 const activityRoute = '/activity';
 const learningRoute = '/learning';
 const learningDetailsRoute = '/learning/details';
 const detailsWebRoute = '/details/web';
 const leaderboardRoute = '/leaderboard';
 const profileRoute = '/profile';
+const editProfileRoute = '/profile/edit';
 const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
 const workingScheduleRoute = '/working/schedule';
@@ -196,8 +200,14 @@ class _MyFitAppState extends State<MyFitApp> {
         case splashRoute:
           screen = const SplashPage();
           break;
-        case userInfoRoute:
-          screen = const UserInfoPage();
+        case registerRoute:
+          screen = const RegistrationPage();
+          break;
+        case loginRoute:
+          screen = const LoginPage();
+          break;
+        case editProfileRoute:
+          screen = const EditProfilePage();
           break;
         case landingRoute:
           screen = const LandingPage();

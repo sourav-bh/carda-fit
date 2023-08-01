@@ -286,11 +286,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_localizations:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_svg:
     dependency: transitive
     description:
@@ -413,22 +408,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  multiselect:
+  multi_select_flutter:
     dependency: "direct main"
     description:
-      name: multiselect
-      sha256: "89307c172c874dbd184825f8509bee38c4c68eae676c480ac5b7943ee2e8436d"
+      name: multi_select_flutter
+      sha256: "503857b415d390d29159df8a9d92d83c6aac17aaf1c307fb7bcfc77d097d20ed"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9"
-  navigation_builder:
-    dependency: transitive
-    description:
-      name: navigation_builder
-      sha256: "95e25150191d9cd4e4b86504f33cd9e786d1e6732edb2e3e635bbedc5ef0dea7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.3"
+    version: "4.1.3"
   nested:
     dependency: transitive
     description:
@@ -778,14 +765,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
-  states_rebuilder:
-    dependency: transitive
-    description:
-      name: states_rebuilder
-      sha256: bf1a5ab5c543acdefce35e60f482eb7ab592339484fe3266d147ee597f18dc92
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
   stream_channel:
     dependency: transitive
     description:

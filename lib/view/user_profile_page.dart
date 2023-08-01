@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app/view/user_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
@@ -10,11 +9,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:multiselect/multiselect.dart';
 import 'package:random_avatar/random_avatar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:app/view/user_info_page.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -94,29 +89,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return selectedSnoozeTime;
   }
 
-  _getTime() async {
-    // TODO: @Justin -- implement here your code to save the value
-    SharedPref.instance
-        .saveStringValue(SharedPref.keySnoozeDuration, selectedValue!);
-    // TODO: @Justin -- also save the current time to indicate that user when saved the snooze time
-    SharedPref.instance.saveIntValue(
-        SharedPref.keySnoozeActualTime, DateTime.now().millisecondsSinceEpoch);
+  _saveSnoozeTime() async {
+    await SharedPref.instance.saveStringValue(SharedPref.keySnoozeDuration, selectedValue!);
+    await SharedPref.instance.saveIntValue(SharedPref.keySnoozeActualTime, DateTime.now().millisecondsSinceEpoch);
   }
 
   // List of times that can be selected for snooze the notifications
-  List<String> items = <String>[
-    '5 min',
-    '10 min',
-    '30 min',
-    '60 min',
-    '120 min',
-    '1440 min'
-  ];
+  List<String> items = <String>['5 min', '10 min', '30 min', '60 min', '120 min', '1440 min'];
 
   // Get the snooze status from SharedPref
   Future<void> getSnoozeStatus() async {
-    bool? isUserSnoozedNow =
-        await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
+    bool? isUserSnoozedNow = await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     if (isUserSnoozedNow != null && isUserSnoozedNow) {
       setState(() {
@@ -127,12 +110,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   _logoutAction() async {
     SharedPref.instance.clearCache();
-    Navigator.pushNamed(context, userInfoRoute);
+    Navigator.pushNamed(context, loginRoute);
   }
 
-  _editProfile() async {
-    // TODO: @Justin -- implement here your code to send value to indicate as edit profile page
-    Navigator.pushNamed(context, userInfoRoute, arguments: true);
+  _editProfileAction() async {
+    Navigator.pushNamed(context, editProfileRoute, arguments: true);
   }
 
   @override
@@ -193,7 +175,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ?.copyWith(fontSize: 18),
                         ),
                         Text(
-                          _userInfo?.avatar ?? "Nicht ausgewählt",
+                          _userInfo?.userName ?? "Nicht ausgewählt",
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
@@ -207,24 +189,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       margin: const EdgeInsets.only(top: 30),
                       child: Column(
                         children: <Widget>[
-                         Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const Icon(Icons.person_pin_rounded,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                _userInfo?.fullName ?? "",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(fontSize: 20),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 24),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -272,7 +236,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 width: 10,
                               ),
                               Text(
-                                _userInfo?.condition ?? "Nicht ausgewählt",
+                                _userInfo?.medicalConditions ?? "Nicht ausgewählt",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyText1
@@ -309,7 +273,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                               Expanded(
                                 child: Text(
-                                  _userInfo?.designation ?? "Nicht ausgewählt",
+                                  _userInfo?.jobPosition ?? "Nicht ausgewählt",
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyText1
@@ -335,7 +299,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             selectedValue = newValue;
                             selectedSnoozeTime = extractNumbersAndCombine(newValue!);
                             snoozeEndTime = DateTime.now().millisecondsSinceEpoch + (selectedSnoozeTime * 60000);
-                            _getTime();
+                            _saveSnoozeTime();
                             isUserSnoozedNow = true;
                           });
                         },
@@ -393,7 +357,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 MaterialStateProperty.all(Colors.transparent),
                           ),
                           onPressed: () {
-                            _editProfile();
+                            _editProfileAction();
                           },
                           child: Ink(
                             decoration: const BoxDecoration(

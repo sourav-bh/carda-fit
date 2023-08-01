@@ -40,7 +40,7 @@ class SummaryPage extends StatelessWidget {
                 padding: EdgeInsets.all(16), // Padding um den Button
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, taskAlertRoute);
+                    Navigator.pop(context, true);
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.orangeAccent,
