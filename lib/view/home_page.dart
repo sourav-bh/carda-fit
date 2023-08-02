@@ -98,10 +98,10 @@ class _HomePageState extends State<HomePage> {
                         text: TextSpan(
                           children: <TextSpan>[
                             TextSpan(text: DataLoader.quotes[AppCache.instance.quoteIndex],
-                                style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,)
+                                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColor.darkBlue, fontSize: 24, fontStyle: FontStyle.normal,)
                             ),
                             TextSpan(text: '\n ${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
-                              style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.black54, fontSize: 16, fontStyle: FontStyle.italic),
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.black54, fontSize: 16, fontStyle: FontStyle.italic),
                             ),
                           ],
                         ),
@@ -132,10 +132,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 10,),
                       Text("Schritt für Schritt erreichen Sie Ihr Ziel",
-                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal, fontWeight: FontWeight.w600),
                       ),
+                      const SizedBox(height: 10,),
                       Text("Sie machen sich heute gut, machen Sie weiter, um Ihre Tagesziele zu erreichen!",
-                        style: Theme.of(context).textTheme.bodyText1,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 10,),
                       Row(
@@ -167,8 +168,8 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Icon(Icons.recommend_outlined, color: Colors.black54,),
                           SizedBox(width: 10,),
                           Text("Empfehlungen"),
@@ -178,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 10,),
                       Text("Glaube an die Magie der Regelmäßigkeit, lass sie uns heute rocken",
-                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10,),
                       Container(
@@ -234,14 +235,14 @@ class _HomePageState extends State<HomePage> {
                               // CommonUtil.testApi();
                             },
                             child: Text("Alles",
-                              style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.orange, fontSize: 18, fontStyle: FontStyle.normal,),
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.orange, fontSize: 18, fontStyle: FontStyle.normal,),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10,),
                       Text("Lernen Sie die Dinge in Ihrem eigenen Tempo, das Leben ist kein Wettlauf",
-                        style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10,),
                       ListView.separated(

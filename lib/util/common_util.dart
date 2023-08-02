@@ -160,6 +160,25 @@ class CommonUtil {
     return result.isNotEmpty ? result.substring(0, result.length - 2) : "";
   }
 
+  static String getTaskAlertName(TaskType? type) {
+    switch(type) {
+      case TaskType.waterWithBreak:
+        return "Water & Break";
+      case TaskType.exercise:
+        return "Exercise";
+      case TaskType.walkWithExercise:
+        return "Walk & Exercise";
+      case TaskType.steps:
+        return "Walk";
+      case TaskType.water:
+        return "Water";
+      case TaskType.breaks:
+        return "Break";
+      default:
+        return "";
+    }
+  }
+
   static testApi() async {
     ApiManager apiManager = ApiManager();
 

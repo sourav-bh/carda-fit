@@ -11,6 +11,7 @@ import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_image_picker.dart';
+import 'package:app/view/widgets/leaderborad_top_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -106,7 +107,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
         children: [
           const SizedBox(height: 30,),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 10),
             child: Text('Du hast den ${_getCurrentUserPosition() + 1} Platz erreicht!',
               style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,),
               textAlign: TextAlign.center,
@@ -122,89 +123,9 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
               crossAxisSpacing: 8.0,
               mainAxisSpacing: 8.0,
               children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 8, left: 8, right: 8),
-                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
-                  child: CustomPaint(
-                    painter: CurvePainter(Colors.green.shade300),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text('2', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                        const SizedBox(width: 10,),
-                        Visibility(
-                          visible: _getTopUserInfo(2) != null,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(_getTopUserInfo(2)?.userName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                              const SizedBox(width: 10,),
-                              RandomAvatar(_getTopUserInfo(2)?.avatarImage ?? "n/a", width: 25, height: 25),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10,),
-                        Visibility(
-                          visible: _getTopUserInfo(2) != null,
-                          child: Text('${_getTopUserInfo(2)?.score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,)
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
-                  child: CustomPaint(
-                    painter: CurvePainter(Colors.orange.shade300),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text('1', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                        const SizedBox(width: 10,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(_getTopUserInfo(1)?.userName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                            const SizedBox(width: 10,),
-                            RandomAvatar(_getTopUserInfo(1)?.avatarImage ?? "n/a", width: 25, height: 25),
-                          ],
-                        ),
-                        const SizedBox(width: 10,),
-                        Text('${_getTopUserInfo(1)?.score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: CommonUtil.getRectangleBoxDecoration(Colors.white54, 10),
-                  child: CustomPaint(
-                    painter: CurvePainter(Colors.blue.shade300),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text('3', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                        const SizedBox(width: 10,),
-                        Visibility(
-                          visible: _getTopUserInfo(3) != null,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(_getTopUserInfo(3)?.userName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
-                              const SizedBox(width: 10,),
-                              RandomAvatar(_getTopUserInfo(3)?.avatarImage ?? "n/a", width: 25, height: 25),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10,),
-                        Visibility(
-                          visible: _getTopUserInfo(3) != null,
-                          child: Text('${_getTopUserInfo(3)?.score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 24, color: Colors.brown), textAlign: TextAlign.center,)
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                LeaderboardTopItemView(userInfo: _getTopUserInfo(2), position: 2, badgeColor: Colors.green.shade300, topMargin: 8,),
+                LeaderboardTopItemView(userInfo: _getTopUserInfo(1), position: 1, badgeColor: Colors.orange.shade300, topMargin: 0),
+                LeaderboardTopItemView(userInfo: _getTopUserInfo(3), position: 3, badgeColor: Colors.blue.shade300, topMargin: 16),
               ],
             ),
           ),
@@ -231,7 +152,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                   children: [
                                     Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                                     const SizedBox(width: 10,),
-                                    Text(participant.userName ?? "", style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w600, fontSize: 24), textAlign: TextAlign.center,),
+                                    Text(participant.userName ?? "", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 20), textAlign: TextAlign.center,),
                                     const SizedBox(width: 10,),
                                     RandomAvatar(participant.avatarImage ?? "n/a", width: 40, height: 40)
                                   ],

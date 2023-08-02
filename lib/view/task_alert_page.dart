@@ -29,6 +29,8 @@ enum TaskType {
   exercise,
   breaks,
   teamExercise,
+  waterWithBreak,
+  walkWithExercise,
 }
 
 class TaskAlertPage extends StatefulWidget {
@@ -386,7 +388,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         ),
         backgroundColor: Colors.pink.shade50,
         body: _isExerciseTask && !_isExerciseSummaryRead ?
-          buildExerciseSummaryView(context, _exercise?.steps ?? []) :
+          buildExerciseSummaryView(context, (_exercise?.steps?.length ?? 0) > 0 ? _exercise?.steps?.sublist(1, (_exercise?.steps?.length ?? 0)-1) ?? [] : []) :
           buildMainView(context)
     );
   }

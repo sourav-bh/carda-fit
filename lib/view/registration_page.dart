@@ -33,7 +33,8 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final _formKey = GlobalKey<FormState>();
+  final _mandatoryFormKey = GlobalKey<FormState>();
+  final _alertTypeFormKey = GlobalKey<FormState>();
   RegisterPageViewState _viewState = RegisterPageViewState.mandatoryInfo;
 
   final TextEditingController _userNameText = TextEditingController();
@@ -62,16 +63,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
   ];
   List<String> _selectedConditions = [];
 
-  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water];
+  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water, TaskType.walkWithExercise, TaskType.waterWithBreak];
   List<TaskType> _selectedAlerts = [];
   List<MultiSelectItem<TaskType?>> _items = [];
   bool _isMergeAlertSelected = false;
+
+  int _stepIndex = 0;
+  String _nextButtonText = "Weiter";
 
   @override
   void initState() {
     super.initState();
 
-    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, alertType?.name ?? "")).toList();
+    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, CommonUtil.getTaskAlertName(alertType))).toList();
   }
 
   @override
@@ -86,9 +90,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void _nextAction() async {
     if (_viewState == RegisterPageViewState.mandatoryInfo) {
-      if (_formKey.currentState!.validate()) {
+      if (_mandatoryFormKey.currentState!.validate()) {
         if (await _checkUserNameAvailability()) {
-          _updateViewState(RegisterPageViewState.optionalOneBioInfo);
+          _updateViewState(RegisterPageViewState.optionalOneBioInfo, 1);
         } else {
           // show error that username is not available
           const snackBar = SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
@@ -96,16 +100,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
         }
       }
     } else if (_viewState == RegisterPageViewState.optionalOneBioInfo) {
-      _updateViewState(RegisterPageViewState.optionalTwoWorkInfo);
+      _updateViewState(RegisterPageViewState.optionalTwoWorkInfo, 2);
     } else if (_viewState == RegisterPageViewState.optionalTwoWorkInfo) {
-      _updateViewState(RegisterPageViewState.optionalThreeConditionAlert);
+      _updateViewState(RegisterPageViewState.optionalThreeConditionAlert, 3);
+      // update button text to Registrieren
+      setState(() {
+        _nextButtonText = "Registrieren";
+      });
     } else if (_viewState == RegisterPageViewState.optionalThreeConditionAlert) {
       // _updateViewState(RegisterPageViewState.allInfoToSubmit);
-      _submitAction();
+      if (_alertTypeFormKey.currentState!.validate()) {
+        _submitAction();
+      }
     } else if (_viewState == RegisterPageViewState.allInfoToSubmit) {
       // submit values for registration to server
-    } else {
-      _updateViewState(RegisterPageViewState.mandatoryInfo);
+      // not being used right now
     }
   }
 
@@ -253,9 +262,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  void _updateViewState(RegisterPageViewState viewState) {
+  void _updateViewState(RegisterPageViewState viewState, int viewIndex) {
     setState(() {
       _viewState = viewState;
+      _stepIndex = viewIndex;
     });
   }
 
@@ -268,6 +278,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          title: Text('Registrierung', style: Theme.of(context).textTheme.displayMedium,),
+        ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
           value: Platform.isIOS
@@ -299,43 +315,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                 ),
               ),
-              Positioned(
-                top: 60,
-                left: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.arrow_back, color: Colors.black, size: 30,),
-                  )
-                ),
-              ),
               Align(
                 alignment: Alignment.center,
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
                   child: ListView(
                     padding: const EdgeInsets.only(bottom: 0),
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 70, bottom: 10),
-                        child: Text('Registrierung',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontSize: 30),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                      buildStepper(context),
                       buildMainBody(context, _viewState),
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) => Colors.transparent,),
-                              overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
+                              backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
+                              overlayColor: MaterialStateProperty.all(Colors.transparent),
                             ),
                             onPressed: () {
                               _nextAction();
@@ -351,8 +345,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     minHeight:
                                     50), // min sizes for Material buttons
                                 alignment: Alignment.center,
-                                child: Text(
-                                  "Weiter".toUpperCase(),
+                                child: Text(_nextButtonText.toUpperCase(),
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700),
@@ -369,7 +362,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ));
   }
 
-  Container buildMainBody(BuildContext context, RegisterPageViewState viewState) {
+  Widget buildMainBody(BuildContext context, RegisterPageViewState viewState) {
     if (viewState == RegisterPageViewState.mandatoryInfo) {
       return buildMandatoryInfoView(context);
     } else if (viewState == RegisterPageViewState.optionalOneBioInfo) {
@@ -385,9 +378,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  Container buildMandatoryInfoView(BuildContext context) {
+  Widget buildMandatoryInfoView(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +388,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             padding: const EdgeInsets.all(15),
             decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
             child: Form(
-              key: _formKey,
+              key: _mandatoryFormKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -568,9 +560,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Container buildOptional1BioInfoView(BuildContext context) {
+  Widget buildOptional1BioInfoView(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -680,9 +671,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Container buildOptional2WorkInfoView(BuildContext context) {
+  Widget buildOptional2WorkInfoView(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -815,9 +805,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Container buildOptional3CondAlertInfoView(BuildContext context) {
+  Widget buildOptional3CondAlertInfoView(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -865,39 +854,55 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 const SizedBox(height: 20,),
                 SizedBox(
-                  child: MultiSelectChipField<TaskType?>(
-                    items: _items,
-                    title: Text('Alarme auswählen',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Form(
+                    key: _alertTypeFormKey,
+                    child: MultiSelectChipField<TaskType?>(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      scroll: false,
+                      items: _items,
+                      title: Text('Alarme auswählen',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                      ),
+                      headerColor: Colors.white,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(color: Colors.white, width: 1,),
+                      ),
+                      selectedChipColor: AppColor.orange,
+                      validator: (values) {
+                        if ((((values?.contains(TaskType.breaks) ?? false) || (values?.contains(TaskType.water) ?? false))
+                            && (values?.contains(TaskType.waterWithBreak) ?? false))
+                        || (((values?.contains(TaskType.steps) ?? false) || (values?.contains(TaskType.exercise) ?? false))
+                                && (values?.contains(TaskType.walkWithExercise) ?? false))) {
+                          return "* Einzelne u. kombinierte dürfen nicht gewählt";
+                        }
+                      },
+                      selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                      onTap: (values) {
+                        _selectedAlerts = values.whereType<TaskType>().toList();
+                      },
                     ),
-                    headerColor: Colors.white,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(color: Colors.white, width: 1,),
-                    ),
-                    selectedChipColor: AppColor.orange,
-                    selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
-                    onTap: (values) {
-                      _selectedAlerts = values.whereType<TaskType>().toList();
-                    },
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  child: MergeSemantics(
-                    child: ListTile(
-                      title: Text('Zusammenführen von Alarmen wie Wasser mit Pausen und Schritte mit Bewegung',
-                        style: Theme.of(context).textTheme.bodyLarge,
+                Visibility(
+                  visible: false,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: MergeSemantics(
+                      child: ListTile(
+                        title: Text('Zusammenführen von Alarmen wie Wasser mit Pausen und Schritte mit Bewegung',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        trailing: CupertinoSwitch(
+                          value: _isMergeAlertSelected,
+                          activeColor: AppColor.primary,
+                          thumbColor: Colors.white,
+                          trackColor: Colors.black26,
+                          onChanged: (bool value) { setState(() { _isMergeAlertSelected = value; }); },
+                        ),
+                        onTap: () { setState(() { _isMergeAlertSelected = !_isMergeAlertSelected; }); },
                       ),
-                      trailing: CupertinoSwitch(
-                        value: _isMergeAlertSelected,
-                        activeColor: AppColor.primary,
-                        thumbColor: Colors.white,
-                        trackColor: Colors.black26,
-                        onChanged: (bool value) { setState(() { _isMergeAlertSelected = value; }); },
-                      ),
-                      onTap: () { setState(() { _isMergeAlertSelected = !_isMergeAlertSelected; }); },
                     ),
                   ),
                 ),
@@ -909,7 +914,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Container buildAllInfoSubmitView(BuildContext context) {
+  Widget buildAllInfoSubmitView(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
@@ -935,6 +940,56 @@ class _RegistrationPageState extends State<RegistrationPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildStepper(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(height: 120.0),
+      child: Theme(
+        data: ThemeData(
+          canvasColor: Colors.transparent,
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: AppColor.orange,
+            background: Colors.red,
+            secondary: Colors.green,
+          ),
+        ),
+        child: Stepper(
+          type: StepperType.horizontal,
+          currentStep: _stepIndex,
+          elevation: 0,
+          controlsBuilder: (BuildContext context, ControlsDetails controls) {
+            return const SizedBox.shrink();
+          },
+          steps: <Step>[
+            Step(
+              title: const Text(''),
+              label: const Text('Nutzername', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              content: const SizedBox(),
+              isActive: _stepIndex >= 0,
+            ),
+            Step(
+              title: const Text(''),
+              label: const Text('Persönlich', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              content: const SizedBox(),
+              isActive: _stepIndex >= 1,
+            ),
+            Step(
+              title: const SizedBox(),
+              label: const Text('Arbeits', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              content: const SizedBox(),
+              isActive: _stepIndex >= 2,
+            ),
+            Step(
+              title: const Text(''),
+              label: const Text('Präferenz', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              content: const SizedBox(),
+              isActive: _stepIndex >= 3,
+            ),
+          ],
+        ),
       ),
     );
   }
