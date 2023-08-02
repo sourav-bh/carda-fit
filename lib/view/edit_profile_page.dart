@@ -4,7 +4,7 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/model/user_info.dart';
-import 'package:app/service/database_helper%202.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -51,7 +51,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   List<String> _selectedConditions = [];
 
   final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water];
-  final List<TaskType> _selectedAlerts = [];
+  List<TaskType> _selectedAlerts = [];
   List<MultiSelectItem<TaskType?>> _items = [];
   bool _isMergeAlertSelected = false;
 
@@ -190,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
       workStartTime: _startTime,
       workEndTime: _endTime,
-      medicalConditions: conditionValue.substring(0, conditionValue.length - 2),
+      medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
       isMergedAlertSet: _isMergeAlertSelected,);
 
@@ -649,7 +649,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     selectedChipColor: AppColor.orange,
                     selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
                     onTap: (values) {
-                      //_selectedAnimals4 = values;
+                      _selectedAlerts = values.whereType<TaskType>().toList();
                     },
                   ),
                 ),

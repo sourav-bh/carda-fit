@@ -16,6 +16,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/widgets/exercise_summary_item.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,7 +50,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   double _showButton = 0.0;
   int _timeLeft = 120;
   bool _showTimer = false;
-  Duration duration = Duration();
+  Duration duration = const Duration();
   double? _progressCountDown;
 
   // hide button if exercise is not finished
@@ -61,7 +62,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   String _staticImage = 'assets/animations/anim_fitness_2.gif';
   List<String> splitConditionList = List.empty(growable: true);
 
-  /// not sure about this
+  bool _isExerciseSummaryRead = false;
 
   @override
   void initState() {
@@ -93,30 +94,27 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         // do nothing, for team exercise we are always choosing the first one
       }
       Exercise exerciseNow = exerciseList.first;
-      print(exerciseNow.toRawJson());
-      Navigator.pushNamed(context, summaryPageRoute, arguments: exerciseNow).then((value) {
-        // do some action in this page
-        // start the steps countdown timer
-        _loadWebsiteMetaData(exerciseNow.url ?? "");
 
-        setState(() {
-          _isExerciseTask = true;
-          _exercise = exerciseNow;
-          _title = exerciseNow.name ?? "";
-        });
+      // start the steps countdown timer
+      _loadWebsiteMetaData(exerciseNow.url ?? "");
 
-        if ((exerciseNow.steps?.length ?? 0) > 1) {
-          _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
-          _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
-          _currentStep = 1;
-          _totalSeconds = exerciseNow.steps?.elementAt(1).duration ?? 5;
-        } else {
-          _totalSeconds = exerciseNow.duration ?? 10;
-        }
-
-        _secondsPassed = _totalSeconds;
-        _startTimer();
+      setState(() {
+        _isExerciseTask = true;
+        _exercise = exerciseNow;
+        _title = exerciseNow.name ?? "";
       });
+
+      if ((exerciseNow.steps?.length ?? 0) > 1) {
+        _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
+        _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
+        _currentStep = 1;
+        _totalSeconds = exerciseNow.steps?.elementAt(1).duration ?? 5;
+      } else {
+        _totalSeconds = exerciseNow.duration ?? 10;
+      }
+
+      _secondsPassed = _totalSeconds;
+
     } else if (_taskType == TaskType.water.index) {
       setState(() {
         _showTimer = false;
@@ -274,7 +272,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
 
   //newTimer
   void _startCountDown() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted && _timeLeft > 0) {
         setState(() {
           _timeLeft--;
@@ -384,159 +382,217 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
           elevation: 0,
           backgroundColor: Colors.pink.shade50,
           centerTitle: false,
-          title: const Text(''),
+          title: _isExerciseTask && !_isExerciseSummaryRead ? const Text('Zusammenfassung') : const Text(''),
         ),
         backgroundColor: Colors.pink.shade50,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Visibility(
-                visible: _isExerciseTask,
-                child: Text(
-                  _stepNo ?? "",
-                  style: Theme.of(context)
-                      .textTheme
-                      .caption
-                      ?.copyWith(fontSize: 36, color: Colors.brown),
-                  textAlign: TextAlign.center,
-                )),
-            const SizedBox(height: 30),
-            Visibility(
+        body: _isExerciseTask && !_isExerciseSummaryRead ?
+          buildExerciseSummaryView(context, _exercise?.steps ?? []) :
+          buildMainView(context)
+    );
+  }
+
+  Widget buildMainView(BuildContext context) {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Visibility(
               visible: _isExerciseTask,
-              child: SizedBox(
-                width: 120,
-                height: 120,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      width: 120,
-                      height: 120,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 20,
-                        backgroundColor: Colors.white,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.orange),
-                        value: _progress,
-                      ),
-                    ),
-                    Center(
-                        child: Text(
-                      CommonUtil.formatDuration(_secondsPassed),
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-                      textAlign: TextAlign.center,
-                    ))
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                _title,
-                style: Theme.of(context)
-                    .textTheme
-                    .caption
-                    ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+              child: Text(_stepNo ?? "",
+                style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 36, color: Colors.brown),
                 textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Visibility(
-              visible: _showTimer,
-              child: SizedBox(
-                width: 120,
-                height: 120,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      width: 120,
-                      height: 120,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 20,
-                        backgroundColor: Colors.white,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.orange),
-                        value: _progress,
-                      ),
+              )),
+          const SizedBox(height: 30),
+          Visibility(
+            visible: _isExerciseTask,
+            child: SizedBox(
+              width: 120,
+              height: 120,
+              child: Stack(
+                children: [
+                  Positioned(
+                    width: 120,
+                    height: 120,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 20,
+                      backgroundColor: Colors.white,
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.orange),
+                      value: _progress,
                     ),
-                    Center(
-                        child: Text(
-                      CommonUtil.formatDuration(_timeLeft),
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-                      textAlign: TextAlign.center,
-                    ))
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                _subTitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .subtitle2
-                    ?.copyWith(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              color: Colors.transparent,
-              height: 150,
-              child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(5)),
-                  child: _image.isNotEmpty
-                      ? Image.network(_image)
-                      : Image.asset(
-                          _staticImage,
-                        )),
-            ),
-            Opacity(
-              opacity: _showButton,
-              // showButton if exercise done
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: GradientSlideToAct(
-                    // width: 400,
-                    text: "Schieben zum\nBestätigen",
-                    dragableIconBackgroundColor: Colors.greenAccent,
-                    textStyle: Theme.of(context)
+                  ),
+                  Center(
+                      child: Text(
+                    CommonUtil.formatDuration(_secondsPassed),
+                    style: Theme.of(context)
                         .textTheme
-                        .bodyText2
-                        ?.copyWith(fontSize: 18),
-                    backgroundColor: Colors.white,
-                    onSubmit: () {
-                      onSubmitScore();
-                      // Future.delayed(const Duration(seconds: 1), () {
-                      //   Navigator.of(context).pop();
-                      //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
-                      // },);
-                    },
-                    gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColor.primary,
-                          AppColor.primaryLight,
-                        ]),
+                        .caption
+                        ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                    textAlign: TextAlign.center,
+                  ))
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(_title,
+              style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Visibility(
+            visible: _showTimer,
+            child: SizedBox(
+              width: 120,
+              height: 120,
+              child: Stack(
+                children: [
+                  Positioned(
+                    width: 120,
+                    height: 120,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 20,
+                      backgroundColor: Colors.white,
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.orange),
+                      value: _progress,
+                    ),
+                  ),
+                  Center(child: Text(
+                    CommonUtil.formatDuration(_timeLeft),
+                    style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                    textAlign: TextAlign.center,
+                  ))
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              _subTitle,
+              style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            color: Colors.transparent,
+            height: 150,
+            child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                child: _image.isNotEmpty
+                    ? Image.network(_image)
+                    : Image.asset(_staticImage,)),
+          ),
+          Opacity(
+            opacity: _showButton,
+            // showButton if exercise done
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: GradientSlideToAct(
+                  // width: 400,
+                  text: "Schieben zum\nBestätigen",
+                  dragableIconBackgroundColor: Colors.greenAccent,
+                  textStyle: Theme.of(context)
+                      .textTheme
+                      .bodyText2
+                      ?.copyWith(fontSize: 18),
+                  backgroundColor: Colors.white,
+                  onSubmit: () {
+                    onSubmitScore();
+                    // Future.delayed(const Duration(seconds: 1), () {
+                    //   Navigator.of(context).pop();
+                    //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+                    // },);
+                  },
+                  gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColor.primary,
+                        AppColor.primaryLight,
+                      ]),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+  }
+
+  Widget buildExerciseSummaryView(BuildContext context, List<ExerciseStep> steps) {
+    return ListView(
+      // crossAxisAlignment: CrossAxisAlignment.center,
+      // mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+          child: Text(
+            'Übung: ${steps.isNotEmpty ? steps[0].name ?? "" : ""}',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.orange),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                ExerciseStep step = steps[index];
+                return ExerciseSummaryItemView(itemData: step,);
+              },
+              separatorBuilder: (context, index) {
+                return const Divider(endIndent: 0, color: Colors.transparent);
+              },
+              itemCount: steps.length,
+              scrollDirection: Axis.vertical,
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+          child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+              ),
+              onPressed: () {
+                setState(() {
+                  _isExerciseSummaryRead = true;
+                });
+                _startTimer();
+              },
+              child: Ink(
+                decoration: const BoxDecoration(
+                  color: Colors.orangeAccent,
+                  borderRadius:
+                  BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Container(
+                  constraints: const BoxConstraints(
+                      minHeight:
+                      50), // min sizes for Material buttons
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Weiter".toUpperCase(),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
-              ),
-            ),
-          ],
-        ));
+              )),
+        ),
+      ],
+    );
   }
 }

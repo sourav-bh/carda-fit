@@ -60,25 +60,25 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     print(">>>>>>>>>>$query");
-// create a result List to show them
-    List<String> matchQuery = [];
+    if (query.isEmpty) return Container();
+
     List<LearningMaterialInfo> learningMaterialResults = [];
 
-// TODO: @Justin -- implement here your code to search actually inside the learning material
     for (var learningMaterial in searchTerms) {
-      if (query.contains(learningMaterial.description.toString())) {
+      if (query.toLowerCase().contains(learningMaterial.description.toLowerCase())) {
         learningMaterialResults.add(learningMaterial);
-      } else if (query.contains(learningMaterial.title.toString())) {
+      } else if (query.toLowerCase().contains(learningMaterial.title.toLowerCase())) {
         learningMaterialResults.add(learningMaterial);
       }
-
     }
+    print(learningMaterialResults);
+
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: learningMaterialResults.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
+        var result = learningMaterialResults[index];
         return ListTile(
-          title: Text(result),
+          title: Text(result.title ?? ""),
         );
       },
     );
@@ -87,19 +87,25 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     print(">>>>>>>>>>$query");
+    if (query.isEmpty) return Container();
 
-    List<String> matchQuery = [];
-    for (var recipe in searchTerms) {
-      // if (recipe.toLowerCase().contains(query.toLowerCase())) {
-      //   matchQuery.add(recipe);
-      // }
+    List<LearningMaterialInfo> learningMaterialResults = [];
+
+    for (var learningMaterial in searchTerms) {
+      if (query.toLowerCase().contains(learningMaterial.description.toLowerCase())) {
+        learningMaterialResults.add(learningMaterial);
+      } else if (query.toLowerCase().contains(learningMaterial.title.toLowerCase())) {
+        learningMaterialResults.add(learningMaterial);
+      }
     }
+    print(learningMaterialResults);
+
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: learningMaterialResults.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
+        var result = learningMaterialResults[index];
         return ListTile(
-          title: Text(result),
+          title: Text(result.title ?? ""),
         );
       },
     );

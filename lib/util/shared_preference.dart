@@ -2,23 +2,17 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
-  static const keySnoozeEndTime = 'key_snooze_end_time';
-  static const keySnoozeDecision = "key_snooze_decision";
-  static const keySnoozeDuration = "key_snooze_duration";
-  static const keySnoozeActualTime = "key_snooze_actual_time";
   static const keyUserName = "key_user_name";
   static const keyUserDbId = "key_user_db_id";
   static const keyUserServerId = "key_user_server_id";
-  static const keyUserAvatar = "key_user_avatar";
+  static const keyDeviceToken = "key_fcm_token";
+
   static const keyUserTargets = "key_user_targets";
   static const keyUserCompletedTargets = "key_user_completed_targets";
-  static const keyUserProgressToday = "key_user_progress_today";
-  static const keyDeviceToken = "key_fcm_token";
-  static const keyTimeoutNotification = "key_timeout_notification";
-  static const keyStartTime = "key_start_time";
-  static const keyEndTime = "key_end_time";
-  static const keySelectedDays = "key_selected_days";
+
   static const keyIsSnoozed = "key_is_snoozed";
+  static const keySnoozeDuration = "key_snooze_duration";
+  static const keySnoozeActualTime = "key_snooze_actual_time";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();

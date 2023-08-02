@@ -30,6 +30,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     super.initState();
     _loadUserInfo();
+
     getSnoozeStatus();
     // Start the timer to check snooze status every 1 minute
     _snoozeTimer = Timer.periodic(Duration(minutes: 1), (timer) {
@@ -56,8 +57,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   _loadUserInfo() async {
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
@@ -109,8 +109,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   _logoutAction() async {
-    SharedPref.instance.clearCache();
-    Navigator.pushNamed(context, loginRoute);
+    await SharedPref.instance.clearCache();
+    Navigator.pushNamedAndRemoveUntil(context, loginRoute, (r) => false);
   }
 
   _editProfileAction() async {
@@ -168,7 +168,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Avatar Name: ',
+                          'Nutzername: ',
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1

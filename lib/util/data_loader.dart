@@ -51,23 +51,21 @@ class LearningMaterialInfo {
   int? id;
   String? thumbnail;
   String? image;
-  // TODO: @Justin -- only use the title and description for search
-  String? title;
-  String? description;
+  String title;
+  String description;
   String? detailsUrl;
   String? videoUrl;
   LearningContent? originalContent;
 
-  LearningMaterialInfo(this.title);
+  LearningMaterialInfo(this.title, this.description);
 
   static Future<LearningMaterialInfo> copyContentFromLink(LearningContent content) async {
     Metadata? metadata = await AnyLinkPreview.getMetadata(
       link: content.contentUri ?? "",
       cache: const Duration(days: 7),
     );
-    LearningMaterialInfo info = LearningMaterialInfo(metadata?.title);
+    LearningMaterialInfo info = LearningMaterialInfo(metadata?.title ?? "", metadata?.desc ?? "");
     info.thumbnail = metadata?.image;
-    info.description = metadata?.desc;
     info.originalContent = content;
     return info;
   }

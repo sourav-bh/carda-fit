@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
-import 'package:app/service/database_helper%202.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -39,6 +39,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+
+    // CommonUtil.testApi();
   }
 
   @override
@@ -72,11 +74,12 @@ class _LoginPageState extends State<LoginPage> {
 
         SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userRes.id!);
         AppCache.instance.userServerId = userRes.id!;
+
+        Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
       } else {
         const snackBar = SnackBar(content: Text('Login fehlschlagen'));
         ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
       }
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }
 

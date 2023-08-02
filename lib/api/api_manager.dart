@@ -16,7 +16,7 @@ class ApiManager {
     if (response.statusCode == 200 || response.statusCode == 201) {
       var jsonRes = json.decode(response.body);
       var user = jsonRes["user"];
-      return UserInfo.fromMap(user);
+      return UserInfo.fromJson(user);
     } else {
       return null;
     }
@@ -27,7 +27,7 @@ class ApiManager {
     if (response.statusCode == 200) {
       var jsonRes = json.decode(response.body);
       var userJson = jsonRes["_embedded"];
-      return List<UserInfo>.from(userJson["user"].map((x) => UserInfo.fromMap(x)));
+      return List<UserInfo>.from(userJson["user"].map((x) => UserInfo.fromJson(x)));
     } else {
       return [];
     }
@@ -36,7 +36,7 @@ class ApiManager {
   Future<UserInfo?> getUser(String id) async {
     var response = await ApiClient.instance.getRequest('/user/$id');
     if (response.statusCode == 200) {
-      return UserInfo.fromMap(json.decode(response.body));
+      return UserInfo.fromJson(json.decode(response.body));
     } else {
       return null;
     }
@@ -44,7 +44,7 @@ class ApiManager {
 
   // return user id
   Future<String?> registerUser(UserInfo userModel) async {
-    var reqBody = userModel.toMap();
+    var reqBody = userModel.toJson();
     var response = await ApiClient.instance.postRequest('/user', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -65,7 +65,7 @@ class ApiManager {
   }
 
   Future<bool> updateUser(UserInfo userModel) async {
-    var reqBody = userModel.toMap();
+    var reqBody = userModel.toJson();
     var response = await ApiClient.instance.putRequest('/user/${userModel.id}', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 204) {

@@ -4,7 +4,7 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/model/user_info.dart';
-import 'package:app/service/database_helper%202.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -71,7 +71,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void initState() {
     super.initState();
 
-    _items = _alertTypes.map((animal) => MultiSelectItem<TaskType?>(animal, animal?.name ?? "")).toList();
+    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, alertType?.name ?? "")).toList();
   }
 
   @override
@@ -82,6 +82,93 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _nextAction() async {
+    if (_viewState == RegisterPageViewState.mandatoryInfo) {
+      if (_formKey.currentState!.validate()) {
+        if (await _checkUserNameAvailability()) {
+          _updateViewState(RegisterPageViewState.optionalOneBioInfo);
+        } else {
+          // show error that username is not available
+          const snackBar = SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      }
+    } else if (_viewState == RegisterPageViewState.optionalOneBioInfo) {
+      _updateViewState(RegisterPageViewState.optionalTwoWorkInfo);
+    } else if (_viewState == RegisterPageViewState.optionalTwoWorkInfo) {
+      _updateViewState(RegisterPageViewState.optionalThreeConditionAlert);
+    } else if (_viewState == RegisterPageViewState.optionalThreeConditionAlert) {
+      // _updateViewState(RegisterPageViewState.allInfoToSubmit);
+      _submitAction();
+    } else if (_viewState == RegisterPageViewState.allInfoToSubmit) {
+      // submit values for registration to server
+    } else {
+      _updateViewState(RegisterPageViewState.mandatoryInfo);
+    }
+  }
+
+  Future<bool> _checkUserNameAvailability() async {
+    return true;
+  }
+
+  void _submitAction() async {
+    String userName = _userNameText.value.text;
+    String password = _passwordText.value.text;
+    int age = int.tryParse(_ageText.value.text) ?? 0;
+    int weight = int.tryParse(_weightText.value.text) ?? 0;
+    int height = int.tryParse(_heightText.value.text) ?? 0;
+    String designation = _designationText.value.text;
+
+    String conditionValue = "";
+    for (String condition in _selectedConditions) {
+      conditionValue += condition;
+      conditionValue += ', ';
+    }
+
+    var userInfo = UserInfo(
+      userName: userName,
+      password: password,
+      avatarImage: _avatarImage,
+      age: age,
+      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
+      weight: weight,
+      height: height,
+      score: 0,
+      jobPosition: designation,
+      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
+      workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
+      workStartTime: _startTime,
+      workEndTime: _endTime,
+      medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
+      preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
+      isMergedAlertSet: _isMergeAlertSelected,
+      deviceToken: AppCache.instance.fcmToken,);
+
+    int userDbId = await DatabaseHelper.instance.addUser(userInfo);
+    SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
+    AppCache.instance.userName = userName;
+    SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
+    AppCache.instance.userDbId = userDbId;
+
+    String? userServerId;
+    try {
+      userServerId = await ApiManager().registerUser(userInfo);
+    } on Exception catch (_) {
+      print('failed to connect with server');
+    }
+
+    if (mounted) {
+      if (userServerId != null) {
+        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
+        AppCache.instance.userServerId = userServerId;
+      } else {
+        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+      }
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+    }
   }
 
   void _toggleObscureText() {
@@ -163,93 +250,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       setState(() {
         _endTime = CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
       });
-    }
-  }
-
-  void _nextAction() async {
-    if (_viewState == RegisterPageViewState.mandatoryInfo) {
-      if (_formKey.currentState!.validate()) {
-        if (await _checkUserNameAvailability()) {
-          _updateViewState(RegisterPageViewState.optionalOneBioInfo);
-        } else {
-          // show error that username is not available
-          const snackBar = SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      }
-    } else if (_viewState == RegisterPageViewState.optionalOneBioInfo) {
-      _updateViewState(RegisterPageViewState.optionalTwoWorkInfo);
-    } else if (_viewState == RegisterPageViewState.optionalTwoWorkInfo) {
-      _updateViewState(RegisterPageViewState.optionalThreeConditionAlert);
-    } else if (_viewState == RegisterPageViewState.optionalThreeConditionAlert) {
-      _updateViewState(RegisterPageViewState.allInfoToSubmit);
-      // _submitAction();
-    } else if (_viewState == RegisterPageViewState.allInfoToSubmit) {
-      // submit values for registration to server
-    } else {
-      _updateViewState(RegisterPageViewState.mandatoryInfo);
-    }
-  }
-
-  Future<bool> _checkUserNameAvailability() async {
-    return true;
-  }
-
-  void _submitAction() async {
-    String userName = _userNameText.value.text;
-    String password = _passwordText.value.text;
-    int age = int.tryParse(_ageText.value.text) ?? 0;
-    int weight = int.tryParse(_weightText.value.text) ?? 0;
-    int height = int.tryParse(_heightText.value.text) ?? 0;
-    String designation = _designationText.value.text;
-
-    String conditionValue = "";
-    for (String condition in _selectedConditions) {
-      conditionValue += condition;
-      conditionValue += ', ';
-    }
-
-    var userInfo = UserInfo(
-      userName: userName,
-      password: password,
-      avatarImage: _avatarImage,
-      age: age,
-      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
-      weight: weight,
-      height: height,
-      score: 0,
-      jobPosition: designation,
-      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
-      workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
-      workStartTime: _startTime,
-      workEndTime: _endTime,
-      medicalConditions: conditionValue.substring(0, conditionValue.length - 2),
-      preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
-      isMergedAlertSet: _isMergeAlertSelected,
-      deviceToken: AppCache.instance.fcmToken,);
-
-    int userDbId = await DatabaseHelper.instance.addUser(userInfo);
-    SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
-    AppCache.instance.userName = userName;
-    SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
-    AppCache.instance.userDbId = userDbId;
-
-    String? userServerId;
-    try {
-      userServerId = await ApiManager().registerUser(userInfo);
-    } on Exception catch (_) {
-      print('failed to connect with server');
-    }
-
-    if (mounted) {
-      if (userServerId != null) {
-        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
-        AppCache.instance.userServerId = userServerId;
-      } else {
-        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
-      }
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }
 
@@ -551,7 +551,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           }),
                     ),
                     validator: (value) {
-                      debugPrint(_passwordText.text);
                       if (value != _passwordText.text) {
                         return 'Passwort nicht übereinstimmend!';
                       } else {
@@ -880,7 +879,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     selectedChipColor: AppColor.orange,
                     selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
                     onTap: (values) {
-                      //_selectedAnimals4 = values;
+                      _selectedAlerts = values.whereType<TaskType>().toList();
                     },
                   ),
                 ),

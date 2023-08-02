@@ -47,7 +47,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -71,16 +71,23 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute("CREATE TABLE $TABLE_USER("
         "id INTEGER PRIMARY KEY,"
-        "fullName TEXT,"
-        "avatar VARCHAR,"
-        "avatar_image VARCHAR,"
+        "userName TEXT,"
+        "avatarImage VARCHAR,"
+        "teamName VARCHAR,"
         "gender VARCHAR,"
         "age INTEGER,"
         "weight INTEGER,"
         "height INTEGER,"
-        "designation VARCHAR,"
-        "job_type VARCHAR,"
-        "condition VARCHAR,"
+        "score INTEGER,"
+        "jobPosition VARCHAR,"
+        "jobType VARCHAR,"
+        "workingDays VARCHAR,"
+        "workStartTime VARCHAR,"
+        "workEndTime VARCHAR,"
+        "medicalConditions VARCHAR,"
+        "diseases VARCHAR,"
+        "preferredAlerts VARCHAR,"
+        "isMergedAlertSet INTEGER,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_TASK("
         "id INTEGER PRIMARY KEY,"
@@ -139,14 +146,28 @@ class DatabaseHelper {
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    await db.execute('ALTER TABLE $TABLE_USER ADD avatar_image VARCHAR');
+    await db.execute('ALTER TABLE $TABLE_USER '
+        'DROP COLUMN fullName, '
+        'RENAME COLUMN avatar TO userName,'
+        'RENAME COLUMN avatar_image TO avatarImage,'
+        'RENAME COLUMN designation TO jobPosition,'
+        'RENAME COLUMN job_type TO jobType,'
+        'RENAME COLUMN condition TO medicalConditions,'
+        'ADD teamName VARCHAR,'
+        'ADD score INTEGER,'
+        'ADD workingDays VARCHAR,'
+        'ADD workStartTime VARCHAR,'
+        'ADD workEndTime VARCHAR,'
+        'ADD diseases VARCHAR,'
+        'ADD preferredAlerts VARCHAR,'
+        'ADD isMergedAlertSet INTEGER;');
   }
 
   Future<List<UserInfo>> getAllUserInfo() async {
     Database db = await instance.database;
     var userInfo = await db.query(TABLE_USER, orderBy: 'full_name');
     List<UserInfo> userInfoList = userInfo.isNotEmpty
-        ? userInfo.map((e) => UserInfo.fromMap(e)).toList()
+        ? userInfo.map((e) => UserInfo.fromDbMap(e)).toList()
         : [];
     return userInfoList;
   }
@@ -157,7 +178,7 @@ class DatabaseHelper {
         await db.query(TABLE_USER, where: 'id = ?', whereArgs: [id]);
     if (users.isNotEmpty) {
       print(users.first["id"]);
-      return UserInfo.fromMap(users.first);
+      return UserInfo.fromDbMap(users.first);
     } else {
       return null;
     }
@@ -165,7 +186,7 @@ class DatabaseHelper {
 
   Future<int> addUser(UserInfo item) async {
     Database db = await instance.database;
-    return await db.insert(TABLE_USER, item.toMap());
+    return await db.insert(TABLE_USER, item.toDbMap());
   }
 
   Future<int> removeUser(int id) async {
@@ -175,8 +196,7 @@ class DatabaseHelper {
 
   Future<int> updateUser(UserInfo item, int id) async {
     Database db = await instance.database;
-    return await db
-        .update(TABLE_USER, item.toMap(), where: 'id = ?', whereArgs: [id]);
+    return await db.update(TABLE_USER, item.toDbMap(), where: 'id = ?', whereArgs: [id]);
   }
 
   /// user_allergies

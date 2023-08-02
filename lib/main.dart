@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:app/view/edit_profile_page.dart';
 import 'package:app/view/login_page.dart';
 import 'package:app/view/registration_page.dart';
-import 'package:app/view/working_schedule_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:app/api/api_manager.dart';
 import 'package:app/util/app_constant.dart';
@@ -26,7 +25,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:app/view/summary_page.dart';
 
 const splashRoute = '/';
 const landingRoute = '/landing';
@@ -42,8 +40,6 @@ const profileRoute = '/profile';
 const editProfileRoute = '/profile/edit';
 const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
-const workingScheduleRoute = '/working/schedule';
-const summaryPageRoute = '/summary/page/';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 int? timeToSnooze;
@@ -191,12 +187,6 @@ class _MyFitAppState extends State<MyFitApp> {
       final dynamic arguments = settings.arguments;
       Widget screen;
       switch (settings.name) {
-        case summaryPageRoute:
-          screen = SummaryPage();
-          break;
-        case workingScheduleRoute:
-          screen = const WorkingSchedulePage();
-          break;
         case splashRoute:
           screen = const SplashPage();
           break;

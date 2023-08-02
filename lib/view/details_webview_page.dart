@@ -34,9 +34,7 @@ class _DetailsWebState extends State<DetailsWebPage> {
   }
 
   _loadIntent() {
-    // TODO: @Justin -- see here how to receive value from another page
     _learningContent = ModalRoute.of(context)?.settings.arguments as LearningContent;
-
     _loadWebviewController(_learningContent?.contentUri ?? "");
   }
 
