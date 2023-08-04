@@ -6,6 +6,7 @@ class SharedPref {
   static const keyUserDbId = "key_user_db_id";
   static const keyUserServerId = "key_user_server_id";
   static const keyDeviceToken = "key_fcm_token";
+  static const keyAvatarImage = "key_avatar_image";
 
   static const keyUserTargets = "key_user_targets";
   static const keyUserCompletedTargets = "key_user_completed_targets";
@@ -75,5 +76,6 @@ class SharedPref {
     deleteValue(keyUserTargets);
     deleteValue(keyDeviceToken);
     deleteValue(keyUserCompletedTargets);
+    deleteValue(keyAvatarImage);
   }
 }
