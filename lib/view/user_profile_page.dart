@@ -217,78 +217,136 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           _buildProfileRow(
-                              context: context,
-                              icon: Icons.date_range,
-                              label: 'Alter:',
-                              value: _userInfo?.age != 0
-                                  ? '${_userInfo?.age} Jahre'
-                                  : 'Nicht ausgewählt'),
+                            context: context,
+                            icon: Icons.date_range,
+                            label: 'Alter:',
+                            value: _userInfo?.age != 0
+                                ? '${_userInfo?.age} Jahre'
+                                : 'Nicht ausgewählt',
+                          ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
-                              context: context,
-                              icon: Icons.male_rounded,
-                              label: 'Gender:',
-                              value: _userInfo?.gender ?? "Nicht ausgewählt"),
+                            context: context,
+                            icon: Icons.male_rounded,
+                            label: 'Gender:',
+                            value: _userInfo?.gender ?? "Nicht ausgewählt",
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.height,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Größe: ${_userInfo?.height} cm',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Icon(Icons.line_weight_rounded,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Gewicht: ${_userInfo?.weight} kg',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.filter_tilt_shift,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Arbeitstyp: ${_userInfo?.jobType}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Icon(Icons.design_services,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Job Position: ${_userInfo?.jobPosition}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
-                              context: context,
-                              icon: Icons.height,
-                              label: 'Größe:',
-                              value: '${_userInfo?.height} cm'),
+                            context: context,
+                            icon: Icons.work,
+                            label: 'Arbeitstage:',
+                            value: _userInfo?.workingDays ?? "Nicht ausgewählt",
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.access_time,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Startzeit: ${_userInfo?.workStartTime}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Icon(Icons.access_time,
+                                  color: Colors.orangeAccent, size: 25),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Endzeit: ${_userInfo?.workEndTime}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
-                              context: context,
-                              icon: Icons.line_weight_rounded,
-                              label: 'Gewicht:',
-                              value: '${_userInfo?.weight} kg'),
+                            context: context,
+                            icon: Icons.medical_services,
+                            label: 'Medizinische Bedingungen:',
+                            value: _userInfo?.medicalConditions ??
+                                "Nicht ausgewählt",
+                          ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
-                              context: context,
-                              icon: Icons.filter_tilt_shift,
-                              label: 'JobType:',
-                              value: _userInfo?.jobType ?? "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.design_services,
-                              label: 'JobPosition:',
-                              value:
-                                  _userInfo?.jobPosition ?? "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.work,
-                              label: 'Arbeitstage:',
-                              value:
-                                  _userInfo?.workingDays ?? "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.access_time,
-                              label: 'Arbeitsbeginn:',
-                              value: _userInfo?.workStartTime ??
-                                  "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.access_time,
-                              label: 'Arbeitsende:',
-                              value:
-                                  _userInfo?.workEndTime ?? "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.medical_services,
-                              label: 'Medizinische Bedingungen:',
-                              value: _userInfo?.medicalConditions ??
-                                  "Nicht ausgewählt"),
-                          const SizedBox(height: 10),
-                          _buildProfileRow(
-                              context: context,
-                              icon: Icons.notifications,
-                              label: 'Bevorzugte Benachrichtigungen:',
-                              value: _userInfo?.preferredAlerts ??
-                                  "Nicht ausgewählt"),
+                            context: context,
+                            icon: Icons.notifications,
+                            label: 'Bevorzugte Benachrichtigungen:',
+                            value: _userInfo?.preferredAlerts ??
+                                "Nicht ausgewählt",
+                          ),
                         ],
                       ),
                     ),
@@ -353,100 +411,73 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    // Container(
-                    //   child: DropdownButton<String>(
-                    //     hint:
-                    //         const Text('Pausieren Sie die Benachrichtigungen'),
-                    //     dropdownColor: Colors.grey,
-                    //     icon: const Icon(Icons.arrow_drop_down),
-                    //     value: selectedValue,
-                    //     onChanged: (newValue) {
-                    //       setState(() {
-                    //         selectedValue = newValue;
-                    //         selectedSnoozeTime =
-                    //             extractNumbersAndCombine(newValue!);
-                    //         snoozeEndTime =
-                    //             DateTime.now().millisecondsSinceEpoch +
-                    //                 (selectedSnoozeTime * 60000);
-                    //         _saveSnoozeTime();
-                    //         isUserSnoozedNow = true;
-                    //       });
-                    //     },
-                    //     items: items.map((String item) {
-                    //       return DropdownMenuItem<String>(
-                    //         value: item,
-                    //         child: Text(item),
-                    //       );
-                    //     }).toList(),
-                    //   ),
-                    // ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) => Colors.transparent,
-                            ),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) => Colors.transparent,
                           ),
-                          onPressed: () {
-                            _logoutAction();
-                          },
-                          child: Ink(
-                            decoration: const BoxDecoration(
-                              color: Colors.orangeAccent,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                          overlayColor:
+                              MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          _logoutAction();
+                        },
+                        child: Ink(
+                          decoration: const BoxDecoration(
+                            color: Colors.orangeAccent,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Container(
+                            constraints: const BoxConstraints(
+                                minHeight:
+                                    50), // min sizes for Material buttons
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Abmeldung".toUpperCase(),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                  minHeight:
-                                      50), // min sizes for Material buttons
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Abmeldung".toUpperCase(),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) => Colors.transparent,
-                            ),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) => Colors.transparent,
                           ),
-                          onPressed: () {
-                            _editProfileAction();
-                          },
-                          child: Ink(
-                            decoration: const BoxDecoration(
-                              color: Colors.orangeAccent,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                          overlayColor:
+                              MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          _editProfileAction();
+                        },
+                        child: Ink(
+                          decoration: const BoxDecoration(
+                            color: Colors.orangeAccent,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Container(
+                            constraints: const BoxConstraints(
+                                minHeight:
+                                    50), // min sizes for Material buttons
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Profil bearbeiten".toUpperCase(),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                  minHeight:
-                                      50), // min sizes for Material buttons
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Profil bearbeiten".toUpperCase(),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

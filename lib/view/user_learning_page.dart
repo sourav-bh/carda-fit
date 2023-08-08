@@ -2,7 +2,6 @@
 
 import 'dart:math';
 import 'dart:typed_data';
-
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
 import 'package:app/service/database_helper.dart';
@@ -35,7 +34,6 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
-  // Abteil um die Query zu löschen
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
@@ -48,13 +46,13 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
-  //Leave and close the Searchbar
   Widget buildLeading(BuildContext context) {
     return IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          close(context, null);
-        });
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
   }
 
   @override
@@ -65,13 +63,13 @@ class CustomSearchDelegate extends SearchDelegate {
     List<LearningMaterialInfo> learningMaterialResults = [];
 
     for (var learningMaterial in searchTerms) {
-      if (query.toLowerCase().contains(learningMaterial.description.toLowerCase())) {
-        learningMaterialResults.add(learningMaterial);
-      } else if (query.toLowerCase().contains(learningMaterial.title.toLowerCase())) {
+      if (learningMaterial.description
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          learningMaterial.title.toLowerCase().contains(query.toLowerCase())) {
         learningMaterialResults.add(learningMaterial);
       }
     }
-    print(learningMaterialResults);
 
     return ListView.builder(
       itemCount: learningMaterialResults.length,
@@ -92,25 +90,35 @@ class CustomSearchDelegate extends SearchDelegate {
     List<LearningMaterialInfo> learningMaterialResults = [];
 
     for (var learningMaterial in searchTerms) {
-      if (query.toLowerCase().contains(learningMaterial.description.toLowerCase())) {
-        learningMaterialResults.add(learningMaterial);
-      } else if (query.toLowerCase().contains(learningMaterial.title.toLowerCase())) {
+      if (learningMaterial.description
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          learningMaterial.title.toLowerCase().contains(query.toLowerCase())) {
         learningMaterialResults.add(learningMaterial);
       }
     }
-    print(learningMaterialResults);
 
-    return ListView.builder(
+    return ListView.separated(
       itemCount: learningMaterialResults.length,
+      separatorBuilder: (context, index) {
+        return const Divider(endIndent: 0, color: Colors.transparent);
+      },
       itemBuilder: (context, index) {
         var result = learningMaterialResults[index];
-        return ListTile(
-          title: Text(result.title ?? ""),
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, detailsWebRoute,
+                arguments: result.originalContent);
+          },
+          child: ListTile(
+            title: Text(result.title ?? ""),
+          ),
         );
       },
     );
   }
 }
+
 // TODO: how to switch the view of the list while seachring (no search / searching / search is over {3 cases})
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
@@ -145,7 +153,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
   _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+    if (userInfo != null &&
+        !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       setState(() {
         _showFilteredList = true;
         _userCondition = userInfo.medicalConditions;

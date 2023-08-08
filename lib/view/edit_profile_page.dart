@@ -81,12 +81,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadData();
+    // _loadData();
   }
 
   @override
   void dispose() {
     super.dispose();
+    _loadData();
   }
 
   List<bool> convertStringToListOfBools(String value) {
