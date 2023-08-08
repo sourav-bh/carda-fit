@@ -61,8 +61,9 @@ class _LandingPageState extends State<LandingPage> {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
+    } else {
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
     }
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
   void _handleMessage(RemoteMessage message) {

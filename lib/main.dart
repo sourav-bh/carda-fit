@@ -53,7 +53,6 @@ void main() async {
   );
 
   final messaging = FirebaseMessaging.instance;
-
   final settings = await messaging.requestPermission(
     alert: true,
     announcement: false,
@@ -77,31 +76,40 @@ void main() async {
     }
   }
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print('Remote notification message data whilst in the foreground: ${message.data}');
-
-    int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
-    int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    bool isUserSnoozedNow = currentTime - snoozedAt > snoozeDuration * 60 * 1000;
-
-    if (isUserSnoozedNow == false) {
-      await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
-      await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
-
-      return; // don't show the alert as user set a snooze time currently
-    } else if (message.notification != null) {
-      var data = message.data['text'];
-      String payload = data ?? "0";
-      int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
-
-      print("-------> opening task alert page from FirebaseMessaging foreground listener");
-      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
-    }
-  });
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  FirebaseMessaging.onMessage.listen(foregroundHandler);
 
   runApp(const MyFitApp());
+}
+
+Future<void> foregroundHandler(RemoteMessage message) async {
+  print('Remote notification message data whilst in the foreground: ${message.data}');
+
+  int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+  int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+  int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+  bool isUserSnoozedNow = currentTime - snoozedAt > snoozeDuration * 60 * 1000;
+
+  if (isUserSnoozedNow == false) {
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
+
+    return; // don't show the alert as user set a snooze time currently
+  } else if (message.notification != null) {
+    var data = message.data['text'];
+    String payload = data ?? "0";
+    int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+
+    print("-------> opening task alert page from FirebaseMessaging foreground listener");
+    Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
+  }
+}
+
+Future<void> backgroundHandler(RemoteMessage message) async {
+  print('Remote notification message data whilst in the background: ${message.data}');
+
+  //TODO: handle all background alerts here
 }
 
 _checkIfUserLoggedIn() async {
