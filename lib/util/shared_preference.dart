@@ -11,9 +11,8 @@ class SharedPref {
   static const keyUserTargets = "key_user_targets";
   static const keyUserCompletedTargets = "key_user_completed_targets";
 
-  static const keyIsSnoozed = "key_is_snoozed";
-  static const keySnoozeDuration = "key_snooze_duration";
-  static const keySnoozeActualTime = "key_snooze_actual_time";
+  static const keySnoozeDuration = "key_snooze_duration"; // in minutes
+  static const keySnoozedAt = "key_snoozed_at";
 
   SharedPref._privateConstructor();
   static final SharedPref instance = SharedPref._privateConstructor();
@@ -49,6 +48,14 @@ class SharedPref {
       return prefs.get(key);
     }
     return null;
+  }
+
+  getIntValue(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey(key)) {
+      return prefs.get(key);
+    }
+    return 0;
   }
 
   getJsonValue(String key) async {

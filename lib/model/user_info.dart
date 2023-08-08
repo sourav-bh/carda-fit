@@ -155,3 +155,13 @@ enum JobType {
   Teilzeit,
   HomeOffice,
 }
+
+class SnoozeTime {
+  SnoozeTime({
+    required this.duration,
+    required this.isSelected
+  });
+
+  Duration duration;
+  bool isSelected;
+}

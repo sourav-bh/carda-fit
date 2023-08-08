@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
@@ -22,56 +23,32 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
   String? selectedValue;
-  bool? isUserSnoozedNow = false;
-  Timer? _snoozeTimer;
-  int selectedSnoozeTime = 0;
-  int?
-      snoozeEndTime; // Speichert das Ende der Snooze-Dauer als Millisekunden seit Epoch
-  List<String> _selectedSnoozeTime = [];
-  final List<String> _snoozeTimeItems = [
-    '5 min',
-    '10 min',
-    '30 min',
-    '60 min',
-    '120 min',
-    '1440 min'
+
+  SnoozeTime? _selectedSnoozeTimeVal;
+  final List<SnoozeTime> _snoozeTimeItems = [
+    SnoozeTime(duration: const Duration(minutes: 5), isSelected: false),
+    SnoozeTime(duration: const Duration(minutes: 10), isSelected: false),
+    SnoozeTime(duration: const Duration(minutes: 30), isSelected: false),
+    SnoozeTime(duration: const Duration(hours: 1), isSelected: false),
+    SnoozeTime(duration: const Duration(hours: 2), isSelected: false),
+    SnoozeTime(duration: const Duration(hours: 3), isSelected: false),
   ];
 
+  @override
   void initState() {
     super.initState();
-    _loadUserInfo();
 
-    getSnoozeStatus();
-    // Start the timer to check snooze status every 1 minute
-    _snoozeTimer = Timer.periodic(Duration(minutes: 1), (timer) {
-      checkSnoozeStatus();
-    });
+    _loadUserInfo();
+    _checkSnoozeTimeStatus();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _snoozeTimer?.cancel();
-  }
-
-  void checkSnoozeStatus() async {
-    bool? isUserSnoozedNow =
-        await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    if (isUserSnoozedNow != null &&
-        isUserSnoozedNow &&
-        currentTime >= snoozeEndTime!) {
-      setState(() {
-        isUserSnoozedNow = false;
-        selectedValue = null;
-      });
-      // TODO: @Justin -- Add code here to handle resuming notifications.
-    }
   }
 
   _loadUserInfo() async {
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
@@ -79,55 +56,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  int extractNumbersAndCombine(String selectedValue) {
-    int selectedSnoozeTime = 0;
-    String currentNumber = '';
+  void setSnoozeTime(SnoozeTime snoozeTime) async {
+    setState(() {
+      _selectedSnoozeTimeVal = snoozeTime;
+    });
 
-    for (int i = 0; i < selectedValue.length; i++) {
-      if (selectedValue[i].contains(RegExp(r'[0-9]'))) {
-        currentNumber += selectedValue[i];
-      } else {
-        if (currentNumber.isNotEmpty) {
-          int num = int.tryParse(currentNumber) ?? 0;
-          selectedSnoozeTime = selectedSnoozeTime * 10 + num;
-          currentNumber = '';
-        }
-      }
-    }
-
-    if (currentNumber.isNotEmpty) {
-      int num = int.tryParse(currentNumber) ?? 0;
-      selectedSnoozeTime = selectedSnoozeTime * 10 + num;
-    }
-
-    return selectedSnoozeTime;
+    await SharedPref.instance.saveIntValue(SharedPref.keySnoozeDuration, _selectedSnoozeTimeVal?.duration.inMinutes ?? 0);
+    await SharedPref.instance.saveIntValue(SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 
-  _saveSnoozeTime() async {
-    await SharedPref.instance
-        .saveStringValue(SharedPref.keySnoozeDuration, selectedValue!);
-    await SharedPref.instance.saveIntValue(
-        SharedPref.keySnoozeActualTime, DateTime.now().millisecondsSinceEpoch);
-  }
-
-  // List of times that can be selected for snooze the notifications
-  List<String> items = <String>[
-    '5 min',
-    '10 min',
-    '30 min',
-    '60 min',
-    '120 min',
-    '1440 min'
-  ];
-
-  // Get the snooze status from SharedPref
-  Future<void> getSnoozeStatus() async {
-    bool? isUserSnoozedNow =
-        await SharedPref.instance.getValue(SharedPref.keyIsSnoozed);
+  _checkSnoozeTimeStatus() async {
+    int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
-    if (isUserSnoozedNow != null && isUserSnoozedNow) {
+
+    if (currentTime - snoozedAt > snoozeDuration * 60 * 1000) {
       setState(() {
-        selectedValue = "Benachrichtigungen sind stummgeschaltet";
+        _selectedSnoozeTimeVal = null;
+      });
+
+      await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+      await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
+    } else {
+      setState(() {
+        _selectedSnoozeTimeVal = SnoozeTime(duration: Duration(minutes: snoozeDuration), isSelected: true);
       });
     }
   }
@@ -151,10 +103,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: Platform.isIOS
-            ? SystemUiOverlayStyle.light
-            : const SystemUiOverlayStyle(
-                statusBarIconBrightness: Brightness.light),
+        value: Platform.isIOS ? SystemUiOverlayStyle.light
+            : const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
         child: SingleChildScrollView(
           child: Stack(
             children: <Widget>[
@@ -167,11 +117,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         colors: [AppColor.lightPink, AppColor.lightPink],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter)),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _editProfileAction();
+                    },
+                    icon: const Icon(Icons.edit, size: 20,),
+                    label: const Text('Profil ändern'),
+                    style: ElevatedButton.styleFrom(
+                      elevation:0,
+                    ),
+                  ),
+                ),
               ),
               Container(
                 alignment: Alignment.topCenter,
-                margin: EdgeInsets.only(
-                    top: (topHeight) - MediaQuery.of(context).size.width / 5.5),
+                margin: EdgeInsets.only(top: (topHeight) - MediaQuery.of(context).size.width / 5.5),
                 child: Column(
                   children: <Widget>[
                     CircleAvatar(
@@ -180,13 +142,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: (MediaQuery.of(context).size.width / 5.5),
-                        child: ClipOval(
-                            child: _userInfo?.avatarImage != null
+                        child: ClipOval(child: _userInfo?.avatarImage != null
                                 ? RandomAvatar(_userInfo?.avatarImage ?? "")
-                                : const Icon(
-                                    Icons.person_outlined,
-                                    size: 100,
-                                  )),
+                                : const Icon(Icons.person_outlined, size: 100,)),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -232,66 +190,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             value: _userInfo?.gender ?? "Nicht ausgewählt",
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Icon(Icons.height,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Größe: ${_userInfo?.height} cm',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Icon(Icons.line_weight_rounded,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Gewicht: ${_userInfo?.weight} kg',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                            ],
+                          _buildProfileRow(
+                            context: context,
+                            icon: Icons.line_weight,
+                            label: 'BMI:',
+                            value: '${((_userInfo?.weight ?? 0)/pow(((_userInfo?.height ?? 1)/ 100), 2)).toStringAsFixed(1)} '
+                                '(Größe: ${_userInfo?.weight} kg, Gewicht: ${_userInfo?.height} cm)',
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Icon(Icons.filter_tilt_shift,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Arbeitstyp: ${_userInfo?.jobType}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Icon(Icons.design_services,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Job Position: ${_userInfo?.jobPosition}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                            ],
+                          _buildProfileRow(
+                            context: context,
+                            icon: Icons.filter_tilt_shift,
+                            label: 'Arbeitsinfo:',
+                            value: '${_userInfo?.jobPosition}, ${_userInfo?.jobType}',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -301,41 +212,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             value: _userInfo?.workingDays ?? "Nicht ausgewählt",
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Icon(Icons.access_time,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Startzeit: ${_userInfo?.workStartTime}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Icon(Icons.access_time,
-                                  color: Colors.orangeAccent, size: 25),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Endzeit: ${_userInfo?.workEndTime}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(fontSize: 20),
-                                ),
-                              ),
-                            ],
+                          _buildProfileRow(
+                            context: context,
+                            icon: Icons.schedule,
+                            label: 'Arbeitszeitplan:',
+                            value: '${_userInfo?.workStartTime} - ${_userInfo?.workEndTime}',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
                             context: context,
                             icon: Icons.medical_services,
-                            label: 'Medizinische Bedingungen:',
+                            label: 'Medizinische Daten:',
                             value: _userInfo?.medicalConditions ??
                                 "Nicht ausgewählt",
                           ),
@@ -343,137 +230,59 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           _buildProfileRow(
                             context: context,
                             icon: Icons.notifications,
-                            label: 'Bevorzugte Benachrichtigungen:',
+                            label: 'Alarme:',
                             value: _userInfo?.preferredAlerts ??
                                 "Nicht ausgewählt",
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 30,
-                    ),
+                    const SizedBox(height: 10,),
                     Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 10),
-                      child: Text(
-                        'Pausieren Sie die Benachrichtigungen',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(
-                      child: MultiSelectDialogField<String>(
-                        items: _snoozeTimeItems
-                            .map((e) => MultiSelectItem(e, e))
-                            .toList(),
-                        listType: MultiSelectListType.CHIP,
-                        onConfirm: (values) {
-                          setState(() {
-                            _selectedSnoozeTime = [values.first];
-                            String _selectedValue = values.first;
-                            selectedSnoozeTime =
-                                extractNumbersAndCombine(_selectedValue);
-                            print(_selectedValue);
-                            snoozeEndTime =
-                                DateTime.now().millisecondsSinceEpoch +
-                                    (selectedSnoozeTime * 60000);
-                            _saveSnoozeTime();
-                            isUserSnoozedNow = true;
-                          });
-                        },
-                        title: const Text("Wählen Sie die zu pausierende Zeit"),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                          border: Border.all(
-                            color: Colors.white12,
-                            width: 1,
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: _buildProfileRow(
+                              context: context,
+                              icon: Icons.snooze,
+                              label: 'Snooze-Alarme:',
+                              value: _selectedSnoozeTimeVal != null ? '${_selectedSnoozeTimeVal!.duration.inMinutes} min' : 'Nicht festgelegt',
+                            ),
                           ),
-                        ),
-                        selectedColor: AppColor.orange,
-                        buttonText:
-                            const Text('Wählen Sie die zu pausierende Zeit'),
-                        buttonIcon: const Icon(Icons.filter_list),
-                        checkColor: AppColor.orange,
-                        itemsTextStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(fontSize: 16, color: Colors.black),
-                        selectedItemsTextStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(fontSize: 16, color: Colors.white),
+                          GestureDetector(
+                            onTap: () {
+                              _showSnoozeTimeSelected(context);
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2),
+                              child: Icon(Icons.more_time_outlined, color: AppColor.primary,),
+                            )
+                          )
+                        ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20,
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 30),
                       child: TextButton(
                         style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) => Colors.transparent,
-                          ),
-                          overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) => Colors.transparent,),
+                          overlayColor: MaterialStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
                           _logoutAction();
                         },
                         child: Ink(
-                          decoration: const BoxDecoration(
-                            color: Colors.orangeAccent,
+                          decoration: const BoxDecoration(color: Colors.orangeAccent,
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                           child: Container(
-                            constraints: const BoxConstraints(
-                                minHeight:
-                                    50), // min sizes for Material buttons
+                            constraints: const BoxConstraints(minHeight: 40), // min sizes for Material buttons
                             alignment: Alignment.center,
-                            child: Text(
-                              "Abmeldung".toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) => Colors.transparent,
-                          ),
-                          overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
-                        ),
-                        onPressed: () {
-                          _editProfileAction();
-                        },
-                        child: Ink(
-                          decoration: const BoxDecoration(
-                            color: Colors.orangeAccent,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Container(
-                            constraints: const BoxConstraints(
-                                minHeight:
-                                    50), // min sizes for Material buttons
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Profil bearbeiten".toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
+                            child: Text("Abmeldung".toUpperCase(),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ),
@@ -488,25 +297,116 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
-}
 
-// Helper method to build each row in the profile
-Widget _buildProfileRow(
-    {required BuildContext context,
+  // Helper method to build each row in the profile
+  Widget _buildProfileRow({required BuildContext context,
     required IconData icon,
     required String label,
     required String value}) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      Icon(icon, color: Colors.orangeAccent, size: 25),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Text(
-          '$label $value',
-          style: Theme.of(context).textTheme.bodyText1?.copyWith(fontSize: 20),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Icon(icon, color: Colors.orangeAccent, size: 20),
+        const SizedBox(width: 10),
+        Text(label,
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
-      )
-    ],
-  );
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(value,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        )
+      ],
+    );
+  }
+
+  void _showSnoozeTimeSelected(BuildContext context) {
+    showDialog(context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (context, setState) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.only(left: 20, top: 65, right: 20, bottom: 20),
+                        margin: const EdgeInsets.only(top: 45),
+                        decoration: BoxDecoration(shape: BoxShape.rectangle, color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black, offset: Offset(0,10), blurRadius: 10),
+                            ]
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                children: [
+                                  for (var snoozeTime in _snoozeTimeItems)
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      child: FilterChip(
+                                        label: Text('${(snoozeTime.duration.inMinutes)} min'),
+                                        labelStyle: const TextStyle(color: Colors.white),
+                                        selected: snoozeTime.isSelected,
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            for (var i = 0; i < _snoozeTimeItems.length; i += 1) {
+                                              _snoozeTimeItems[i].isSelected = false;
+                                            }
+                                            snoozeTime.isSelected = !(snoozeTime.isSelected);
+                                            setSnoozeTime(snoozeTime);
+                                          });
+                                        },
+                                        elevation: 5,
+                                        pressElevation: 10,
+                                        backgroundColor: AppColor.darkGrey,
+                                        selectedColor: AppColor.orange,
+                                        showCheckmark: true,
+                                        checkmarkColor: Colors.white,
+                                      ),
+                                    )
+                                ],
+                              ),
+                              const SizedBox(height: 20,),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('OK',
+                                    style: Theme.of(context).textTheme.titleMedium,)
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Positioned(
+                        left: 20,
+                        right: 20,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 45,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.all(Radius.circular(45)),
+                              child: Icon(Icons.snooze, color: AppColor.primary,size: 40,)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+          );
+        }
+    );
+  }
 }

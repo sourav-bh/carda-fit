@@ -303,6 +303,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          title: Text('Profil ändern', style: Theme.of(context).textTheme.displayMedium,),
+        ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
           value: Platform.isIOS
@@ -334,22 +340,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
               ),
-              Positioned(
-                top: 60,
-                left: 0,
-                child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                    )),
-              ),
               Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -357,17 +347,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: ListView(
                     padding: const EdgeInsets.only(bottom: 0),
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 70, bottom: 10),
-                        child: Text(
-                          'Profil ändern',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(color: Colors.black, fontSize: 30),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
                       buildMainBody(context, _viewState),
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),

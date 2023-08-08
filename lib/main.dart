@@ -42,10 +42,6 @@ const taskAlertRoute = '/alert';
 const aboutUsRoute = '/aboutUs';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-int? timeToSnooze;
-int? snoozeEndTime;
-int selectedSnoozeTime = 0;
-bool? isUserSnoozedNow;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,66 +78,26 @@ void main() async {
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print(
-        'Remote notification message data whilst in the foreground: ${message.data}');
+    print('Remote notification message data whilst in the foreground: ${message.data}');
 
-    var currentTime = DateTime.now().millisecondsSinceEpoch;
-    var snoozeTime =
-        await SharedPref.instance.getValue(SharedPref.keySnoozeActualTime);
-    String snoozeDuration =
-        await SharedPref.instance.getValue(SharedPref.keySnoozeDuration);
-    debugPrint(snoozeDuration);
+    int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
 
-    int extractNumbersAndCombine(String snoozeDuration) {
-      int selectedSnoozeTime = 0;
-      String currentNumber = '';
-
-      for (int i = 0; i < snoozeDuration.length; i++) {
-        if (snoozeDuration[i].contains(RegExp(r'[0-9]'))) {
-          currentNumber += snoozeDuration[i];
-        } else {
-          if (currentNumber.isNotEmpty) {
-            int num = int.tryParse(currentNumber) ?? 0;
-            selectedSnoozeTime = selectedSnoozeTime * 10 + num;
-            currentNumber = '';
-          }
-        }
-      }
-
-      if (currentNumber.isNotEmpty) {
-        int num = int.tryParse(currentNumber) ?? 0;
-        selectedSnoozeTime = selectedSnoozeTime * 10 + num;
-      }
-
-      return selectedSnoozeTime;
-    }
-
-    int selectedSnoozeTime = extractNumbersAndCombine(snoozeDuration);
-    print('Selected Snooze Time: $selectedSnoozeTime');
-    int snoozeEndTime = snoozeTime +
-        (selectedSnoozeTime * 60000); // Convert snoozeMinutes to milliseconds
-
-    print('Snooze End Time: $snoozeEndTime');
-    if (currentTime >= snoozeEndTime) {
-      isUserSnoozedNow = true;
-    } else {
-      isUserSnoozedNow = false;
-    }
-
-    SharedPref.instance
-        .saveBoolValue(SharedPref.keyIsSnoozed, isUserSnoozedNow!);
+    bool isUserSnoozedNow = currentTime - snoozedAt > snoozeDuration * 60 * 1000;
 
     if (isUserSnoozedNow == false) {
-      return;
+      await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+      await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
+
+      return; // don't show the alert as user set a snooze time currently
     } else if (message.notification != null) {
       var data = message.data['text'];
       String payload = data ?? "0";
       int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
-      print(
-          "-------> opening task alert page from FirebaseMessaging foreground listener");
-      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute,
-          arguments: taskType);
+      print("-------> opening task alert page from FirebaseMessaging foreground listener");
+      Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
     }
   });
 
