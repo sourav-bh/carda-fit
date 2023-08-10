@@ -26,7 +26,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
   _loadDummyData() {
    setState(() {
      _historyItems.add(AlertHistoryItem(
-         title: 'Walking alert',
+         title: 'Walk',
          description: 'Please walk for 2 minutes',
          taskType: TaskType.steps,
          taskStatus: TaskStatus.completed,
@@ -34,7 +34,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
          completedAt: '01 Jun 2023, 14:27')
      );
      _historyItems.add(AlertHistoryItem(
-         title: 'Exercise alert',
+         title: 'Exercise',
          description: 'Please stretch your hand and move around a little bit',
          taskType: TaskType.exercise,
          taskStatus: TaskStatus.pending,
@@ -42,7 +42,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
          completedAt: '')
      );
      _historyItems.add(AlertHistoryItem(
-         title: 'Drink with Break alert',
+         title: 'Drink & Break',
          description: 'Take a short break for 2 minutes and drink a glass of water',
          taskType: TaskType.waterWithBreak,
          taskStatus: TaskStatus.missed,
@@ -50,7 +50,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
          completedAt: '')
      );
      _historyItems.add(AlertHistoryItem(
-         title: 'Exercise alert',
+         title: 'Exercise',
          description: 'Stand up and move your head in left, right, front and back directions',
          taskType: TaskType.exercise,
          taskStatus: TaskStatus.completed,
@@ -58,7 +58,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
          completedAt: '01 Jun 2023, 09:35')
      );
      _historyItems.add(AlertHistoryItem(
-         title: 'Drink alert',
+         title: 'Drink',
          description: 'Please drink a glass of water',
          taskType: TaskType.water,
          taskStatus: TaskStatus.pending,
@@ -67,6 +67,22 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
      );
    });
   }
+
+  // TODO: @Justin
+  // left-side is the icon to identify the task, so pick the image based on the 'TaskType' value
+
+  // in the middle show the title on top with the time only (no date).
+  // -> In case the alert is "completed" show the time of 'completedAt', otherwise show 'taskCreatedAt'
+
+  // in the middle and bottom of the title, show the description
+
+  // right-side is the status icon, pick one from below based on the 'TaskStatus' value
+
+  // status icons
+  // const Icon(Icons.done_outline)
+  // const Icon(Icons.call_missed)
+  // const Icon(Icons.snooze)
+  // const Icon(Icons.pending_actions)
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +97,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
           child: Text(
             'History items here, count is: ${_historyItems.length}',
             style: const TextStyle(fontSize: 14, color: AppColor.darkBlue),
-          ),)
+          ),),
     );
   }
 }
