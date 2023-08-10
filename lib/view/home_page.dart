@@ -168,13 +168,18 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.recommend_outlined, color: Colors.black54,),
-                          SizedBox(width: 10,),
-                          Text("Empfehlungen"),
-                          Spacer(),
-                          Icon(Icons.more_horiz),
+                          const Icon(Icons.recommend_outlined, color: Colors.black54,),
+                          const SizedBox(width: 10,),
+                          const Text("Empfehlungen"),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, alertHistoryRoute);
+                            },
+                            child: const Icon(Icons.more_horiz)
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10,),

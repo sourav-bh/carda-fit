@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:app/view/task_alert_page.dart';
+
 class TaskAlert {
   TaskAlert({
     this.alertId,
@@ -52,4 +54,22 @@ class TaskAlert {
       };
 }
 
-enum Status { none, off, on, hourly }
+enum TaskStatus { completed, pending, missed, snoozed, upcoming }
+
+class AlertHistoryItem {
+  AlertHistoryItem({
+    required this.title,
+    required this.description,
+    required this.taskType,
+    required this.taskStatus,
+    required this.taskCreatedAt,
+    required this.completedAt,
+  });
+
+  String title;
+  String description;
+  TaskType taskType;
+  TaskStatus taskStatus;
+  String taskCreatedAt; // date-time format: 01 Jun 2023, 14:25
+  String completedAt; // date-time format: 01 Jun 2023, 14:25
+}

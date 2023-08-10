@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:io';
+import 'package:app/view/alert_history_page.dart';
 import 'package:app/view/edit_profile_page.dart';
 import 'package:app/view/login_page.dart';
 import 'package:app/view/registration_page.dart';
@@ -39,6 +40,7 @@ const leaderboardRoute = '/leaderboard';
 const profileRoute = '/profile';
 const editProfileRoute = '/profile/edit';
 const taskAlertRoute = '/alert';
+const alertHistoryRoute = '/alert/history';
 const aboutUsRoute = '/aboutUs';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -189,6 +191,9 @@ class _MyFitAppState extends State<MyFitApp> {
           break;
         case taskAlertRoute:
           screen = const TaskAlertPage();
+          break;
+        case alertHistoryRoute:
+          screen = const AlertHistoryPage();
           break;
         case aboutUsRoute:
           screen = const AboutUsPage();
