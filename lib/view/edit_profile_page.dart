@@ -76,18 +76,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _items = _alertTypes
         .map((animal) => MultiSelectItem<TaskType?>(animal, animal?.name ?? ""))
         .toList();
+    _loadData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // _loadData();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _loadData();
   }
 
   List<bool> convertStringToListOfBools(String value) {
@@ -173,8 +172,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void _loadData() async {
     String? userId =
         await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    print(userId);
 
     UserInfo? userRes;
+    print(userRes);
     try {
       userRes = await ApiManager().getUser(userId ?? "");
     } on Exception catch (_) {
@@ -206,7 +207,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         //   _selectedWeekdays = convertStringToListOfBools(userWorkingDays);
         // }
         _startTime = userRes.workStartTime.toString();
-        _endTime = userRes.workEndTime = toString();
+        _endTime = userRes.workEndTime.toString();
         _selectedConditions =
             userRes.medicalConditions!.replaceAll(" ", "").split(',');
         _selectedAlerts = userRes.preferredAlerts!
@@ -307,7 +308,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           centerTitle: true,
-          title: Text('Profil ändern', style: Theme.of(context).textTheme.displayMedium,),
+          title: Text(
+            'Profil ändern',
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
         ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(

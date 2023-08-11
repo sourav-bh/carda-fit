@@ -4,6 +4,9 @@ import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:any_link_preview/any_link_preview.dart';
+import 'package:app/model/learning.dart';
+import 'package:app/view/task_alert_page.dart';
 
 class AlertHistoryPage extends StatefulWidget {
   const AlertHistoryPage({Key? key}) : super(key: key);
@@ -83,21 +86,113 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
   // const Icon(Icons.call_missed)
   // const Icon(Icons.snooze)
   // const Icon(Icons.pending_actions)
+Icon _getStatusIcon(TaskStatus status) {
+  Color iconColor;
+  switch (status) {
+    case TaskStatus.completed:
+      iconColor = Colors.green;
+      return Icon(Icons.done_outline, color: iconColor);
+    case TaskStatus.missed:
+      iconColor = Colors.red;
+      return Icon(Icons.call_missed, color: iconColor);
+    case TaskStatus.pending:
+      iconColor = Colors.yellow;
+      return Icon(Icons.pending_actions, color: iconColor);
+    default:
+      iconColor = Colors.grey;
+      return Icon(Icons.snooze, color: iconColor);
+  }
+}
 
-  @override
+  String _getIconForTaskType(TaskType type) {
+  switch (type) {
+    case TaskType.steps:
+      return 'assets/images/walk.jpg';
+    case TaskType.exercise:
+      return 'assets/images/exercise.jpg';
+    case TaskType.waterWithBreak:
+      return 'assets/images/break.jpg';
+    case TaskType.water:
+      return 'assets/images/water.jpg';
+    default:
+      return 'assets/default_icon.png';
+  }
+}
+
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          centerTitle: false,
-          title: const Text('Alarmgeschichte'),
+      appBar: AppBar(
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        centerTitle: false,
+        title: const Text('Alarmgeschichte'),
+      ),
+      backgroundColor: AppColor.lightPink,
+      body: Padding(
+        padding: EdgeInsets.all(8),
+        child: ListView.separated(
+          itemCount: _historyItems.length,
+          separatorBuilder: (BuildContext context, int index) =>
+              SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final historyItem = _historyItems[index];
+            return Card(
+              color: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder( 
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                    contentPadding: EdgeInsets.all(12),
+                    leading: CircleAvatar(
+                      radius: 30, 
+                      backgroundImage: AssetImage(
+                        _getIconForTaskType(historyItem.taskType),
+                      ),
+                    ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          historyItem.title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          historyItem.completedAt.isNotEmpty
+                              ? historyItem.completedAt
+                              : historyItem.taskCreatedAt,
+                          style: TextStyle(fontSize: 12,
+                          color: AppColor.lightBlack
+                          )
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      historyItem.description,
+                      style: TextStyle(fontSize: 12,
+                       color: AppColor.lightBlack),
+                    ),
+                  ],
+                ),
+                trailing: _getStatusIcon(historyItem.taskStatus),
+                onTap: () {
+                },
+              ),
+            );
+          },
         ),
-        body: Center(
-          child: Text(
-            'History items here, count is: ${_historyItems.length}',
-            style: const TextStyle(fontSize: 14, color: AppColor.darkBlue),
-          ),),
+      ),
     );
   }
 }
