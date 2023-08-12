@@ -1,21 +1,17 @@
 import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
-import 'package:app/main.dart';
-import 'package:app/model/user_info.dart';
+import 'package:app/app.dart';
+import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
-import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
-import 'package:app/view/task_alert_page.dart';
-import 'package:app/view/widgets/avatar_picker_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:random_avatar/random_avatar.dart';
 
 enum EditProfilePageViewState {
   bioInfo,
@@ -31,7 +27,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _formKey = GlobalKey<FormState>();
+  final _alertTypeFormKey = GlobalKey<FormState>();
   EditProfilePageViewState _viewState = EditProfilePageViewState.bioInfo;
 
   final TextEditingController _ageText = TextEditingController();
@@ -41,56 +37,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Gender? _genderValue;
   JobType? _jobTypeValue;
-  List<bool> _selectedWeekdays =
-      List.filled(CommonUtil.weekdayNames.length, false);
+  final List<bool> _selectedWeekdays = List.filled(CommonUtil.weekdayNames.length, false);
   String? _startTime = '';
   String? _endTime = '';
 
   final List<String> _conditionItems = [
-    'Herz',
-    'Beine',
-    'Knie',
-    'Schulter',
-    'Nacken',
-    'Rücken',
-    'Arme',
-    'Hände',
-    'Bauch',
-    'Augen',
+    'Herz', 'Beine', 'Knie', 'Schulter', 'Nacken', 'Rücken', 'Arme', 'Hände', 'Bauch', 'Augen',
   ];
   List<String> _selectedConditions = [];
 
-  final List<TaskType?> _alertTypes = [
-    TaskType.breaks,
-    TaskType.exercise,
-    TaskType.steps,
-    TaskType.water
-  ];
-  List<TaskType> _selectedAlerts = [];
   List<MultiSelectItem<TaskType?>> _items = [];
-  bool _isMergeAlertSelected = false;
+  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water, TaskType.walkWithExercise, TaskType.waterWithBreak];
+  List<TaskType> _selectedAlerts = [];
 
   @override
   void initState() {
     super.initState();
-    _items = _alertTypes
-        .map((animal) => MultiSelectItem<TaskType?>(animal, animal?.name ?? ""))
-        .toList();
-    _loadData();
+
+    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, CommonUtil.getTaskAlertName(alertType))).toList();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    _loadData();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  List<bool> convertStringToListOfBools(String value) {
-    return value.split(',').map((item) => item == 'true').toList();
   }
 
   Future<void> _selectStartTime(BuildContext context) async {
@@ -170,12 +146,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _loadData() async {
-    String? userId =
-        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     print(userId);
 
     UserInfo? userRes;
-    print(userRes);
     try {
       userRes = await ApiManager().getUser(userId ?? "");
     } on Exception catch (_) {
@@ -185,41 +159,62 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (mounted) {
       if (userRes != null) {
         _ageText.text = userRes.age.toString();
-        if (userRes.gender == "Männlich") {
-          _genderValue = Gender.Mannlich;
-        } else if (userRes.gender == 'Weiblich') {
-          _genderValue = Gender.Weiblich;
-        } else if (userRes.gender == 'Divers') {
-          _genderValue = Gender.Divers;
-        }
+
+        setState(() {
+          if (userRes?.gender == "Männlich" || userRes?.gender == "Mannlich") {
+            _genderValue = Gender.Mannlich;
+          } else if (userRes?.gender == 'Weiblich') {
+            _genderValue = Gender.Weiblich;
+          } else if (userRes?.gender == 'Divers') {
+            _genderValue = Gender.Divers;
+          }
+        });
+
         _weightText.text = userRes.weight.toString();
         _heightText.text = userRes.height.toString();
         _designationText.text = userRes.jobPosition ?? '';
-        if (userRes.jobType == "Vollzeit") {
-          _jobTypeValue = JobType.Vollzeit;
-        } else if (userRes.gender == 'Teilzeit') {
-          _jobTypeValue = JobType.Teilzeit;
-        } else if (userRes.gender == 'Außendienst') {
-          _jobTypeValue = JobType.HomeOffice;
+
+        setState(() {
+          if (userRes?.jobType == "Vollzeit") {
+            _jobTypeValue = JobType.Vollzeit;
+          } else if (userRes?.jobType == 'Teilzeit') {
+            _jobTypeValue = JobType.Teilzeit;
+          } else if (userRes?.jobType == 'Außendienst') {
+            _jobTypeValue = JobType.HomeOffice;
+          }
+        });
+
+        String? userWorkingDays = userRes.workingDays;
+        if (!CommonUtil.isNullOrEmpty(userWorkingDays)) {
+          List<String> selectedDays = userWorkingDays!.split(',');
+          for (var day in selectedDays) {
+            int index = CommonUtil.weekdayNames.indexOf(day.trim());
+            setState(() {
+              _selectedWeekdays[index] = true;
+            });
+          }
         }
-        // String? userWorkingDays = userRes.workingDays;
-        // if (userWorkingDays != null) {
-        //   _selectedWeekdays = convertStringToListOfBools(userWorkingDays);
-        // }
+
         _startTime = userRes.workStartTime.toString();
         _endTime = userRes.workEndTime.toString();
-        _selectedConditions =
-            userRes.medicalConditions!.replaceAll(" ", "").split(',');
-        _selectedAlerts = userRes.preferredAlerts!
-            .replaceAll(" ", "")
-            .split(',')
-            .cast<TaskType>();
+
+        _selectedConditions = userRes.medicalConditions!.replaceAll(" ", "").split(',');
+
+        String? userSelAlerts = userRes.preferredAlerts;
+        if (!CommonUtil.isNullOrEmpty(userSelAlerts)) {
+          List<String> selectedAlerts = userSelAlerts!.split(',');
+          for (var alert in selectedAlerts) {
+            setState(() {
+              _selectedAlerts.add(TaskType.values.firstWhere((e) => e.name == alert.trim()));
+            });
+          }
+        }
+
         // load values in the text fields and other form elements
         // in userRes.x are the value sto check -> wie schonmal gemacht
-      } else {
+      } else if (mounted) {
         const snackBar = SnackBar(content: Text('Daten wurden nicht geladen'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context)
-            .showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
@@ -236,27 +231,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
       conditionValue += ', ';
     }
 
-    String? userId =
-        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
 
     var userInfo = UserInfo(
       id: userId,
       age: age,
-      gender:
-          _genderValue != null ? _genderValue.toString().split('.').last : "",
+      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
       jobPosition: designation,
-      jobType:
-          _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
+      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
       workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
       workStartTime: _startTime,
       workEndTime: _endTime,
-      medicalConditions: conditionValue.isNotEmpty
-          ? conditionValue.substring(0, conditionValue.length - 2)
-          : "",
+      medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
-      isMergedAlertSet: _isMergeAlertSelected,
     );
 
     // Retrieve the existing avatarImage and userName from the previous UserInfo
@@ -281,15 +270,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (mounted) {
       if (isApiSuccess) {
-        const snackBar = SnackBar(
-            content: Text('Das Profil wurde erfolgreich aktualisiert!'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context)
-            .showSnackBar(snackBar);
+        const snackBar = SnackBar(content: Text('Das Profil wurde erfolgreich aktualisiert!'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } else {
-        const snackBar =
-            SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context)
-            .showSnackBar(snackBar);
+        const snackBar = SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
@@ -315,10 +300,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: Platform.isIOS
-              ? SystemUiOverlayStyle.light
-              : const SystemUiOverlayStyle(
-                  statusBarIconBrightness: Brightness.light),
+          value: Platform.isIOS ? SystemUiOverlayStyle.light
+              : const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -327,10 +310,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Container(
                     width: CommonUtil.getSmallDiameter(context),
                     height: CommonUtil.getSmallDiameter(context),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColor.lightOrange,
-                    )),
+                    decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColor.lightOrange,)),
               ),
               Positioned(
                 bottom: 50,
@@ -338,10 +318,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Container(
                   width: CommonUtil.getSmallDiameter(context),
                   height: CommonUtil.getSmallDiameter(context),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColor.lightBlue,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColor.lightBlue,),
                 ),
               ),
               Align(
@@ -356,13 +333,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) =>
-                                    Colors.transparent,
-                              ),
-                              overlayColor:
-                                  MaterialStateProperty.all(Colors.transparent),
+                              backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
+                              overlayColor: MaterialStateProperty.all(Colors.transparent),
                             ),
                             onPressed: () {
                               _nextAction();
@@ -370,19 +342,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             child: Ink(
                               decoration: const BoxDecoration(
                                 color: Colors.orangeAccent,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Container(
-                                constraints: const BoxConstraints(
-                                    minHeight:
-                                        50), // min sizes for Material buttons
+                                constraints: const BoxConstraints(minHeight: 50), // min sizes for Material buttons
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Weiter".toUpperCase(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700),
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                                 ),
                               ),
                             )),
@@ -426,10 +393,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre biologischen Daten ein\n(optional)',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 18),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -442,13 +406,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -471,8 +433,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<Gender>(
                     groupValue: _genderValue,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                     children: const {
                       Gender.Mannlich: Text('Männlich'),
                       Gender.Weiblich: Text('Weiblich'),
@@ -494,13 +455,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -518,13 +477,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -558,10 +515,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre arbeitsbezogenen Informationen und Ihren Wochenplan ein\n(optional)',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 18),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -574,13 +528,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.white12),
+                      borderSide: const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -591,19 +543,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text(
-                    'Arbeitszeitmodell',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
+                  child: Text('Arbeitszeitmodell',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<JobType>(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                     groupValue: _jobTypeValue,
                     children: const {
                       JobType.Vollzeit: Text('Vollzeit'),
@@ -619,12 +566,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text(
-                    'Arbeitszeitplan',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
+                  child: Text('Arbeitszeitplan',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
@@ -635,21 +578,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ToggleButtons(
                         onPressed: (int index) {
                           setState(() {
-                            _selectedWeekdays[index] =
-                                !_selectedWeekdays[index];
+                            _selectedWeekdays[index] = !_selectedWeekdays[index];
                           });
                         },
                         selectedColor: AppColor.orange,
                         borderRadius: BorderRadius.circular(10),
                         isSelected: _selectedWeekdays,
-                        constraints:
-                            const BoxConstraints(minWidth: 55, minHeight: 50),
+                        constraints: const BoxConstraints(minWidth: 55, minHeight: 50),
                         children: [
                           for (int i = 1; i <= 5; i++)
                             Text(
                               CommonUtil.weekdayNames[i - 1],
-                              style: const TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
                         ],
                       ),
@@ -658,35 +598,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text(
-                    'Arbeitszeiten',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
+                  child: Text('Arbeitszeiten',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      CommonUtil.isNullOrEmpty(_startTime)
-                          ? 'Startzeit wählen'
-                          : 'Startzeit: $_startTime',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    Text(CommonUtil.isNullOrEmpty(_startTime) ? 'Startzeit wählen' : 'Startzeit: $_startTime',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
                     ),
                     IconButton(
-                        onPressed: () {
-                          _selectStartTime(context);
-                        },
-                        icon: const Icon(
-                          Icons.access_time_rounded,
-                          color: AppColor.orange,
-                          size: 30,
-                        ))
+                      onPressed: () {
+                        _selectStartTime(context);
+                      },
+                      icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
                   ],
                 ),
                 Row(
@@ -737,111 +663,70 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre medizinischen Bedingungen und die Auswahl der Ausschreibungen\n(optional)',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 18),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 10),
-                  child: Text(
-                    'Medizinische Beeinträchtigungen',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
+                  child: Text('Medizinische Beeinträchtigungen',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   child: MultiSelectDialogField<String>(
-                    items: _conditionItems
-                        .map((e) => MultiSelectItem(e, e))
-                        .toList(),
+                    items: _conditionItems.map((e) => MultiSelectItem(e, e)).toList(),
                     listType: MultiSelectListType.CHIP,
                     onConfirm: (values) {
                       _selectedConditions = values;
-                      print(_selectedConditions);
                     },
+                    initialValue: _selectedConditions,
                     title: const Text("Wählen Sie ein Element"),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.1),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      border: Border.all(
-                        color: Colors.white12,
-                        width: 1,
-                      ),
+                      border: Border.all(color: Colors.white12, width: 1,),
                     ),
                     selectedColor: AppColor.orange,
                     buttonText: const Text('Wählen Sie ein Element'),
                     buttonIcon: const Icon(Icons.filter_list),
                     checkColor: AppColor.orange,
-                    itemsTextStyle: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16, color: Colors.black),
-                    selectedItemsTextStyle: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16, color: Colors.white),
+                    itemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.black),
+                    selectedItemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
                   ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
                 SizedBox(
-                  child: MultiSelectChipField<TaskType?>(
-                    items: _items,
-                    title: Text(
-                      'Alarme auswählen',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(fontSize: 16),
-                    ),
-                    headerColor: Colors.white,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(
+                  child: Form(
+                    key: _alertTypeFormKey,
+                    child: MultiSelectChipField<TaskType?>(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      scroll: false,
+                      items: _items,
+                      initialValue: _selectedAlerts,
+                      title: Text('Alarme auswählen',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                      ),
+                      headerColor: Colors.white,
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        width: 1,
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(color: Colors.white, width: 1,),
                       ),
-                    ),
-                    selectedChipColor: AppColor.orange,
-                    selectedTextStyle: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16, color: Colors.white),
-                    onTap: (values) {
-                      _selectedAlerts = values.whereType<TaskType>().toList();
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  child: MergeSemantics(
-                    child: ListTile(
-                      title: Text(
-                        'Zusammenführen von Alarmen wie Wasser mit Pausen und Schritte mit Bewegung',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      trailing: CupertinoSwitch(
-                        value: _isMergeAlertSelected,
-                        activeColor: AppColor.primary,
-                        thumbColor: Colors.white,
-                        trackColor: Colors.black26,
-                        onChanged: (bool value) {
-                          setState(() {
-                            _isMergeAlertSelected = value;
-                          });
-                        },
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _isMergeAlertSelected = !_isMergeAlertSelected;
-                        });
+                      selectedChipColor: AppColor.orange,
+                      validator: (values) {
+                        if ((((values?.contains(TaskType.breaks) ?? false) || (values?.contains(TaskType.water) ?? false))
+                            && (values?.contains(TaskType.waterWithBreak) ?? false))
+                            || (((values?.contains(TaskType.steps) ?? false) || (values?.contains(TaskType.exercise) ?? false))
+                                && (values?.contains(TaskType.walkWithExercise) ?? false))) {
+                          return "* Einzelne u. kombinierte dürfen nicht gewählt";
+                        }
+                      },
+                      selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                      onTap: (values) {
+                        _selectedAlerts = values.whereType<TaskType>().toList();
                       },
                     ),
                   ),

@@ -1,12 +1,7 @@
-// ignore_for_file: iterable_contains_unrelated_type
-
-import 'dart:math';
-import 'dart:typed_data';
-import 'package:app/model/exercise.dart';
-import 'package:app/model/exercise_steps.dart';
-import 'package:app/service/database_helper.dart';
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/model/user_info.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
@@ -15,8 +10,7 @@ import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:app/model/user_info.dart';
-import '../model/user_info.dart';
+
 import '../util/app_constant.dart';
 
 class UserLearningPage extends StatefulWidget {
@@ -76,7 +70,7 @@ class CustomSearchDelegate extends SearchDelegate {
       itemBuilder: (context, index) {
         var result = learningMaterialResults[index];
         return ListTile(
-          title: Text(result.title ?? ""),
+          title: Text(result.title),
         );
       },
     );
@@ -107,11 +101,10 @@ class CustomSearchDelegate extends SearchDelegate {
         var result = learningMaterialResults[index];
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, detailsWebRoute,
-                arguments: result.originalContent);
+            Navigator.pushNamed(context, detailsWebRoute, arguments: result.originalContent);
           },
           child: ListTile(
-            title: Text(result.title ?? ""),
+            title: Text(result.title),
           ),
         );
       },
@@ -133,21 +126,6 @@ class _UserLearningPageState extends State<UserLearningPage> {
     super.initState();
 
     _loadData();
-  }
-
-  /*  */
-  // The function needs to be called everytime something is getting searched
-  // The function gives out the list of recipes that mtach with the query
-  // The search function needs to be implemented in the MySearchDelegate class, which is not possible for me
-  _searchRecipes() {
-    var query = "Gemüse";
-    var results = [];
-    for (var recipe in _learningMaterials) {
-      if (recipe.title?.contains(query) ?? false) {
-        results.add(recipe);
-      }
-    }
-    return results;
   }
 
   _loadData() async {

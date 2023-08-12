@@ -1,15 +1,14 @@
 import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
-import 'package:app/main.dart';
-import 'package:app/model/user_info.dart';
+import 'package:app/app.dart';
+import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
-import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/widgets/avatar_picker_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,10 +62,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   ];
   List<String> _selectedConditions = [];
 
+  List<MultiSelectItem<TaskType?>> _items = [];
   final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water, TaskType.walkWithExercise, TaskType.waterWithBreak];
   List<TaskType> _selectedAlerts = [];
-  List<MultiSelectItem<TaskType?>> _items = [];
-  bool _isMergeAlertSelected = false;
 
   int _stepIndex = 0;
   String _nextButtonText = "Weiter";
@@ -119,7 +117,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   Future<bool> _checkUserNameAvailability() async {
-    return true;
+    String userName = _userNameText.value.text;
+    return await ApiManager().checkIfUserNameAvailable(userName);
   }
 
   void _submitAction() async {
@@ -144,6 +143,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
+      teamName: AppConstant.teamNameForCustomBuild,
       score: 0,
       jobPosition: designation,
       jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
@@ -152,7 +152,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       workEndTime: _endTime,
       medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
-      isMergedAlertSet: _isMergeAlertSelected,
       deviceToken: AppCache.instance.fcmToken,);
 
     int userDbId = await DatabaseHelper.instance.addUser(userInfo);
@@ -172,9 +171,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (userServerId != null) {
         SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
         AppCache.instance.userServerId = userServerId;
+        CommonUtil.createUserTargets(userInfo);
       } else {
         const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
@@ -425,8 +425,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         return 'Nutzername ist erforderlich.';
                       } else if ((value?.length ?? 0) < 5) {
                         return 'Muss mindestens 5 Zeichen lang sein.';
-                      } else if ((value?.length ?? 0) > 15) {
-                        return 'Darf maximal 15 Zeichen lang sein.';
+                      } else if ((value?.length ?? 0) > 8) {
+                        return 'Darf maximal 8 Zeichen lang sein.';
                       } else if ((value ?? "").contains(' ')) {
                         return 'Darf keine Leerzeichen enthalten.';
                       } else {
@@ -882,27 +882,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       onTap: (values) {
                         _selectedAlerts = values.whereType<TaskType>().toList();
                       },
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: false,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: MergeSemantics(
-                      child: ListTile(
-                        title: Text('Zusammenführen von Alarmen wie Wasser mit Pausen und Schritte mit Bewegung',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        trailing: CupertinoSwitch(
-                          value: _isMergeAlertSelected,
-                          activeColor: AppColor.primary,
-                          thumbColor: Colors.white,
-                          trackColor: Colors.black26,
-                          onChanged: (bool value) { setState(() { _isMergeAlertSelected = value; }); },
-                        ),
-                        onTap: () { setState(() { _isMergeAlertSelected = !_isMergeAlertSelected; }); },
-                      ),
                     ),
                   ),
                 ),

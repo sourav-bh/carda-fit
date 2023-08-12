@@ -149,6 +149,22 @@ enum Gender {
   Divers,
 }
 
+enum UserLevelType {
+  starter,
+  advanced,
+  pro,
+}
+
+class UserLevel {
+  UserLevel({
+    required this.levelType,
+    required this.level
+  });
+
+  UserLevelType levelType;
+  int level;
+}
+
 enum JobType {
   none,
   Vollzeit,

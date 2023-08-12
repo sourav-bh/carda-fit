@@ -3,8 +3,6 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/user_activity_item.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class UserActivityPage extends StatefulWidget {
   const UserActivityPage({Key? key}) : super(key: key);
@@ -20,21 +18,6 @@ class _UserActivityPageState extends State<UserActivityPage> {
   @override
   void initState() {
     super.initState();
-    currentDate();
-  }
-
-  //Daily Reset
-  currentDate() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var now = DateTime.now();
-    String formatter = DateFormat('yMd').format(now);
-    if (prefs.getString('currentDay') != formatter) {
-      await prefs.setString('currentDay', formatter);
-      _completedJobs?.steps = 0;
-      _completedJobs?.exercises = 0;
-      _completedJobs?.waterGlasses = 0;
-      _completedJobs?.breaks = 0;
-    }
   }
 
   @override
@@ -45,8 +28,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
   }
 
   _loadDailyTarget() async {
-    var targetJson =
-        await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
+    var targetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
     if (targetJson != null && targetJson is String && targetJson.isNotEmpty) {
       setState(() {
         _dailyTarget = DailyTarget.fromRawJson(targetJson);

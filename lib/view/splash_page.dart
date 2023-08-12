@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/data_loader.dart';
@@ -45,9 +45,9 @@ class _SplashPageState extends State<SplashPage> {
     }
 
     if (isUserExist && mounted) {
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     } else {
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, loginRoute, (r) => false);
+      Navigator.pushNamedAndRemoveUntil(context, loginRoute, (r) => false);
     }
   }
 

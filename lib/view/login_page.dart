@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
@@ -64,22 +64,24 @@ class _LoginPageState extends State<LoginPage> {
       print('failed to connect with server');
     }
 
-    if (mounted) {
-      if (userRes != null) {
-        int userDbId = await DatabaseHelper.instance.addUser(userRes);
-        SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
-        AppCache.instance.userName = userName;
-        SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
-        AppCache.instance.userDbId = userDbId;
+    if (userRes != null) {
+      int userDbId = await DatabaseHelper.instance.addUser(userRes);
+      SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
+      AppCache.instance.userName = userName;
+      SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
+      AppCache.instance.userDbId = userDbId;
 
-        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userRes.id!);
-        AppCache.instance.userServerId = userRes.id!;
+      SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userRes.id!);
+      AppCache.instance.userServerId = userRes.id!;
 
+      CommonUtil.createUserTargets(userRes);
+
+      if (mounted) {
         Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
-      } else {
-        const snackBar = SnackBar(content: Text('Login fehlschlagen'));
-        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(snackBar);
       }
+    } else if (mounted) {
+      const snackBar = SnackBar(content: Text('Login fehlschlagen'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

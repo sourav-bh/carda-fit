@@ -1,16 +1,15 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:app/main.dart';
+
+import 'package:app/app.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -88,11 +87,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
     SharedPref.instance.clearCache();
     Navigator.pushNamed(context, loginRoute);
     await SharedPref.instance.clearCache();
-    Navigator.pushNamedAndRemoveUntil(context, loginRoute, (r) => false);
+
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, loginRoute, (r) => false);
+    }
   }
 
   _editProfileAction() async {
     Navigator.pushNamed(context, editProfileRoute, arguments: true);
+  }
+
+  String _getCalculatedBmiValue(int? weight, int? height) {
+    if ((weight != null && weight > 0) && (height != null && height > 0)) {
+      return ((weight) / pow(((height) / 100), 2)).toStringAsFixed(1);
+    } else {
+      return '0.0';
+    }
   }
 
   @override
@@ -194,7 +204,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             context: context,
                             icon: Icons.line_weight,
                             label: 'BMI:',
-                            value: '${((_userInfo?.weight ?? 0)/pow(((_userInfo?.height ?? 1)/ 100), 2)).toStringAsFixed(1)} '
+                            value: '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
                                 '(Größe: ${_userInfo?.weight} kg, Gewicht: ${_userInfo?.height} cm)',
                           ),
                           const SizedBox(height: 10),

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 onTap: () {
                                   print("-------> opening task alert page from on home page item click");
-                                  Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: item.taskType.index);
+                                  Navigator.pushNamed(context, taskAlertRoute, arguments: item.taskType.index);
                                 },
                               );
                             },
@@ -275,11 +275,11 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(material.title?.trim() ?? "",
+                                        Text(material.title.trim(),
                                           style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20),
                                           maxLines: 2,
                                         ),
-                                        Text(material.description?.trim() ?? "",
+                                        Text(material.description.trim(),
                                           style: Theme.of(context).textTheme.bodyText2,
                                           maxLines: 3,
                                         ),

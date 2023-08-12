@@ -1,6 +1,6 @@
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/model/learning.dart';
-import 'package:app/view/task_alert_page.dart';
+import 'package:app/model/task_alert.dart';
 
 class DataLoader {
   static const List<String> quotes = ['Sorge dich gut um deinen Körper',
@@ -85,10 +85,6 @@ class LearningMaterialInfo {
     // data.add(LearningMaterialInfo(13722, 'assets/images/thumb_office_exercises.png', '', 'Bürogymnastik: 9 Übungen für mehr Bewegung im Büro', 'Read details about correct ways for doing quick exercises in your office', 'https://www.gesundheit.de/fitness/fitness-uebungen/buerogymnastik/galerie-buerogymnastik', ''));
     return data;
   }
-
-  bool? contains(String lowerCase) {}
-
-  void add(List<String> learningMaterialResults) {}
 }
 
 class LeaderboardParticipantInfo {

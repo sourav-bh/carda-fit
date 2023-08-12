@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:math';
 
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/api/api_manager.dart';
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
-import 'package:app/model/task.dart';
+import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
@@ -21,17 +19,6 @@ import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
-import 'package:intl/intl.dart';
-
-enum TaskType {
-  water,
-  steps,
-  exercise,
-  breaks,
-  teamExercise,
-  waterWithBreak,
-  walkWithExercise,
-}
 
 class TaskAlertPage extends StatefulWidget {
   const TaskAlertPage({Key? key}) : super(key: key);
@@ -42,20 +29,18 @@ class TaskAlertPage extends StatefulWidget {
 
 class _TaskAlertPageState extends State<TaskAlertPage> {
   int? _taskType;
+  Timer? _timer;
+
+  // hide button if exercise is not finished
+  double _showHideCloseButton = 0.0;
+
   Exercise? _exercise;
   bool _isExerciseTask = false;
   int _currentStep = 0;
-  Timer? _timer;
-  double _progress = 0;
-  int _totalSeconds = 0;
-  int _secondsPassed = 0;
-  double _showButton = 0.0;
-  int _timeLeft = 120;
-  bool _showTimer = false;
-  Duration duration = const Duration();
-  double? _progressCountDown;
-
-  // hide button if exercise is not finished
+  double _timerProgress = 0;
+  int _totalExerciseSec = 0;
+  int _passedExerciseSec = 0;
+  bool _isExerciseSummaryRead = false;
 
   String? _stepNo;
   String _title = "";
@@ -64,7 +49,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   String _staticImage = 'assets/animations/anim_fitness_2.gif';
   List<String> splitConditionList = List.empty(growable: true);
 
-  bool _isExerciseSummaryRead = false;
+  int _targetTotalTimeInSec = 120;
+  int _timePassedInSec = 0;
 
   @override
   void initState() {
@@ -110,38 +96,35 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
         _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
         _currentStep = 1;
-        _totalSeconds = exerciseNow.steps?.elementAt(1).duration ?? 5;
+        _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
       } else {
-        _totalSeconds = exerciseNow.duration ?? 10;
+        _totalExerciseSec = exerciseNow.duration ?? 10;
       }
 
-      _secondsPassed = _totalSeconds;
+      _passedExerciseSec = 0;
 
     } else if (_taskType == TaskType.water.index) {
       setState(() {
-        _showTimer = false;
         _title = 'Trinke jetzt ein Glas Wasser!';
         _subTitle = '8 Gläser Wasser pro Tag, halten den Arzt fern';
         _staticImage = 'assets/animations/anim_water.gif';
-        _showButton = 1.0;
+        _showHideCloseButton = 1.0;
       });
     } else if (_taskType == TaskType.steps.index) {
       setState(() {
-        _showTimer = true;
         _title = 'Bleib nun zwei Minuten in Bewegung!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
 
-        _timeLeft = 120;
-        _startCountDown();
+        _startBreakAndWalkTimer();
       });
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
-        _showTimer = true;
         _title = 'Lege nun eine zwei minütige Pause ein!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
-        _startCountDown();
+
+        _startBreakAndWalkTimer();
       });
     }
   }
@@ -170,16 +153,11 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         String? condition;
         List<ExerciseStep> steps = [];
         for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0); rowIndex++) {
-          Data? stepCell = sheet?.cell(
-              CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
-          Data? detailsCell = sheet?.cell(
-              CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
-          Data? durationCell = sheet?.cell(
-              CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
-          Data? linkCell = sheet?.cell(
-              CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
-          Data? conditionCell = sheet?.cell(
-              CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
+          Data? stepCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? detailsCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+          Data? durationCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+          Data? conditionCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
 
           String stepVal = stepCell?.value.toString() ?? "";
           if (stepVal == "Start") {
@@ -208,8 +186,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             exercise.steps?.addAll(steps);
 
             bool addContent = false;
-            if (exercise.condition != null &&
-                userCondition.isNotEmpty &&
+            if (exercise.condition != null && userCondition.isNotEmpty &&
                 _checkUserConditionInDb(userCondition, exercise.condition!)) {
               //check if exercise.conditions match with items of the userConditionList
               addContent = true;
@@ -244,10 +221,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
 
   _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
-        link: url,
-        cache: const Duration(days: 7),
-        proxyUrl:
-            "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU");
+        link: url, cache: const Duration(days: 7),
+        proxyUrl: "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU");
     print(_metadata?.title);
     print(_metadata?.image);
     if (mounted) {
@@ -257,44 +232,48 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
-  void _startTimer() {
+  void _startExerciseTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (mounted) {
         setState(() {
-          _secondsPassed -= 1;
-          if (_progress >= 1) {
-            _cancelTimer();
+          _passedExerciseSec += 1;
+          if (_timerProgress >= 1) {
+            _cancelExerciseTimer();
           } else {
-            _progress += 1 / _totalSeconds;
+            _timerProgress += 1 / _totalExerciseSec;
           }
         });
       }
     });
   }
 
-  //newTimer
-  void _startCountDown() {
+  void _startBreakAndWalkTimer() {
+    _targetTotalTimeInSec = 120;
+    _timePassedInSec = 0;
+
     Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted && _timeLeft > 0) {
+      if (mounted && _timePassedInSec <= _targetTotalTimeInSec) {
         setState(() {
-          _timeLeft--;
-          if (_progress >= 1) {
-            // _cancelTimer();
+          _timePassedInSec++;
+          if (_timerProgress >= 1) {
+            if (_timer != null) {
+              _timer!.cancel();
+              _timer = null;
+            }
           } else {
-            _progress += 1 / _timeLeft;
-            print(_progress);
+            _timerProgress += 1 / _targetTotalTimeInSec;
           }
         });
       } else if (mounted) {
         setState(() {
-          _showButton = 1.0;
+          _showHideCloseButton = 1.0;
         });
         timer.cancel();
       }
     });
   }
 
-  void _cancelTimer() {
+  void _cancelExerciseTimer() {
     if (_timer != null) {
       _timer!.cancel();
       _timer = null;
@@ -309,16 +288,14 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
           _stepNo = _exercise?.steps?.elementAt(_currentStep).serialNo;
           _subTitle = _exercise?.steps?.elementAt(_currentStep).name ?? "";
 
-          _progress = 0;
-          _totalSeconds =
-              _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
-          _secondsPassed = _totalSeconds;
-          _startTimer();
+          _timerProgress = 0;
+          _totalExerciseSec = _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
+          _passedExerciseSec = _totalExerciseSec;
+          _startExerciseTimer();
         } else if ((_exercise?.steps?.length ?? 0) - 1 == _currentStep) {
-          _showButton = 1.0;
+          _showHideCloseButton = 1.0;
           // else if show the button
         }
-        ;
       });
     }
   }
@@ -334,16 +311,13 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
-    var complTargetJson = await SharedPref.instance
-        .getJsonValue(SharedPref.keyUserCompletedTargets);
+    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
     if (complTargetJson != null &&
-        complTargetJson is String &&
-        complTargetJson.isNotEmpty) {
+        complTargetJson is String && complTargetJson.isNotEmpty) {
       completedTarget = DailyTarget.fromRawJson(complTargetJson);
     } else {
-      completedTarget =
-          DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
+      completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
     }
 
     switch (_taskType) {
@@ -362,18 +336,19 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       default:
         break;
     }
-    SharedPref.instance.saveJsonValue(
-        SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
+    SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     int score = DataLoader.getScoreForTask(_taskType ?? -1);
     String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
       await ApiManager().updateUserScore(userId, score);
-      Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
-    } else {
-      Navigator.of(navigatorKey.currentState!.context).pop();
-      Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
+      if (mounted) {
+        Navigator.of(context).pop();
+        Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+      }
+    } else if (mounted) {
+      Navigator.of(context).pop();
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }
 
@@ -419,12 +394,12 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                       backgroundColor: Colors.white,
                       valueColor:
                           const AlwaysStoppedAnimation<Color>(Colors.orange),
-                      value: _progress,
+                      value: _timerProgress,
                     ),
                   ),
                   Center(
                       child: Text(
-                    CommonUtil.formatDuration(_secondsPassed),
+                    CommonUtil.formatDuration(_passedExerciseSec),
                     style: Theme.of(context)
                         .textTheme
                         .caption
@@ -447,7 +422,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             height: 20,
           ),
           Visibility(
-            visible: _showTimer,
+            visible: (_taskType == TaskType.breaks.index || _taskType == TaskType.steps.index),
             child: SizedBox(
               width: 120,
               height: 120,
@@ -459,13 +434,12 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                     child: CircularProgressIndicator(
                       strokeWidth: 20,
                       backgroundColor: Colors.white,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.orange),
-                      value: _progress,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                      value: _timerProgress,
                     ),
                   ),
                   Center(child: Text(
-                    CommonUtil.formatDuration(_timeLeft),
+                    CommonUtil.formatDuration(_targetTotalTimeInSec - _timePassedInSec),
                     style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                     textAlign: TextAlign.center,
                   ))
@@ -493,7 +467,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                     : Image.asset(_staticImage,)),
           ),
           Opacity(
-            opacity: _showButton,
+            opacity: _showHideCloseButton,
             // showButton if exercise done
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
@@ -574,7 +548,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                 setState(() {
                   _isExerciseSummaryRead = true;
                 });
-                _startTimer();
+                _startExerciseTimer();
               },
               child: Ink(
                 decoration: const BoxDecoration(

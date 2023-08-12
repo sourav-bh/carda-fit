@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:app/view/task_alert_page.dart';
-
 class TaskAlert {
   TaskAlert({
     this.alertId,
@@ -52,6 +50,16 @@ class TaskAlert {
         "created_at": createdAt,
         "last_updated_at": lastUpdatedAt,
       };
+}
+
+enum TaskType {
+  water,
+  steps,
+  exercise,
+  breaks,
+  teamExercise,
+  waterWithBreak,
+  walkWithExercise,
 }
 
 enum TaskStatus { completed, pending, missed, snoozed, upcoming }

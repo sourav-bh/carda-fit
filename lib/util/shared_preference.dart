@@ -8,6 +8,7 @@ class SharedPref {
   static const keyDeviceToken = "key_fcm_token";
   static const keyAvatarImage = "key_avatar_image";
 
+  static const keyLastAppOpenDay = "key_last_app_open_day";
   static const keyUserTargets = "key_user_targets";
   static const keyUserCompletedTargets = "key_user_completed_targets";
 

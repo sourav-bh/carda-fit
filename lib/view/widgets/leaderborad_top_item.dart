@@ -1,6 +1,4 @@
-import 'package:app/model/exercise_steps.dart';
 import 'package:app/model/user_info.dart';
-import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';

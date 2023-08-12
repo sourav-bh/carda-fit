@@ -33,6 +33,26 @@ class ApiManager {
     }
   }
 
+  Future<List<UserInfo>> getAllUsersByTeam(String teamName) async {
+    var response = await ApiClient.instance.getRequest('/users?teamName=$teamName');
+    if (response.statusCode == 200) {
+      var jsonRes = json.decode(response.body);
+      var userJson = jsonRes["records"];
+      return List<UserInfo>.from(userJson.map((x) => UserInfo.fromJson(x)));
+    } else {
+      return [];
+    }
+  }
+
+  Future<bool> checkIfUserNameAvailable(String userName) async {
+    var response = await ApiClient.instance.getRequest('/check-userName?userName=$userName');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<UserInfo?> getUser(String id) async {
     var response = await ApiClient.instance.getRequest('/user/$id');
     if (response.statusCode == 200) {

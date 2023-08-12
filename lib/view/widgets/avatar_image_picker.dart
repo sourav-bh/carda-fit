@@ -1,6 +1,4 @@
-import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
-import 'package:app/util/data_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 

@@ -43,6 +43,10 @@ class AppColor {
   static const darkGrey = Color(0xff8e8e8e);
   static const lightBlack = Color(0xFF333333);
 
+  static const gold = Color(0xFFDBA522);
+  static const silver = Color(0xFF969696);
+  static const bronze = Color(0xFF6A3805);
+
 }
 
 class AppDimension {

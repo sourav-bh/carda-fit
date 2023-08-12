@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:app/main.dart';
+import 'package:app/app.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
@@ -11,7 +10,6 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
-import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
@@ -67,17 +65,16 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   void _handleMessage(RemoteMessage message) {
-    print('remote push notification onClicked');
-    if (message != null) {
-      print('remote notification payload: $message');
-    }
+    debugPrint('remote notification onClicked with payload: $message');
 
     var data = message.data['text'];
     String payload = data ?? "0";
     int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
 
-    print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
-    Navigator.pushNamed(navigatorKey.currentState!.context, taskAlertRoute, arguments: taskType);
+    if (mounted) {
+      print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
+      Navigator.pushNamed(context, taskAlertRoute, arguments: taskType);
+    }
   }
 
   void _switchFromHomeToAnotherTab(int tab) {
@@ -238,7 +235,7 @@ class _LandingPageState extends State<LandingPage> {
                     color: _currentIndex == 2 ? Colors.orange : Colors.grey)),
             BottomNavigationBarItem(
                 label: 'Board',
-                icon: Icon(Icons.leaderboard,
+                icon: Icon(Icons.score,
                     color: _currentIndex == 3 ? Colors.orange : Colors.grey)),
             BottomNavigationBarItem(
                 label: 'Profile',

@@ -1,12 +1,7 @@
 import 'package:app/model/task_alert.dart';
 import 'package:app/util/app_style.dart';
-import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:any_link_preview/any_link_preview.dart';
-import 'package:app/model/learning.dart';
-import 'package:app/view/task_alert_page.dart';
 
 class AlertHistoryPage extends StatefulWidget {
   const AlertHistoryPage({Key? key}) : super(key: key);
@@ -130,11 +125,11 @@ Icon _getStatusIcon(TaskStatus status) {
       ),
       backgroundColor: AppColor.lightPink,
       body: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: ListView.separated(
           itemCount: _historyItems.length,
           separatorBuilder: (BuildContext context, int index) =>
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final historyItem = _historyItems[index];
             return Card(
@@ -144,7 +139,7 @@ Icon _getStatusIcon(TaskStatus status) {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
-                    contentPadding: EdgeInsets.all(12),
+                    contentPadding: const EdgeInsets.all(12),
                     leading: CircleAvatar(
                       radius: 30, 
                       backgroundImage: AssetImage(
@@ -160,27 +155,27 @@ Icon _getStatusIcon(TaskStatus status) {
                       children: [
                         Text(
                           historyItem.title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.black
                           ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
                           historyItem.completedAt.isNotEmpty
                               ? historyItem.completedAt
                               : historyItem.taskCreatedAt,
-                          style: TextStyle(fontSize: 12,
+                          style: const TextStyle(fontSize: 12,
                           color: AppColor.lightBlack
                           )
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       historyItem.description,
-                      style: TextStyle(fontSize: 12,
+                      style: const TextStyle(fontSize: 12,
                        color: AppColor.lightBlack),
                     ),
                   ],

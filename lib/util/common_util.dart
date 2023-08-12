@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
+
 import 'package:app/api/api_manager.dart';
+import 'package:app/model/task_alert.dart';
+import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/util/app_style.dart';
-import 'package:app/view/task_alert_page.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -130,6 +132,51 @@ class CommonUtil {
 
   static int getRandomScore(int max) {
     return Random().nextInt(max);
+  }
+
+  static void createUserTargets(UserInfo userInfo) {
+    int steps = 7500;
+    int exercises = 12;
+    int waterGlasses = 8;
+    int breaks = 8;
+
+    if (userInfo.age != null) {
+      int age = userInfo.age!;
+      String gender = userInfo.gender ?? "Divers";
+
+      if (age > 18 && age < 35) {
+        steps = gender == "Mannlich" ? 7500 : 7000;
+      } else if (age > 35 && age < 50) {
+        steps = gender == "Mannlich" ? 6840 : 6400;
+        exercises = 10;
+      } else if (age > 50) {
+        steps = gender == "Mannlich" ? 5910 : 5750;
+        exercises = 8;
+      }
+    }
+
+    if ((userInfo.jobType ?? "") == "Teilzeit") {
+      exercises = exercises ~/ 2;
+      waterGlasses = 4;
+      breaks = 4;
+    }
+
+    DailyTarget dailyTarget = DailyTarget(
+        steps: steps,
+        exercises: exercises,
+        waterGlasses: waterGlasses,
+        breaks: breaks);
+    SharedPref.instance.saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
+  }
+
+  static UserLevel getUserLevelByScore(int score) {
+    if (score < 1000) {
+      return UserLevel(levelType: UserLevelType.starter, level: score ~/ 350);
+    } else if (score < 2500) {
+      return UserLevel(levelType: UserLevelType.advanced, level: (score-1000) ~/ 500);
+    } else {
+      return UserLevel(levelType: UserLevelType.pro, level: min((score-2500) ~/ 1000, 2));
+    }
   }
 
   static const List<String> weekdayNames = [

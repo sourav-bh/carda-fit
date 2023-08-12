@@ -1,19 +1,15 @@
 import 'dart:math';
 
 import 'package:app/api/api_manager.dart';
-import 'package:app/main.dart';
 import 'package:app/model/user_info.dart';
-import 'package:app/model/user_info.dart';
-import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
-import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
-import 'package:app/view/widgets/avatar_image_picker.dart';
 import 'package:app/view/widgets/leaderborad_top_item.dart';
+import 'package:app/view/widgets/user_badge_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 class LeaderBoardPage extends StatefulWidget {
@@ -24,73 +20,57 @@ class LeaderBoardPage extends StatefulWidget {
 }
 
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
-  final List<UserInfo> _participantInfo = List.empty(growable: true);
-  String? _avatarName;
+  final List<UserInfo> _teamMembersList = List.empty(growable: true);
+  String? _currentUserName;
 
   @override
   void initState() {
     super.initState();
 
-    _loadAvatarName();
+    _loadUserName();
     _loadAllUsers();
   }
 
-  _loadAvatarName() async {
+  _loadUserName() async {
     var userName = await SharedPref.instance.getValue(SharedPref.keyUserName);
     if (userName != null && userName is String) {
       setState(() {
-        _avatarName = userName;
+        _currentUserName = userName;
       });
     }
   }
 
   void _loadAllUsers() async {
     setState(() {
-      _participantInfo.clear();
+      _teamMembersList.clear();
     });
 
     List<UserInfo> allUsers = [];
     try {
-      allUsers = await ApiManager().getAllUsers();
+      allUsers = await ApiManager().getAllUsersByTeam(AppConstant.teamNameForCustomBuild);
     } on Exception catch (_) {
       print('failed to connect with server');
     }
 
     for (var user in allUsers) {
-      if (mounted) {
+      if (user.userName != _currentUserName && mounted) {
         setState(() {
-          _participantInfo.add(user);
+          _teamMembersList.add(user);
         });
       }
     }
 
     setState(() {
-      _participantInfo.sort((a, b) => (b.score ?? 0).compareTo((a.score ?? 0)));
+      _teamMembersList.sort((a, b) => (b.score ?? 0).compareTo((a.score ?? 0)));
     });
   }
 
-  UserInfo? _getTopUserInfo(int position) {
-    if (position == 0 || position > _participantInfo.length) {
-      return null;
-    } else {
-      return _participantInfo[position-1];
-    }
-  }
-
   UserInfo _getCurrentUserInfo() {
-    if (_avatarName != null && _avatarName!.isNotEmpty) {
-      var user = _participantInfo.firstWhere((element) => element.userName == _avatarName, orElse: () => UserInfo());
+    if (_currentUserName != null && _currentUserName!.isNotEmpty) {
+      var user = _teamMembersList.firstWhere((element) => element.userName == _currentUserName, orElse: () => UserInfo());
       return user;
     } else {
       return UserInfo();
-    }
-  }
-
-  int _getCurrentUserPosition() {
-    if (_avatarName != null && _avatarName!.isNotEmpty) {
-      return _participantInfo.indexWhere((element) => element.userName == _avatarName);
-    } else {
-      return -1;
     }
   }
 
@@ -104,37 +84,57 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     return Scaffold(
       backgroundColor: AppColor.lightPink,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 30,),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 30, 16, 10),
-            child: Text('Du hast den ${_getCurrentUserPosition() + 1} Platz erreicht!',
-              style: Theme.of(context).textTheme.caption?.copyWith(color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,),
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.fromLTRB(16, 50, 16, 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Hallo, $_currentUserName',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 5,),
+                      Text('Ihr aktueller Spielstand ist: ${_getCurrentUserInfo().score ?? 0}', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.black87)),
+                      const SizedBox(height: 15,),
+                      Text('Mach weiter mit den Aktivitäten und schalte das nächste Level frei!',
+                          style: Theme.of(context).textTheme.labelMedium
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20,),
+                UserBadgeView(userLevel: CommonUtil.getUserLevelByScore(_getCurrentUserInfo().score ?? 0),),
+              ],
             ),
           ),
-          Text('Mit ${_getCurrentUserInfo().score ?? 0} Punkte', style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 20, color: Colors.brown)),
-          const SizedBox(height: 20,),
-          SizedBox(
-            height: 150,
-            child: GridView.extent(
-              padding: const EdgeInsets.all(8),
-              maxCrossAxisExtent: MediaQuery.of(context).size.width/3,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-              children: [
-                LeaderboardTopItemView(userInfo: _getTopUserInfo(2), position: 2, badgeColor: Colors.green.shade300, topMargin: 8,),
-                LeaderboardTopItemView(userInfo: _getTopUserInfo(1), position: 1, badgeColor: Colors.orange.shade300, topMargin: 0),
-                LeaderboardTopItemView(userInfo: _getTopUserInfo(3), position: 3, badgeColor: Colors.blue.shade300, topMargin: 16),
-              ],
+          const SizedBox(height: 30,),
+          _teamMembersList.isEmpty ?
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
+            child: Text('Derzeit gibt es keine anderen Teammitglieder, die angezeigt werden können!',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.blueGrey),
+              textAlign: TextAlign.center,
+            ),
+          ) :
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text('Sehen was andere machen',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.brown)
             ),
           ),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: max(_participantInfo.length-3, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              itemCount: max(_teamMembersList.length, 0),
               itemBuilder: (BuildContext context, int index) {
-                UserInfo participant = _participantInfo[index + 3];
+                UserInfo participant = _teamMembersList[index];
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
                   child: Card(
@@ -175,6 +175,43 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
           )
         ],
       )
+    );
+  }
+}
+
+class HexagonalBadge extends StatelessWidget {
+  final Color color;
+  final Icon icon;
+  final int badgeNumber;
+
+  const HexagonalBadge({
+    required this.color,
+    required this.icon,
+    required this.badgeNumber,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+      child: Stack(
+        children: [
+          icon,
+          Positioned(
+            right: 10,
+            top: 10,
+            child: Badge(
+              backgroundColor: Colors.white,
+              child: Text(badgeNumber.toString()),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

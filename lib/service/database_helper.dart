@@ -1,23 +1,22 @@
 import 'dart:io';
+
 import 'package:app/model/allergy.dart';
 import 'package:app/model/condition.dart';
 import 'package:app/model/exercise.dart';
+import 'package:app/model/learning.dart';
 import 'package:app/model/scorer.dart';
+import 'package:app/model/task_alert.dart';
+import 'package:app/model/user_allergy.dart';
 import 'package:app/model/user_condition.dart';
 import 'package:app/model/user_exercise.dart';
 import 'package:app/model/user_info.dart';
+import 'package:app/model/user_learning_contents.dart';
 import 'package:app/model/user_task.dart';
 import 'package:path/path.dart';
-import 'package:app/model/user_allergy.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:app/model/learning.dart';
-import 'package:app/model/user_learning_contents.dart';
-import 'package:app/model/task_alert.dart';
 
 import '../model/task.dart';
-import '../model/task_alert.dart';
-import '../model/task_alert.dart';
 
 const TABLE_USER = 'user';
 const TABLE_TASK = 'task';
