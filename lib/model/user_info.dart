@@ -169,7 +169,6 @@ enum JobType {
   none,
   Vollzeit,
   Teilzeit,
-  HomeOffice,
 }
 
 class SnoozeTime {

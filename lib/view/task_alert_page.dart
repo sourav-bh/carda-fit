@@ -399,7 +399,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                   ),
                   Center(
                       child: Text(
-                    CommonUtil.formatDuration(_passedExerciseSec),
+                    CommonUtil.formatTimeDurationToDisplay(_passedExerciseSec),
                     style: Theme.of(context)
                         .textTheme
                         .caption
@@ -439,7 +439,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                     ),
                   ),
                   Center(child: Text(
-                    CommonUtil.formatDuration(_targetTotalTimeInSec - _timePassedInSec),
+                    CommonUtil.formatTimeDurationToDisplay(_targetTotalTimeInSec - _timePassedInSec),
                     style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                     textAlign: TextAlign.center,
                   ))

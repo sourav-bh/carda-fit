@@ -725,7 +725,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     children: const {
                       JobType.Vollzeit: Text('Vollzeit'),
                       JobType.Teilzeit: Text('Teilzeit'),
-                      JobType.HomeOffice: Text('Außendienst'),
                     },
                     onValueChanged: (groupValue) {
                       setState(() {

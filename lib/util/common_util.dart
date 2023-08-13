@@ -74,7 +74,7 @@ class CommonUtil {
     }
   }
 
-  static String formatDuration(int totalSeconds) {
+  static String formatTimeDurationToDisplay(int totalSeconds) {
     if (totalSeconds <= 0) return '00:00';
 
     final duration = Duration(seconds: totalSeconds);

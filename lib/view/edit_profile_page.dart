@@ -179,8 +179,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _jobTypeValue = JobType.Vollzeit;
           } else if (userRes?.jobType == 'Teilzeit') {
             _jobTypeValue = JobType.Teilzeit;
-          } else if (userRes?.jobType == 'Außendienst') {
-            _jobTypeValue = JobType.HomeOffice;
           }
         });
 
@@ -555,7 +553,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     children: const {
                       JobType.Vollzeit: Text('Vollzeit'),
                       JobType.Teilzeit: Text('Teilzeit'),
-                      JobType.HomeOffice: Text('Außendienst'),
                     },
                     onValueChanged: (groupValue) {
                       setState(() {
