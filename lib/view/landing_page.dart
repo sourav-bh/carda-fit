@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/exercise_steps.dart';
@@ -8,6 +11,7 @@ import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
+import 'package:app/util/shared_preference.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/user_activity_page.dart';
@@ -49,6 +53,58 @@ class _LandingPageState extends State<LandingPage> {
     _loadLearningMaterialFromAsset();
 
     setupInteractedMessage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _checkIfAllowedToUseTheApp();
+  }
+
+  _checkIfAllowedToUseTheApp() async {
+    bool isActive = await ApiManager().checkIfTeamIsActive(AppConstant.teamNameForCustomBuild);
+
+    if (!isActive && mounted) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Container(
+              width: 300,
+              height: 175,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Fehler!",
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20,),
+                  Expanded(
+                    child: Text("Die Gültigkeit Ihres Kontos ist abgelaufen. Bitte wenden Sie sich an den Administrator Ihrer Organisation.",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text("OK", style: TextStyle(color: AppColor.orange),),
+                onPressed: () {
+                  Navigator.pop(context);
+                  exit(0);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void _handleTabSelection() {

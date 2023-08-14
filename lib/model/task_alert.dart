@@ -64,8 +64,8 @@ enum TaskType {
 
 enum TaskStatus { completed, pending, missed, snoozed, upcoming }
 
-class AlertHistoryItem {
-  AlertHistoryItem({
+class AlertHistory {
+  AlertHistory({
     required this.title,
     required this.description,
     required this.taskType,
@@ -78,6 +78,28 @@ class AlertHistoryItem {
   String description;
   TaskType taskType;
   TaskStatus taskStatus;
-  String taskCreatedAt; // date-time format: 01 Jun 2023, 14:25
+  String taskCreatedAt; // date-time format: YYYY-MM-DD HH:MM:SS
   String completedAt; // date-time format: 01 Jun 2023, 14:25
+
+  factory AlertHistory.fromRawJson(String str) => AlertHistory.fromMap(json.decode(str));
+
+  String toRawJson() => json.encode(toMap());
+
+  factory AlertHistory.fromMap(Map<String, dynamic> json) => AlertHistory(
+    title: json["title"],
+    description: json["description"],
+    taskType: TaskType.values[json["taskType"]],
+    taskStatus: TaskStatus.values[json["taskStatus"]],
+    taskCreatedAt: json["taskCreatedAt"],
+    completedAt: json["completedAt"],
+  );
+
+  Map<String, dynamic> toMap() => {
+    "title": title,
+    "description": description,
+    "taskType": taskType.index,
+    "taskStatus": taskStatus.index,
+    "taskCreatedAt": taskCreatedAt,
+    "completedAt": completedAt,
+  };
 }

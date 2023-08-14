@@ -92,6 +92,17 @@ class CommonUtil {
     return DateFormat('HH:mm').format(dt);
   }
 
+  static String getCurrentTimeAsDbFormat() {
+    var df = DateFormat("YYYY-MM-DD HH:MM:SS");
+    return df.format(DateTime.now());
+  }
+
+  static String convertDbTimeStampToTimeOnlyStr(String dbTime) {
+    var df = DateFormat("YYYY-MM-DD HH:MM:SS");
+    var dt = df.parse(dbTime);
+    return DateFormat('HH:mm').format(dt);
+  }
+
   static double getSmallDiameter(BuildContext context) {
     return MediaQuery.of(context).size.width * 2 / 3;
   }

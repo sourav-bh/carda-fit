@@ -53,6 +53,15 @@ class ApiManager {
     }
   }
 
+  Future<bool> checkIfTeamIsActive(String teamName) async {
+    var response = await ApiClient.instance.getRequest('/team/check?teamName=$teamName');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<UserInfo?> getUser(String id) async {
     var response = await ApiClient.instance.getRequest('/user/$id');
     if (response.statusCode == 200) {
@@ -98,6 +107,19 @@ class ApiManager {
   Future<bool> updateDeviceToken(String userId, String fcmToken) async {
     var reqBody = <String, dynamic> {
       'deviceToken': fcmToken,
+    };
+
+    var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> updateTeamName(String userId, String teamName) async {
+    var reqBody = <String, dynamic> {
+      'teamName': teamName,
     };
 
     var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);

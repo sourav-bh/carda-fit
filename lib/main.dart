@@ -4,11 +4,13 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
 import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_daily_target.dart';
+import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/splash_page.dart';
 import 'package:app/view/task_alert_page.dart';
+import 'package:excel/excel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +63,7 @@ _setupFireBase() async {
   print('FCM token: $token');
   if (token != null && token.isNotEmpty) {
     AppCache.instance.fcmToken = token;
-    String? userId =
-    await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId.isNotEmpty) {
       await ApiManager().updateDeviceToken(userId, token);
     }
@@ -101,15 +102,30 @@ Future<void> foregroundHandler(RemoteMessage message) async {
 Future<void> backgroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the background: ${message.data}');
 
-  const AndroidNotificationDetails androidNotificationDetails =
-  AndroidNotificationDetails('carda_fit', 'CardaFit',
-      channelDescription: 'CardaFit Alerts',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker');
+  String title = message.data["title"];
+  String desc = message.data["message"];
+  int alertType = int.parse(message.data["text"]);
 
-  const DarwinNotificationDetails iOSNotificationDetails =
-  DarwinNotificationDetails(
+  AlertHistory alertHistory = AlertHistory(
+      title: title,
+      description: desc,
+      taskType: TaskType.values[alertType],
+      taskStatus: TaskStatus.pending,
+      taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
+      completedAt: "");
+
+  // mark all previous history items as missed alerts, for the same type of task
+  await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
+
+  await DatabaseHelper.instance.addAlertHistory(alertHistory);
+
+  // show the alert notification
+  const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+      'carda_fit', 'CardaFit', channelDescription: 'CardaFit Alerts',
+      importance: Importance.max, priority: Priority.high, ticker: 'ticker'
+  );
+
+  const DarwinNotificationDetails iOSNotificationDetails = DarwinNotificationDetails(
       presentAlert: true,  // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
       presentSound: true,  // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
   );
@@ -119,9 +135,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
       iOS: iOSNotificationDetails
   );
 
-  await flutterLocalNotificationsPlugin.show(
-      int.parse(message.data["text"]), message.data["title"], message.data["message"], notificationDetails,
-      payload: message.data["text"]);
+  await flutterLocalNotificationsPlugin.show(alertType, title, desc,
+      notificationDetails, payload: alertType.toString());
 }
 
 _checkIfUserLoggedIn() async {

@@ -321,23 +321,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  void _showPopup(BuildContext context, String image, String quote, String title) {
-    // showDialog(context: context, barrierDismissible: false,
-    //     builder: (BuildContext context) {
-    //       return WillPopScope(
-    //         onWillPop: () {
-    //           return Future.value(false);
-    //         },
-    //         child: Dialog(
-    //             shape: RoundedRectangleBorder(
-    //               borderRadius: BorderRadius.circular(24),
-    //             ),
-    //             backgroundColor: Colors.transparent,
-    //             child: NotificationAlertDialog(image, quote, title)
-    //         ),
-    //       );
-    //     }
-    // );
-  }
 }

@@ -20,6 +20,7 @@ import '../model/task.dart';
 
 const TABLE_USER = 'user';
 const TABLE_TASK = 'task';
+const TABLE_ALERT_HISTORY = 'alert_history';
 const TABLE_EXERCISES = 'exercises';
 const TABLE_EXERCISE_STEPS = 'exercise_steps';
 const TABLE_USER_EXERCISES = 'user_exercises';
@@ -97,6 +98,14 @@ class DatabaseHelper {
         "duration INTEGER,"
         "score DOUBLE,"
         "created_at TIMESTAMP)");
+    await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
+        "id INTEGER PRIMARY KEY,"
+        "title VARCHAR,"
+        "description VARCHAR,"
+        "taskType INTEGER,"
+        "taskStatus INTEGER,"
+        "taskCreatedAt VARCHAR,"
+        "completedAt VARCHAR)");
     await db.execute("CREATE TABLE $TABLE_EXERCISES("
         "id INTEGER PRIMARY KEY,"
         "condition VARCHAR,"
@@ -160,6 +169,14 @@ class DatabaseHelper {
         'ADD diseases VARCHAR,'
         'ADD preferredAlerts VARCHAR,'
         'ADD isMergedAlertSet INTEGER;');
+    await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
+        "id INTEGER PRIMARY KEY,"
+        "title VARCHAR,"
+        "description VARCHAR,"
+        "taskType INTEGER,"
+        "taskStatus INTEGER,"
+        "taskCreatedAt VARCHAR,"
+        "completedAt VARCHAR)");
   }
 
   Future<List<UserInfo>> getAllUserInfo() async {
@@ -428,8 +445,8 @@ class DatabaseHelper {
   Future<List<Task>> getTasks() async {
     Database db = await instance.database;
     var tasks = await db.query(TABLE_TASK, orderBy: 'user_id');
-    List<Task> taskList =
-        tasks.isNotEmpty ? tasks.map((e) => Task.fromMap(e)).toList() : [];
+    List<Task> taskList = tasks.isNotEmpty ? tasks.map((e) => Task.fromMap(e))
+        .toList() : [];
     return taskList;
   }
 
@@ -449,8 +466,47 @@ class DatabaseHelper {
         where: 'id = ?', whereArgs: [item.userId]);
   }
 
-  /// user_task
+  /// alert_history
+  Future<List<AlertHistory>> getAlertHistoryList() async {
+    Database db = await instance.database;
+    var alertHistory = await db.query(TABLE_ALERT_HISTORY, orderBy: 'taskCreatedAt');
+    List<AlertHistory> historyList = alertHistory.isNotEmpty ? alertHistory.map((e) => AlertHistory.fromMap(e)).toList() : [];
+    return historyList;
+  }
 
+  Future<int> addAlertHistory(AlertHistory item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_ALERT_HISTORY, item.toMap());
+  }
+
+  Future<int> removeAlertHistory(int id) async {
+    Database db = await instance.database;
+    return await db.delete(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateAlertHistory(AlertHistory item, int id) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_ALERT_HISTORY, item.toMap(),
+        where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> batchUpdateAlertHistoryItemAsMissed(int alertType) async {
+    Map<String, dynamic> updatedStatusValue = {
+      "taskStatus": TaskStatus.missed.index,
+    };
+
+    Database db = await instance.database;
+    return db.update(TABLE_ALERT_HISTORY, updatedStatusValue,
+      where: 'taskType = ?', whereArgs: [alertType],
+    );
+  }
+
+  Future<int> clearAlertHistoryTable() async {
+    Database db = await instance.database;
+    return await db.rawDelete('DELETE FROM $TABLE_ALERT_HISTORY');
+  }
+
+  /// user_task
   Future<List<UserTask>> getUserTasks() async {
     Database db = await instance.database;
     var userTasks = await db.query(TABLE_USER_TASK, orderBy: 'user_id');
