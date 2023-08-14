@@ -17,6 +17,7 @@ import 'package:excel/excel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -56,11 +57,24 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<void> setupInteractedMessage() async {
     // Get any messages which caused the application to open from a terminated state.
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    } else {
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    // RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    // if (initialMessage != null) {
+    //   _handleMessage(initialMessage);
+    // } else {
+    //   FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    // }
+
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
+    String? payload = notificationAppLaunchDetails?.notificationResponse?.payload;
+    print('payload from on launch from notification click= $payload');
+
+    if (!CommonUtil.isNullOrEmpty(payload)) {
+      int taskType = int.tryParse(payload!) ?? TaskType.exercise.index;
+
+      if (mounted) {
+        print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
+        Navigator.pushNamed(context, taskAlertRoute, arguments: taskType);
+      }
     }
   }
 

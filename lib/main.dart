@@ -1,15 +1,23 @@
+import 'dart:ffi';
+
 import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
 import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/splash_page.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 
 import 'firebase_options.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +26,17 @@ void main() async {
 
   _checkIfItsANewDay();
   _setupFireBase();
+  initLocalNotificationPlugin();
 
-  runApp(CardaFitApp());
+  // final NotificationAppLaunchDetails? notificationAppLaunchDetails = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  // String? payload = notificationAppLaunchDetails?.notificationResponse?.payload;
+  // print('payload from on launch from notification click= $payload');
+  // Widget homePage = CommonUtil.isNullOrEmpty(payload)
+  //     ? const SplashPage()
+  //     : TaskAlertPage(taskType: int.tryParse(payload!) ?? TaskType.exercise.index);
+  // runApp(CardaFitApp(home: const SplashPage()));
+
+  runApp(const CardaFitApp());
 }
 
 _setupFireBase() async {
@@ -84,7 +101,27 @@ Future<void> foregroundHandler(RemoteMessage message) async {
 Future<void> backgroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the background: ${message.data}');
 
-  //TODO: handle all background alerts here
+  const AndroidNotificationDetails androidNotificationDetails =
+  AndroidNotificationDetails('carda_fit', 'CardaFit',
+      channelDescription: 'CardaFit Alerts',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker');
+
+  const DarwinNotificationDetails iOSNotificationDetails =
+  DarwinNotificationDetails(
+      presentAlert: true,  // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+      presentSound: true,  // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+  );
+
+  const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: iOSNotificationDetails
+  );
+
+  await flutterLocalNotificationsPlugin.show(
+      int.parse(message.data["text"]), message.data["title"], message.data["message"], notificationDetails,
+      payload: message.data["text"]);
 }
 
 _checkIfUserLoggedIn() async {
@@ -100,4 +137,17 @@ _checkIfItsANewDay() async {
     DailyTarget completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
     SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
   }
+}
+
+void initLocalNotificationPlugin() async {
+  const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings('app_icon');
+
+  const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings(
+    requestSoundPermission: false, requestBadgePermission: false, requestAlertPermission: false,
+    // onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+  );
+
+  const InitializationSettings initSettings = InitializationSettings(android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
 }

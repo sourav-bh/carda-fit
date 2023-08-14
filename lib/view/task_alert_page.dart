@@ -66,7 +66,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   _loadIntent() async {
-    _taskType = ModalRoute.of(context)?.settings.arguments as int;
+    _taskType = ModalRoute.of(context)?.settings.arguments as int?;
 
     if (_taskType == TaskType.exercise.index ||
         _taskType == TaskType.teamExercise.index) {

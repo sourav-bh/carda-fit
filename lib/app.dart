@@ -34,7 +34,7 @@ const aboutUsRoute = '/aboutUs';
 class CardaFitApp extends StatefulWidget {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  CardaFitApp({super.key});
+  const CardaFitApp({super.key});
 
   @override
   _CardaFitAppState createState() => _CardaFitAppState();
