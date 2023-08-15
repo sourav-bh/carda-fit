@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
@@ -196,13 +197,7 @@ _checkIfItsANewDay() async {
 }
 
 void initLocalNotificationPlugin() async {
-  final bool? result = await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-  );
+  _requestPermissions();
 
   const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings('app_icon');
 
@@ -214,6 +209,34 @@ void initLocalNotificationPlugin() async {
   const InitializationSettings initSettings = InitializationSettings(android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
 
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+}
+
+Future<void> _requestPermissions() async {
+  if (Platform.isIOS || Platform.isMacOS) {
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        MacOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  } else if (Platform.isAndroid) {
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    final bool? grantedNotificationPermission =
+    await androidImplementation?.requestPermission();
+  }
 }
 
 _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
