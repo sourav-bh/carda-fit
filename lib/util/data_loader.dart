@@ -20,6 +20,10 @@ class DataLoader {
         return 20;
       case 3:
         return 10;
+      case 5:
+        return 30;
+      case 6:
+        return 30;
       default:
         return 0;
     }

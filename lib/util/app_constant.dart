@@ -4,9 +4,9 @@ import 'package:app/model/learning.dart';
 
 class AppConstant {
   static const productionBuild = false;
-  static const baseURL = "http://10.0.2.2:8075"; // local
-  // static const baseURL = "https://kontikat.de/cardafit"; // live
-  static const teamNameForCustomBuild = 'sbtest';
+  // static const baseURL = "http://10.0.2.2:8075"; // local
+  static const baseURL = "https://kontikat.de/cardafit"; // live
+  static const teamNameForCustomBuild = 'bgf'; // bgf-internal, unisiegen-thesis, dokuworks-company1, maipham-mai
 
   static const waterTaskValue = 1;
   static const exerciseTaskValue = 3;
@@ -23,6 +23,7 @@ class AppCache {
   List<LearningContent> contents = [];
   String authToken = "";
   String fcmToken = "";
+  bool didNotificationLaunchApp = false;
 
   AppCache._privateConstructor();
   static final AppCache instance = AppCache._privateConstructor();

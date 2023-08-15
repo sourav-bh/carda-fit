@@ -20,6 +20,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
+class TaskAlertPageData {
+  int viewMode; // 1 for view only, 0 for alert
+  int? taskType, taskHistoryId;
+
+  TaskAlertPageData({required this.viewMode, this.taskType, this.taskHistoryId,});
+}
+
 class TaskAlertPage extends StatefulWidget {
   const TaskAlertPage({Key? key}) : super(key: key);
 
@@ -28,6 +35,7 @@ class TaskAlertPage extends StatefulWidget {
 }
 
 class _TaskAlertPageState extends State<TaskAlertPage> {
+  TaskAlertPageData? _taskPageData;
   int? _taskType;
   Timer? _timer;
 
@@ -66,7 +74,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   _loadIntent() async {
-    _taskType = ModalRoute.of(context)?.settings.arguments as int?;
+    _taskPageData = ModalRoute.of(context)?.settings.arguments as TaskAlertPageData;
+    _taskType = _taskPageData?.taskType;
 
     if (_taskType == TaskType.exercise.index ||
         _taskType == TaskType.teamExercise.index) {
@@ -126,12 +135,27 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
 
         _startBreakAndWalkTimer();
       });
+    } else if (_taskType == TaskType.waterWithBreak.index) {
+      setState(() {
+        _title = 'Machen Sie eine kurze Pause und trinken Sie auch ein Glas Wasser!';
+        _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
+        _staticImage = 'assets/animations/anim_break_time.gif';
+
+        _startBreakAndWalkTimer();
+      });
+    } else if (_taskType == TaskType.walkWithExercise.index) {
+      setState(() {
+        _title = 'Gehen Sie eine Weile spazieren und strecken Sie Ihre Hände ein wenig!';
+        _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
+        _staticImage = 'assets/animations/anim_break_time.gif';
+
+        _startBreakAndWalkTimer();
+      });
     }
   }
 
   _loadExerciseDataFromAsset() async {
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
     if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       userCondition = userInfo.medicalConditions!;
@@ -311,6 +335,11 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   }
 
   void onSubmitScore() async {
+    int? taskHistoryId = _taskPageData?.taskHistoryId;
+    if (taskHistoryId != null) {
+      await DatabaseHelper.instance.updateAlertHistory(taskHistoryId);
+    }
+
     var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
     if (complTargetJson != null &&
@@ -325,7 +354,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         completedTarget.increaseWaterConsumption(1);
         break;
       case 1:
-        completedTarget.increaseStepsCount(100);
+        completedTarget.increaseStepsCount(200);
         break;
       case 2:
         completedTarget.increaseExerciseCount(1);
@@ -333,20 +362,32 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       case 3:
         completedTarget.increaseBreaksCount(1);
         break;
+      case 4:
+        completedTarget.increaseExerciseCount(1);
+        break;
+      case 5:
+        completedTarget.increaseWaterConsumption(1);
+        completedTarget.increaseBreaksCount(1);
+        break;
+      case 6:
+        completedTarget.increaseStepsCount(200);
+        completedTarget.increaseExerciseCount(1);
+        break;
       default:
         break;
     }
     SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
-    int score = DataLoader.getScoreForTask(_taskType ?? -1);
-    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
-    if (userId != null && userId.isNotEmpty) {
-      await ApiManager().updateUserScore(userId, score);
-      if (mounted) {
-        Navigator.of(context).pop();
-        Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+    // only add score if it's for actual task alert, not for view only mode
+    if (_taskPageData?.viewMode == 0) {
+      int score = DataLoader.getScoreForTask(_taskType ?? -1);
+      String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+      if (userId != null && userId.isNotEmpty) {
+        await ApiManager().updateUserScore(userId, score);
       }
-    } else if (mounted) {
+    }
+
+    if (mounted) {
       Navigator.of(context).pop();
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
@@ -422,7 +463,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
             height: 20,
           ),
           Visibility(
-            visible: (_taskType == TaskType.breaks.index || _taskType == TaskType.steps.index),
+            visible: (_taskType == TaskType.breaks.index ||
+                _taskType == TaskType.steps.index ||
+                _taskType == TaskType.waterWithBreak.index ||
+                _taskType == TaskType.walkWithExercise.index),
             child: SizedBox(
               width: 120,
               height: 120,

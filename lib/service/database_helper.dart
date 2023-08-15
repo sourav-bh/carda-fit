@@ -12,6 +12,7 @@ import 'package:app/model/user_exercise.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/model/user_learning_contents.dart';
 import 'package:app/model/user_task.dart';
+import 'package:app/util/common_util.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -469,7 +470,7 @@ class DatabaseHelper {
   /// alert_history
   Future<List<AlertHistory>> getAlertHistoryList() async {
     Database db = await instance.database;
-    var alertHistory = await db.query(TABLE_ALERT_HISTORY, orderBy: 'taskCreatedAt');
+    var alertHistory = await db.query(TABLE_ALERT_HISTORY, orderBy: 'taskCreatedAt DESC');
     List<AlertHistory> historyList = alertHistory.isNotEmpty ? alertHistory.map((e) => AlertHistory.fromMap(e)).toList() : [];
     return historyList;
   }
@@ -479,14 +480,32 @@ class DatabaseHelper {
     return await db.insert(TABLE_ALERT_HISTORY, item.toMap());
   }
 
+  Future<AlertHistory?> getAlertHistory(int id) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> historyItems =
+    await db.query(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
+
+    if (historyItems.isNotEmpty) {
+      print(historyItems.first["id"]);
+      return AlertHistory.fromMap(historyItems.first);
+    } else {
+      return null;
+    }
+  }
+
   Future<int> removeAlertHistory(int id) async {
     Database db = await instance.database;
     return await db.delete(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateAlertHistory(AlertHistory item, int id) async {
+  Future<int> updateAlertHistory(int id) async {
+    Map<String, dynamic> updatedStatusValue = {
+      "taskStatus": TaskStatus.completed.index,
+      "completedAt": CommonUtil.getCurrentTimeAsDbFormat(),
+    };
+
     Database db = await instance.database;
-    return await db.update(TABLE_ALERT_HISTORY, item.toMap(),
+    return await db.update(TABLE_ALERT_HISTORY, updatedStatusValue,
         where: 'id = ?', whereArgs: [id]);
   }
 
@@ -497,7 +516,7 @@ class DatabaseHelper {
 
     Database db = await instance.database;
     return db.update(TABLE_ALERT_HISTORY, updatedStatusValue,
-      where: 'taskType = ?', whereArgs: [alertType],
+      where: 'taskType = ? and taskStatus = ?', whereArgs: [alertType, TaskStatus.pending.index],
     );
   }
 

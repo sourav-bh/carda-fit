@@ -94,8 +94,8 @@ class ApiManager {
   }
 
   Future<bool> updateUser(UserInfo userModel) async {
-    var reqBody = userModel.toJson();
-    var response = await ApiClient.instance.putRequest('/user/${userModel.id}', reqBody);
+    var reqBody = userModel.toUpdateJson();
+    var response = await ApiClient.instance.patchRequest('/user/${userModel.id}', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;

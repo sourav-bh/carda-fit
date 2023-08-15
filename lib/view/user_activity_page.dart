@@ -1,3 +1,4 @@
+import 'package:app/app.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/shared_preference.dart';
@@ -60,12 +61,21 @@ class _UserActivityPageState extends State<UserActivityPage> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-              child: Text("Aktivität heute",
-                  style: Theme.of(context).textTheme.caption?.copyWith(
-                        color: AppColor.darkBlue,
-                        fontSize: 30,
-                        fontStyle: FontStyle.normal,
-                      )),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Aktivität heute",
+                      style: Theme.of(context).textTheme.caption?.copyWith(
+                            color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,)
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, alertHistoryRoute);
+                    },
+                    icon: const Icon(Icons.list_alt, color: AppColor.primary, size: 30,)
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: ListView(

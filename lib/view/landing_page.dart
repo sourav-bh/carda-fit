@@ -14,6 +14,7 @@ import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/home_page.dart';
 import 'package:app/view/leaderboard_page.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
@@ -52,7 +53,10 @@ class _LandingPageState extends State<LandingPage> {
     _loadExerciseDataFromAsset();
     _loadLearningMaterialFromAsset();
 
-    setupInteractedMessage();
+    if (AppCache.instance.didNotificationLaunchApp) {
+      AppCache.instance.didNotificationLaunchApp = false;
+      _handleOnNotificationClick();
+    }
   }
 
   @override
@@ -111,39 +115,23 @@ class _LandingPageState extends State<LandingPage> {
     setState(() {});
   }
 
-  Future<void> setupInteractedMessage() async {
-    // Get any messages which caused the application to open from a terminated state.
-    // RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    // if (initialMessage != null) {
-    //   _handleMessage(initialMessage);
-    // } else {
-    //   FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-    // }
-
+  Future<void> _handleOnNotificationClick() async {
     final NotificationAppLaunchDetails? notificationAppLaunchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
+
     String? payload = notificationAppLaunchDetails?.notificationResponse?.payload;
     print('payload from on launch from notification click= $payload');
 
     if (!CommonUtil.isNullOrEmpty(payload)) {
-      int taskType = int.tryParse(payload!) ?? TaskType.exercise.index;
+      int taskHistoryId = int.tryParse(payload!) ?? 0;
+      AlertHistory? alertHistory = await DatabaseHelper.instance.getAlertHistory(taskHistoryId);
+      int taskType = alertHistory?.taskType.index ?? TaskType.exercise.index;
 
       if (mounted) {
+        TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: taskType, taskHistoryId: taskHistoryId);
+
         print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
-        Navigator.pushNamed(context, taskAlertRoute, arguments: taskType);
+        Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
       }
-    }
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    debugPrint('remote notification onClicked with payload: $message');
-
-    var data = message.data['text'];
-    String payload = data ?? "0";
-    int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
-
-    if (mounted) {
-      print("-------> opening task alert page from _handleMessage for push notification onClicked from background");
-      Navigator.pushNamed(context, taskAlertRoute, arguments: taskType);
     }
   }
 

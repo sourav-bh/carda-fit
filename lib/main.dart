@@ -24,7 +24,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await TaskAlertService.instance.setup();
+
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  AppCache.instance.didNotificationLaunchApp = notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   _checkIfItsANewDay();
   _setupFireBase();
@@ -69,8 +71,8 @@ _setupFireBase() async {
     }
   }
 
-  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   FirebaseMessaging.onMessage.listen(foregroundHandler);
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 }
 
 Future<void> foregroundHandler(RemoteMessage message) async {
@@ -79,28 +81,7 @@ Future<void> foregroundHandler(RemoteMessage message) async {
   int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
   int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
   int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-  bool isUserSnoozedNow = currentTime - snoozedAt > snoozeDuration * 60 * 1000;
-
-  if (isUserSnoozedNow == false) {
-    await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
-    await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
-
-    return; // don't show the alert as user set a snooze time currently
-  } else if (message.notification != null) {
-    var data = message.data['text'];
-    String payload = data ?? "0";
-    int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
-
-    if (CardaFitApp.navigatorKey.currentContext != null && CardaFitApp.navigatorKey.currentContext!.mounted) {
-      debugPrint("-------> opening task alert page from FirebaseMessaging foreground listener");
-      Navigator.pushNamed(CardaFitApp.navigatorKey.currentContext!, taskAlertRoute, arguments: taskType);
-    }
-  }
-}
-
-Future<void> backgroundHandler(RemoteMessage message) async {
-  print('Remote notification message data whilst in the background: ${message.data}');
+  bool isUserSnoozedNow = currentTime - snoozedAt <= snoozeDuration * 60 * 1000;
 
   String title = message.data["title"];
   String desc = message.data["message"];
@@ -110,33 +91,90 @@ Future<void> backgroundHandler(RemoteMessage message) async {
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
-      taskStatus: TaskStatus.pending,
+      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
       taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
       completedAt: "");
 
-  // mark all previous history items as missed alerts, for the same type of task
-  await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
+  int alertHistoryId = await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  debugPrint("-------> Alert history item saved in DB from foreground listener: $alertHistoryId");
 
-  await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  if (isUserSnoozedNow) {
+    return; // don't show the alert as user set a snooze time currently
+  } else {
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
 
-  // show the alert notification
-  const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
-      'carda_fit', 'CardaFit', channelDescription: 'CardaFit Alerts',
-      importance: Importance.max, priority: Priority.high, ticker: 'ticker'
-  );
+    // mark all previous history items as missed alerts, for the same type of task
+    await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
 
-  const DarwinNotificationDetails iOSNotificationDetails = DarwinNotificationDetails(
+    // if (message.notification != null) {
+      var data = message.data['text'];
+      String payload = data ?? "0";
+      int taskType = int.tryParse(payload) ?? TaskType.exercise.index;
+
+      if (CardaFitApp.navigatorKey.currentContext != null && CardaFitApp.navigatorKey.currentContext!.mounted) {
+        TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: taskType, taskHistoryId: alertHistoryId);
+
+        debugPrint("-------> opening task alert page from FirebaseMessaging foreground listener");
+        Navigator.pushNamed(CardaFitApp.navigatorKey.currentContext!, taskAlertRoute, arguments: alertPageData);
+      }
+    // }
+  }
+}
+
+Future<void> backgroundHandler(RemoteMessage message) async {
+  print('Remote notification message data whilst in the background: ${message.data}');
+
+  int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+  int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+  int currentTime = DateTime.now().millisecondsSinceEpoch;
+  bool isUserSnoozedNow = currentTime - snoozedAt <= snoozeDuration * 60 * 1000;
+
+  String title = message.data["title"];
+  String desc = message.data["message"];
+  int alertType = int.parse(message.data["text"]);
+
+  AlertHistory alertHistory = AlertHistory(
+      title: title,
+      description: desc,
+      taskType: TaskType.values[alertType],
+      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
+      taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
+      completedAt: "");
+
+  if (!isUserSnoozedNow) {
+// mark all previous history items as missed alerts, for the same type of task
+    await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
+  }
+
+  int alertHistoryId = await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  debugPrint("-------> Alert history item saved in DB from background listener: $alertHistoryId");
+
+  if (isUserSnoozedNow) {
+    return; // don't show the alert as user set a snooze time currently
+  } else {
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
+
+    // show the alert notification
+    const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+        'carda_fit', 'CardaFit', channelDescription: 'CardaFit Alerts',
+        importance: Importance.max, priority: Priority.high, ticker: 'ticker'
+    );
+
+    const DarwinNotificationDetails iOSNotificationDetails = DarwinNotificationDetails(
       presentAlert: true,  // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
       presentSound: true,  // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
-  );
+    );
 
-  const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-      iOS: iOSNotificationDetails
-  );
+    const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+        iOS: iOSNotificationDetails
+    );
 
-  await flutterLocalNotificationsPlugin.show(alertType, title, desc,
-      notificationDetails, payload: alertType.toString());
+    await flutterLocalNotificationsPlugin.show(alertType, title, desc,
+        notificationDetails, payload: alertHistoryId.toString());
+  }
 }
 
 _checkIfUserLoggedIn() async {
@@ -151,18 +189,82 @@ _checkIfItsANewDay() async {
     await SharedPref.instance.saveStringValue(SharedPref.keyLastAppOpenDay, currentDay);
     DailyTarget completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
     SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
+
+    // TODO: clear all previous alert history items as it's a new day
+    await DatabaseHelper.instance.clearAlertHistoryTable();
   }
 }
 
 void initLocalNotificationPlugin() async {
+  final bool? result = await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+  );
+
   const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings('app_icon');
 
   const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings(
-    requestSoundPermission: false, requestBadgePermission: false, requestAlertPermission: false,
-    // onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+    requestSoundPermission: true, requestBadgePermission: true, requestAlertPermission: true,
+    onDidReceiveLocalNotification: _onDidReceiveLocalNotificationInIos,
   );
 
   const InitializationSettings initSettings = InitializationSettings(android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
 
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+}
+
+_onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
+  print('Remote firebase message whilst for iOS');
+
+  int snoozeDuration = await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+  int snoozedAt = await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+  int currentTime = DateTime.now().millisecondsSinceEpoch;
+  bool isUserSnoozedNow = currentTime - snoozedAt <= snoozeDuration * 60 * 1000;
+
+  int alertType = int.parse(payload);
+
+  AlertHistory alertHistory = AlertHistory(
+      title: title,
+      description: body,
+      taskType: TaskType.values[alertType],
+      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
+      taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
+      completedAt: "");
+
+  if (!isUserSnoozedNow) {
+  // mark all previous history items as missed alerts, for the same type of task
+    await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
+  }
+
+  int alertHistoryId = await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  debugPrint("-------> Alert history item saved in DB from background listener: $alertHistoryId");
+
+  if (isUserSnoozedNow) {
+    return; // don't show the alert as user set a snooze time currently
+  } else {
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
+
+    // show the alert notification
+    const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+        'carda_fit', 'CardaFit', channelDescription: 'CardaFit Alerts',
+        importance: Importance.max, priority: Priority.high, ticker: 'ticker'
+    );
+
+    const DarwinNotificationDetails iOSNotificationDetails = DarwinNotificationDetails(
+      presentAlert: true,  // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+      presentSound: true,  // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+    );
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+        iOS: iOSNotificationDetails
+    );
+
+    await flutterLocalNotificationsPlugin.show(alertType, title, body,
+        notificationDetails, payload: alertHistoryId.toString());
+  }
 }

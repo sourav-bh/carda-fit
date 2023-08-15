@@ -47,15 +47,17 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
   String _getIconForTaskType(TaskType type) {
     switch (type) {
       case TaskType.steps:
+      case TaskType.walkWithExercise:
         return 'assets/images/walk.jpg';
       case TaskType.exercise:
         return 'assets/images/exercise.jpg';
+      case TaskType.breaks:
       case TaskType.waterWithBreak:
         return 'assets/images/break.jpg';
       case TaskType.water:
         return 'assets/images/water.jpg';
       default:
-        return 'assets/default_icon.png';
+        return 'assets/splash_logo.png';
     }
   }
 
@@ -71,7 +73,8 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
       backgroundColor: AppColor.lightPink,
       body: Padding(
         padding: const EdgeInsets.all(8),
-        child: ListView.separated(
+        child: _historyItems.isNotEmpty ?
+            ListView.separated(
           itemCount: _historyItems.length,
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBox(height: 8),
@@ -131,7 +134,13 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
               ),
             );
           },
-        ),
+        ) :
+            Center(
+              child: Text('Noch keine Alarme erhalten!',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+            )
       ),
     );
   }

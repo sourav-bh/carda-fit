@@ -112,7 +112,6 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
-// TODO: how to switch the view of the list while seachring (no search / searching / search is over {3 cases})
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
   final List<LearningMaterialInfo> _learningMaterials =
@@ -267,9 +266,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
                   return GestureDetector(
                     child: UserLearningItemView(itemData: material),
                     onTap: () {
-                      // TODO: @Justin -- see here how to pass value to another page
-                      Navigator.pushNamed(context, detailsWebRoute,
-                          arguments: material.originalContent);
+                      Navigator.pushNamed(context, detailsWebRoute, arguments: material.originalContent);
                       // CommonUtil.openUrl(material.videoUrl);
                       // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
                     },

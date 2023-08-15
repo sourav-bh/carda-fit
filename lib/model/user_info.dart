@@ -100,6 +100,23 @@ class UserInfo {
     "isMergedAlertSet": isMergedAlertSet,
   };
 
+  Map<String, dynamic> toUpdateJson() => {
+    "userName": userName,
+    "avatarImage": avatarImage,
+    "age": age,
+    "gender": gender,
+    "weight": weight,
+    "height": height,
+    "jobPosition": jobPosition,
+    "jobType": jobType,
+    "workingDays": workingDays,
+    "workStartTime": workStartTime,
+    "workEndTime": workEndTime,
+    "medicalConditions": medicalConditions,
+    "diseases": diseases,
+    "preferredAlerts": preferredAlerts,
+  };
+
   factory UserInfo.fromDbMap(Map<String, dynamic> json) => UserInfo(
     dbId: json["id"],
     userName: json["userName"],

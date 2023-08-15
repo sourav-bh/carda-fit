@@ -86,19 +86,19 @@ class CommonUtil {
     return '$minutesString:$secondsString';
   }
 
-  static String convert12HourTimeTo24HourFormat(BuildContext context, TimeOfDay time) {
-    var df = DateFormat("h:mm a");
-    var dt = df.parse(time.format(context));
-    return DateFormat('HH:mm').format(dt);
+  static String convert12HourTimeTo24HourFormat(BuildContext context, TimeOfDay pickedTime) {
+    var date = DateTime.now().applied(pickedTime);
+    var df = DateFormat("HH:mm");
+    return df.format(date);
   }
 
   static String getCurrentTimeAsDbFormat() {
-    var df = DateFormat("YYYY-MM-DD HH:MM:SS");
+    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
     return df.format(DateTime.now());
   }
 
   static String convertDbTimeStampToTimeOnlyStr(String dbTime) {
-    var df = DateFormat("YYYY-MM-DD HH:MM:SS");
+    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
     var dt = df.parse(dbTime);
     return DateFormat('HH:mm').format(dt);
   }
@@ -305,5 +305,11 @@ class CurvePainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+extension DateTimeExtension on DateTime {
+  DateTime applied(TimeOfDay time) {
+    return DateTime(year, month, day, time.hour, time.minute);
   }
 }

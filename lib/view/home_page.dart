@@ -7,6 +7,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -204,8 +205,10 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 onTap: () {
+                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: item.taskType.index);
+
                                   print("-------> opening task alert page from on home page item click");
-                                  Navigator.pushNamed(context, taskAlertRoute, arguments: item.taskType.index);
+                                  Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
                                 },
                               );
                             },

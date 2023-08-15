@@ -55,13 +55,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.initState();
 
     _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, CommonUtil.getTaskAlertName(alertType))).toList();
+
+    _loadData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _loadData();
+
   }
 
   @override
@@ -92,6 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
     );
 
+    print(pickedTime);
     if (pickedTime != null && pickedTime != TimeOfDay.now()) {
       setState(() {
         _startTime =
@@ -136,10 +139,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _updateViewState(EditProfilePageViewState.workInfo);
     } else if (_viewState == EditProfilePageViewState.workInfo) {
       _updateViewState(EditProfilePageViewState.medicalConditionAndAlert);
-    } else if (_viewState ==
-        EditProfilePageViewState.medicalConditionAndAlert) {
+    } else if (_viewState == EditProfilePageViewState.medicalConditionAndAlert) {
       _submitAction();
-      Navigator.pushNamedAndRemoveUntil(context, profileRoute, (r) => false);
     } else {
       _updateViewState(EditProfilePageViewState.bioInfo);
     }
@@ -274,7 +275,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const snackBar = SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+      Navigator.pop(context);
     }
   }
 

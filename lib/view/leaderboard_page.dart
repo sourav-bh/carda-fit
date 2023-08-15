@@ -22,6 +22,7 @@ class LeaderBoardPage extends StatefulWidget {
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
   final List<UserInfo> _teamMembersList = List.empty(growable: true);
   String? _currentUserName;
+  UserInfo? _currentUser;
 
   @override
   void initState() {
@@ -53,10 +54,12 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     }
 
     for (var user in allUsers) {
-      if (user.userName != _currentUserName && mounted) {
-        setState(() {
+      if (mounted) {
+        if (user.userName == _currentUserName) {
+          _currentUser = user;
+        } else {
           _teamMembersList.add(user);
-        });
+        }
       }
     }
 
@@ -66,9 +69,10 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
   }
 
   UserInfo _getCurrentUserInfo() {
-    if (_currentUserName != null && _currentUserName!.isNotEmpty) {
-      var user = _teamMembersList.firstWhere((element) => element.userName == _currentUserName, orElse: () => UserInfo());
-      return user;
+    if (_currentUserName != null &&
+        _currentUserName!.isNotEmpty &&
+        _currentUser != null) {
+      return _currentUser!;
     } else {
       return UserInfo();
     }
@@ -150,8 +154,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                 decoration: CommonUtil.getRectangleBoxDecoration(Colors.white.withAlpha(205), 5),
                                 child: Row(
                                   children: [
-                                    Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                    const SizedBox(width: 10,),
+                                    // Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                    // const SizedBox(width: 10,),
                                     Text(participant.userName ?? "", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 20), textAlign: TextAlign.center,),
                                     const SizedBox(width: 10,),
                                     RandomAvatar(participant.avatarImage ?? "n/a", width: 40, height: 40)
