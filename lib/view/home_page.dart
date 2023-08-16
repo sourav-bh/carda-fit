@@ -32,14 +32,13 @@ class _HomePageState extends State<HomePage> {
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
 
     // _createRandomAlerts();
+    _loadCurrentProgress();
+    _loadLearningContent();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    _loadCurrentProgress();
-    _loadLearningContent();
   }
 
   _loadLearningContent() async {

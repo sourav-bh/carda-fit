@@ -50,7 +50,7 @@ dependencies:
   gradient_slide_to_act: ^0.0.2
   sqflite: ^2.2.2
   excel: ^2.0.1
-  flutter_local_notifications: ^13.0.0
+  flutter_local_notifications: ^15.1.0+1
   any_link_preview: ^3.0.0
   random_avatar: any
   firebase_core: ^2.8.0

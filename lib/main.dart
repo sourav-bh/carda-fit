@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
@@ -91,7 +92,7 @@ Future<void> foregroundHandler(RemoteMessage message) async {
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
-      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
+      taskStatus: isUserSnoozedNow ? TaskStatus.snoozed : TaskStatus.pending,
       taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
       completedAt: "");
 
@@ -138,7 +139,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
-      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
+      taskStatus: isUserSnoozedNow ? TaskStatus.snoozed : TaskStatus.pending,
       taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
       completedAt: "");
 
@@ -213,7 +214,8 @@ void initLocalNotificationPlugin() async {
 
   const InitializationSettings initSettings = InitializationSettings(android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
 
-  await flutterLocalNotificationsPlugin.initialize(initSettings);
+  await flutterLocalNotificationsPlugin.initialize(initSettings,
+  onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
 }
 
 _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
@@ -230,7 +232,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
       title: title,
       description: body,
       taskType: TaskType.values[alertType],
-      taskStatus: isUserSnoozedNow ? TaskStatus.pending : TaskStatus.snoozed,
+      taskStatus: isUserSnoozedNow ? TaskStatus.snoozed : TaskStatus.pending,
       taskCreatedAt: CommonUtil.getCurrentTimeAsDbFormat(),
       completedAt: "");
 
@@ -266,5 +268,28 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
 
     await flutterLocalNotificationsPlugin.show(alertType, title, body,
         notificationDetails, payload: alertHistoryId.toString());
+  }
+}
+
+void _onDidReceiveLocalNotification(NotificationResponse details) async {
+  print('Remote firebase message _onDidReceiveLocalNotification');
+
+  // only handle for iOS platform
+  if (!Platform.isIOS) return;
+
+  String? payload = details.payload;
+  print('payload from on launch from notification click= $payload');
+
+  if (!CommonUtil.isNullOrEmpty(payload)) {
+    int taskHistoryId = int.tryParse(payload!) ?? 0;
+    AlertHistory? alertHistory = await DatabaseHelper.instance.getAlertHistory(taskHistoryId);
+    int taskType = alertHistory?.taskType.index ?? TaskType.exercise.index;
+
+    if (CardaFitApp.navigatorKey.currentContext != null && CardaFitApp.navigatorKey.currentContext!.mounted) {
+      TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: taskType, taskHistoryId: taskHistoryId);
+
+      print("-------> opening task alert page from _handleMessage for push notification onClicked from background in iOS");
+      Navigator.pushNamed(CardaFitApp.navigatorKey.currentContext!, taskAlertRoute, arguments: alertPageData);
+    }
   }
 }

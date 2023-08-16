@@ -39,8 +39,10 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
         return const Icon(Icons.call_missed, color: Colors.red);
       case TaskStatus.pending:
         return const Icon(Icons.pending_actions, color: Colors.yellow);
-      default:
+      case TaskStatus.snoozed:
         return const Icon(Icons.snooze, color: Colors.grey);
+      default:
+        return const Icon(Icons.call_missed, color: Colors.red);
     }
   }
 
