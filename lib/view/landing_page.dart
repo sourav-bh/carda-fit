@@ -52,6 +52,7 @@ class _LandingPageState extends State<LandingPage> {
 
     _loadExerciseDataFromAsset();
     _loadLearningMaterialFromAsset();
+    // loading everything from the excel file
 
     if (AppCache.instance.didNotificationLaunchApp) {
       AppCache.instance.didNotificationLaunchApp = false;

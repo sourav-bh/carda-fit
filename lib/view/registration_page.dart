@@ -53,17 +53,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
   IconData _iconVisible = Icons.visibility_off;
 
   IconData _confirmIconVisible = Icons.visibility_off;
-  final List<bool> _selectedWeekdays = List.filled(CommonUtil.weekdayNames.length, false);
+  final List<bool> _selectedWeekdays =
+      List.filled(CommonUtil.weekdayNames.length, false);
   String? _startTime = '';
   String? _endTime = '';
 
   final List<String> _conditionItems = [
-    'Herz', 'Beine', 'Knie', 'Schulter', 'Nacken', 'Rücken', 'Arme', 'Hände', 'Bauch', 'Augen',
+    'Herz',
+    'Beine',
+    'Knie',
+    'Schulter',
+    'Nacken',
+    'Rücken',
+    'Arme',
+    'Hände',
+    'Bauch',
+    'Augen',
   ];
   List<String> _selectedConditions = [];
 
   List<MultiSelectItem<TaskType?>> _items = [];
-  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water, TaskType.walkWithExercise, TaskType.waterWithBreak];
+  final List<TaskType?> _alertTypes = [
+    TaskType.breaks,
+    TaskType.exercise,
+    TaskType.steps,
+    TaskType.water,
+    TaskType.walkWithExercise,
+    TaskType.waterWithBreak
+  ];
   List<TaskType> _selectedAlerts = [];
 
   int _stepIndex = 0;
@@ -73,7 +90,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void initState() {
     super.initState();
 
-    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, CommonUtil.getTaskAlertName(alertType))).toList();
+    _items = _alertTypes
+        .map((alertType) => MultiSelectItem<TaskType?>(
+            alertType, CommonUtil.getTaskAlertName(alertType)))
+        .toList();
   }
 
   @override
@@ -93,7 +113,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _updateViewState(RegisterPageViewState.optionalOneBioInfo, 1);
         } else {
           // show error that username is not available
-          const snackBar = SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
+          const snackBar =
+              SnackBar(content: Text('Der Nutzername ist bereits vergeben!'));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       }
@@ -105,7 +126,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       setState(() {
         _nextButtonText = "Registrieren";
       });
-    } else if (_viewState == RegisterPageViewState.optionalThreeConditionAlert) {
+    } else if (_viewState ==
+        RegisterPageViewState.optionalThreeConditionAlert) {
       // _updateViewState(RegisterPageViewState.allInfoToSubmit);
       if (_alertTypeFormKey.currentState!.validate()) {
         _submitAction();
@@ -140,19 +162,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
       password: password,
       avatarImage: _avatarImage,
       age: age,
-      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
+      gender:
+          _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
       teamName: AppConstant.teamNameForCustomBuild,
       score: 0,
       jobPosition: designation,
-      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
+      jobType:
+          _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
       workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
       workStartTime: _startTime,
       workEndTime: _endTime,
-      medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
+      medicalConditions: conditionValue.isNotEmpty
+          ? conditionValue.substring(0, conditionValue.length - 2)
+          : "",
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
-      deviceToken: AppCache.instance.fcmToken,);
+      deviceToken: AppCache.instance.fcmToken,
+    );
 
     int userDbId = await DatabaseHelper.instance.addUser(userInfo);
     SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
@@ -169,7 +196,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     if (mounted) {
       if (userServerId != null) {
-        SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userServerId);
+        SharedPref.instance
+            .saveStringValue(SharedPref.keyUserServerId, userServerId);
         AppCache.instance.userServerId = userServerId;
         CommonUtil.createUserTargets(userInfo);
       } else {
@@ -227,7 +255,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     if (pickedTime != null && pickedTime != TimeOfDay.now()) {
       setState(() {
-        _startTime = CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
+        _startTime =
+            CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
       });
     }
   }
@@ -257,7 +286,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     if (pickedTime != null && pickedTime != TimeOfDay.now()) {
       setState(() {
-        _endTime = CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
+        _endTime =
+            CommonUtil.convert12HourTimeTo24HourFormat(context, pickedTime);
       });
     }
   }
@@ -282,14 +312,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           centerTitle: true,
-          title: Text('Registrierung', style: Theme.of(context).textTheme.displayMedium,),
+          title: Text(
+            'Registrierung',
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
         ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
           value: Platform.isIOS
               ? SystemUiOverlayStyle.light
               : const SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.light),
+                  statusBarIconBrightness: Brightness.light),
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -328,8 +361,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
-                              overlayColor: MaterialStateProperty.all(Colors.transparent),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) =>
+                                    Colors.transparent,
+                              ),
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                             ),
                             onPressed: () {
                               _nextAction();
@@ -338,14 +376,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               decoration: const BoxDecoration(
                                 color: Colors.orangeAccent,
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Container(
                                 constraints: const BoxConstraints(
                                     minHeight:
-                                    50), // min sizes for Material buttons
+                                        50), // min sizes for Material buttons
                                 alignment: Alignment.center,
-                                child: Text(_nextButtonText.toUpperCase(),
+                                child: Text(
+                                  _nextButtonText.toUpperCase(),
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700),
@@ -396,45 +435,51 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Text(
                       'Bitte geben Sie Ihren eindeutigen Nutzername ein und legen Sie Ihr Passwort unten fest',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 20,),
-                  TextFormField(
-                    controller: _userNameText,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Colors.orange,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      fillColor: Colors.grey.shade300,
-                      filled: true,
-                      labelText: 'Nutzername',
-                      labelStyle: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    validator: (value) {
-                      if (value?.isEmpty ?? false) {
-                        return 'Nutzername ist erforderlich.';
-                      } else if ((value?.length ?? 0) < 5) {
-                        return 'Muss mindestens 5 Zeichen lang sein.';
-                      } else if ((value?.length ?? 0) > 8) {
-                        return 'Darf maximal 8 Zeichen lang sein.';
-                      } else if ((value ?? "").contains(' ')) {
-                        return 'Darf keine Leerzeichen enthalten.';
-                      } else {
-                        return null;
-                      }
-                    },
-                    autovalidateMode: AutovalidateMode.onUserInteraction
+                  const SizedBox(
+                    height: 20,
                   ),
+                  TextFormField(
+                      controller: _userNameText,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Colors.orange,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.white12),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.white12),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        fillColor: Colors.grey.shade300,
+                        filled: true,
+                        labelText: 'Nutzername',
+                        labelStyle: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      validator: (value) {
+                        if (value?.isEmpty ?? false) {
+                          return 'Nutzername ist erforderlich.';
+                        } else if ((value?.length ?? 0) < 5) {
+                          return 'Muss mindestens 5 Zeichen lang sein.';
+                        } else if ((value?.length ?? 0) > 8) {
+                          return 'Darf maximal 8 Zeichen lang sein.';
+                        } else if ((value ?? "").contains(' ')) {
+                          return 'Darf keine Leerzeichen enthalten.';
+                        } else {
+                          return null;
+                        }
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -444,26 +489,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           margin: const EdgeInsets.symmetric(horizontal: 10),
                           child: TextButton(
                             style: ButtonStyle(
-                                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                backgroundColor: MaterialStateProperty.all<Color>(AppColor.primary),
-                                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.fromLTRB(30, 10, 30, 10)),
-                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                foregroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.white),
+                                backgroundColor: MaterialStateProperty.all<
+                                    Color>(AppColor.primary),
+                                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                    const EdgeInsets.fromLTRB(30, 10, 30, 10)),
+                                shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
                                     const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                                        side: BorderSide(color: AppColor.primary)
-                                    )
-                                )
-                            ),
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(15)),
+                                        side: BorderSide(color: AppColor.primary)))),
                             onPressed: () {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return AvatarPickerDialog(selectionCallback: onAvatarSelected,);
+                                  return AvatarPickerDialog(
+                                    selectionCallback: onAvatarSelected,
+                                  );
                                 },
                               );
                             },
-                            child: Text("Avatar wählen",
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white),
+                            child: Text(
+                              "Avatar wählen",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.white),
                             ),
                           ),
                         ),
@@ -472,12 +525,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         visible: _avatarImage != null,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 30),
-                          child: RandomAvatar(_avatarImage ?? "", height: 50, width: 50),
+                          child: RandomAvatar(_avatarImage ?? "",
+                              height: 50, width: 50),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     controller: _passwordText,
                     obscureText: _obscureText,
@@ -485,11 +541,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     style: Theme.of(context).textTheme.bodyLarge,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderSide:
+                            const BorderSide(width: 1, color: Colors.white12),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderSide:
+                            const BorderSide(width: 1, color: Colors.white12),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       fillColor: Colors.grey.shade300,
@@ -497,7 +555,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       labelText: 'Passwort',
                       labelStyle: Theme.of(context).textTheme.bodyLarge,
                       suffixIcon: IconButton(
-                          icon: Icon(_iconVisible, color: Colors.grey[400], size: 20),
+                          icon: Icon(_iconVisible,
+                              color: Colors.grey[400], size: 20),
                           onPressed: () {
                             _toggleObscureText();
                           }),
@@ -517,7 +576,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   TextFormField(
                     controller: _confirmPasswordText,
                     obscureText: _confirmObscureText,
@@ -525,11 +586,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     style: Theme.of(context).textTheme.bodyLarge,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderSide:
+                            const BorderSide(width: 1, color: Colors.white12),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(width: 1, color: Colors.white12),
+                        borderSide:
+                            const BorderSide(width: 1, color: Colors.white12),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       fillColor: Colors.grey.shade300,
@@ -537,7 +600,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       labelText: 'Passwort bestätigen',
                       labelStyle: Theme.of(context).textTheme.bodyLarge,
                       suffixIcon: IconButton(
-                          icon: Icon(_confirmIconVisible, color: Colors.grey[400], size: 20),
+                          icon: Icon(_confirmIconVisible,
+                              color: Colors.grey[400], size: 20),
                           onPressed: () {
                             _toggleConfirmObscureText();
                           }),
@@ -576,22 +640,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre biologischen Daten ein\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
                 TextField(
                   controller: _ageText,
                   keyboardType: TextInputType.number,
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -602,15 +673,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text('Geschlecht',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Geschlecht',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<Gender>(
                     groupValue: _genderValue,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     children: const {
                       Gender.Mannlich: Text('Männlich'),
                       Gender.Weiblich: Text('Weiblich'),
@@ -623,18 +699,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     },
                   ),
                 ),
-                const SizedBox(height: 15,),
+                const SizedBox(
+                  height: 15,
+                ),
                 TextField(
                   controller: _weightText,
                   keyboardType: TextInputType.number,
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -643,18 +723,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     labelStyle: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
-                const SizedBox(height: 15,),
+                const SizedBox(
+                  height: 15,
+                ),
                 TextField(
                   controller: _heightText,
                   keyboardType: TextInputType.number,
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -687,22 +771,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre arbeitsbezogenen Informationen und Ihren Wochenplan ein\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
                 TextField(
                   controller: _designationText,
                   keyboardType: TextInputType.text,
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -713,14 +804,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeitmodell',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeitmodell',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<JobType>(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     groupValue: _jobTypeValue,
                     children: const {
                       JobType.Vollzeit: Text('Vollzeit'),
@@ -735,8 +831,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeitplan',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeitplan',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
@@ -747,17 +847,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ToggleButtons(
                         onPressed: (int index) {
                           setState(() {
-                            _selectedWeekdays[index] = !_selectedWeekdays[index];
+                            _selectedWeekdays[index] =
+                                !_selectedWeekdays[index];
                           });
                         },
                         selectedColor: AppColor.orange,
                         borderRadius: BorderRadius.circular(10),
                         isSelected: _selectedWeekdays,
-                        constraints: const BoxConstraints(minWidth: 55, minHeight: 50),
+                        constraints:
+                            const BoxConstraints(minWidth: 55, minHeight: 50),
                         children: [
                           for (int i = 1; i <= 5; i++)
-                            Text(CommonUtil.weekdayNames[i - 1],
-                                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                            Text(
+                              CommonUtil.weekdayNames[i - 1],
+                              style: const TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
                         ],
                       ),
@@ -766,34 +870,58 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeiten',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeiten',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(CommonUtil.isNullOrEmpty(_startTime) ? 'Startzeit wählen' : 'Startzeit: $_startTime',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    Text(
+                      CommonUtil.isNullOrEmpty(_startTime)
+                          ? 'Startzeit wählen'
+                          : 'Startzeit: $_startTime',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
                     ),
                     IconButton(
-                      onPressed: () {
-                        _selectStartTime(context);
-                      },
-                      icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
+                        onPressed: () {
+                          _selectStartTime(context);
+                        },
+                        icon: const Icon(
+                          Icons.access_time_rounded,
+                          color: AppColor.orange,
+                          size: 30,
+                        ))
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(CommonUtil.isNullOrEmpty(_endTime) ? 'Endzeit wählen' : 'Endzeit: $_endTime',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    Text(
+                      CommonUtil.isNullOrEmpty(_endTime)
+                          ? 'Endzeit wählen'
+                          : 'Endzeit: $_endTime',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
                     ),
                     IconButton(
                         onPressed: () {
                           _selectEndTime(context);
                         },
-                        icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
+                        icon: const Icon(
+                          Icons.access_time_rounded,
+                          color: AppColor.orange,
+                          size: 30,
+                        ))
                   ],
                 )
               ],
@@ -820,19 +948,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre medizinischen Bedingungen und die Auswahl der Ausschreibungen\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 10),
-                  child: Text('Medizinische Beeinträchtigungen',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Medizinische Beeinträchtigungen',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   child: MultiSelectDialogField<String>(
-                    items: _conditionItems.map((e) => MultiSelectItem(e, e)).toList(),
+                    items: _conditionItems
+                        .map((e) => MultiSelectItem(e, e))
+                        .toList(),
                     listType: MultiSelectListType.CHIP,
                     onConfirm: (values) {
                       _selectedConditions = values;
@@ -841,17 +978,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.1),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      border: Border.all(color: Colors.white12, width: 1,),
+                      border: Border.all(
+                        color: Colors.white12,
+                        width: 1,
+                      ),
                     ),
                     selectedColor: AppColor.orange,
                     buttonText: const Text('Wählen Sie ein Element'),
                     buttonIcon: const Icon(Icons.filter_list),
                     checkColor: AppColor.orange,
-                    itemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.black),
-                    selectedItemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                    itemsTextStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16, color: Colors.black),
+                    selectedItemsTextStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
                 SizedBox(
                   child: Form(
                     key: _alertTypeFormKey,
@@ -859,25 +1007,42 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       scroll: false,
                       items: _items,
-                      title: Text('Alarme auswählen',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                      title: Text(
+                        'Alarme auswählen',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(fontSize: 16),
                       ),
                       headerColor: Colors.white,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
-                        border: Border.all(color: Colors.white, width: 1,),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1,
+                        ),
                       ),
                       selectedChipColor: AppColor.orange,
                       validator: (values) {
-                        if ((((values?.contains(TaskType.breaks) ?? false) || (values?.contains(TaskType.water) ?? false))
-                            && (values?.contains(TaskType.waterWithBreak) ?? false))
-                        || (((values?.contains(TaskType.steps) ?? false) || (values?.contains(TaskType.exercise) ?? false))
-                                && (values?.contains(TaskType.walkWithExercise) ?? false))) {
+                        if ((((values?.contains(TaskType.breaks) ?? false) ||
+                                    (values?.contains(TaskType.water) ??
+                                        false)) &&
+                                (values?.contains(TaskType.waterWithBreak) ??
+                                    false)) ||
+                            (((values?.contains(TaskType.steps) ?? false) ||
+                                    (values?.contains(TaskType.exercise) ??
+                                        false)) &&
+                                (values?.contains(TaskType.walkWithExercise) ??
+                                    false))) {
                           return "* Einzelne u. kombinierte dürfen nicht gewählt";
                         }
                       },
-                      selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                      selectedTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontSize: 16, color: Colors.white),
                       onTap: (values) {
                         _selectedAlerts = values.whereType<TaskType>().toList();
                       },
@@ -909,11 +1074,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte bestätigen Sie alle eingegebenen Informationen und klicken Sie auf die Schaltfläche "Senden", um ein Konto zu erstellen.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 20),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
               ],
             ),
           ),
@@ -929,10 +1099,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
         data: ThemeData(
           canvasColor: Colors.transparent,
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppColor.orange,
-            background: Colors.red,
-            secondary: Colors.green,
-          ),
+                primary: AppColor.orange,
+                background: Colors.red,
+                secondary: Colors.green,
+              ),
         ),
         child: Stepper(
           type: StepperType.horizontal,
@@ -944,25 +1114,37 @@ class _RegistrationPageState extends State<RegistrationPage> {
           steps: <Step>[
             Step(
               title: const Text(''),
-              label: const Text('Nutzername', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              label: const Text(
+                'Nutzername',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               content: const SizedBox(),
               isActive: _stepIndex >= 0,
             ),
             Step(
               title: const Text(''),
-              label: const Text('Persönlich', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              label: const Text(
+                'Persönlich',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               content: const SizedBox(),
               isActive: _stepIndex >= 1,
             ),
             Step(
               title: const SizedBox(),
-              label: const Text('Arbeits', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              label: const Text(
+                'Arbeits',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               content: const SizedBox(),
               isActive: _stepIndex >= 2,
             ),
             Step(
               title: const Text(''),
-              label: const Text('Präferenz', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+              label: const Text(
+                'Präferenz',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               content: const SizedBox(),
               isActive: _stepIndex >= 3,
             ),

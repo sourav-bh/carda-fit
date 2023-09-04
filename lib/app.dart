@@ -41,7 +41,6 @@ class CardaFitApp extends StatefulWidget {
 }
 
 class _CardaFitAppState extends State<CardaFitApp> {
-
   @override
   void initState() {
     super.initState();

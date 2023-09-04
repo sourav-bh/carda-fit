@@ -2,8 +2,11 @@ import 'package:app/model/task_alert.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
+import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../app.dart';
 
 class AlertHistoryPage extends StatefulWidget {
   const AlertHistoryPage({Key? key}) : super(key: key);
@@ -70,7 +73,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         centerTitle: false,
-        title: const Text('Alarmgeschichte'),
+        title: const Text('Alarmverlauf'),
       ),
       backgroundColor: AppColor.lightPink,
       body: Padding(
@@ -132,6 +135,10 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
                 ),
                 trailing: _getStatusIcon(historyItem.taskStatus),
                 onTap: () {
+                    if (historyItem.taskStatus == TaskStatus.snoozed) {
+                      TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: historyItem.taskType.index);
+                        Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
+                 }
                 },
               ),
             );

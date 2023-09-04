@@ -130,9 +130,8 @@ class ApiManager {
     }
   }
 
-  Future<bool> updateAvatarInfo(String userId, String avatarName, String avatarImage) async {
+  Future<bool> updateAvatarInfo(String userId, String avatarImage) async {
     var reqBody = <String, dynamic> {
-      'avatarName': avatarName,
       'avatarImage': avatarImage,
     };
 

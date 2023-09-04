@@ -178,7 +178,8 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               Navigator.pushNamed(context, alertHistoryRoute);
                             },
-                            child: const Icon(Icons.more_horiz)
+                            child:  Text("Alarmverlauf",
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.orange, fontSize: 18, fontStyle: FontStyle.normal,),)
                           ),
                         ],
                       ),

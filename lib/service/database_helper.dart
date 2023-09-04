@@ -111,6 +111,8 @@ class DatabaseHelper {
         "id INTEGER PRIMARY KEY,"
         "condition VARCHAR,"
         "name VARCHAR,"
+        "exercise_name VARCHAR,"
+        "steps VARCHAR,"
         "description VARCHAR,"
         "url VARCHAR,"
         "duration INTEGER,"
