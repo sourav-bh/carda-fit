@@ -1,29 +1,29 @@
 import 'dart:convert';
 
 class UserInfo {
-  UserInfo({
-    this.id,
-    this.dbId,
-    this.userName,
-    this.password,
-    this.avatarImage,
-    this.deviceToken,
-    this.age,
-    this.gender,
-    this.weight,
-    this.height,
-    this.teamName,
-    this.score,
-    this.jobPosition,
-    this.jobType,
-    this.workingDays,
-    this.workStartTime,
-    this.workEndTime,
-    this.medicalConditions,
-    this.diseases,
-    this.preferredAlerts,
-    this.isMergedAlertSet
-  });
+  UserInfo(
+      {this.id,
+      this.dbId,
+      this.userName,
+      this.password,
+      this.avatarImage,
+      this.deviceToken,
+      this.age,
+      this.gender,
+      this.walkingSpeed,
+      this.weight,
+      this.height,
+      this.teamName,
+      this.score,
+      this.jobPosition,
+      this.jobType,
+      this.workingDays,
+      this.workStartTime,
+      this.workEndTime,
+      this.medicalConditions,
+      this.diseases,
+      this.preferredAlerts,
+      this.isMergedAlertSet});
 
   String? id;
   int? dbId;
@@ -31,6 +31,7 @@ class UserInfo {
   String? password;
   String? avatarImage;
   String? deviceToken;
+  String? walkingSpeed;
 
   int? age;
   String? gender;
@@ -48,116 +49,129 @@ class UserInfo {
 
   String? medicalConditions; // comma separated conditions string
   String? diseases; // comma separated disease string
-  String? preferredAlerts; // comma separated string containing alert type enum values
-  bool? isMergedAlertSet; // indicate if the user wants to merge the alert types, like water + break and exercise + steps
+  String?
+      preferredAlerts; // comma separated string containing alert type enum values
+  bool?
+      isMergedAlertSet; // indicate if the user wants to merge the alert types, like water + break and exercise + steps
 
-  factory UserInfo.fromRawJson(String str) => UserInfo.fromJson(json.decode(str));
+  factory UserInfo.fromRawJson(String str) =>
+      UserInfo.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
   factory UserInfo.fromJson(Map<String, dynamic> json) => UserInfo(
-    id: json["id"],
-    userName: json["userName"],
-    password: json["password"],
-    avatarImage: json["avatarImage"],
-    deviceToken: json["deviceToken"],
-    age: json["age"],
-    gender: json["gender"],
-    weight: json["weight"],
-    height: json["height"],
-    teamName: json["teamName"],
-    score: json["score"],
-    jobPosition: json["jobPosition"],
-    jobType: json["jobType"],
-    workingDays: json["workingDays"],
-    workStartTime: json["workStartTime"],
-    workEndTime: json["workEndTime"],
-    medicalConditions: json["medicalConditions"],
-    diseases: json["diseases"],
-    preferredAlerts: json["preferredAlerts"],
-    isMergedAlertSet: json["isMergedAlertSet"],
-  );
+        id: json["id"],
+        userName: json["userName"],
+        password: json["password"],
+        avatarImage: json["avatarImage"],
+        deviceToken: json["deviceToken"],
+        age: json["age"],
+        gender: json["gender"],
+        walkingSpeed: json["walkingSpeed"],
+        weight: json["weight"],
+        height: json["height"],
+        teamName: json["teamName"],
+        score: json["score"],
+        jobPosition: json["jobPosition"],
+        jobType: json["jobType"],
+        workingDays: json["workingDays"],
+        workStartTime: json["workStartTime"],
+        workEndTime: json["workEndTime"],
+        medicalConditions: json["medicalConditions"],
+        diseases: json["diseases"],
+        preferredAlerts: json["preferredAlerts"],
+        isMergedAlertSet: json["isMergedAlertSet"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "userName": userName,
-    "password": password,
-    "avatarImage": avatarImage,
-    "deviceToken": deviceToken,
-    "age": age,
-    "gender": gender,
-    "weight": weight,
-    "height": height,
-    "teamName": teamName,
-    "score": score,
-    "jobPosition": jobPosition,
-    "jobType": jobType,
-    "workingDays": workingDays,
-    "workStartTime": workStartTime,
-    "workEndTime": workEndTime,
-    "medicalConditions": medicalConditions,
-    "diseases": diseases,
-    "preferredAlerts": preferredAlerts,
-    "isMergedAlertSet": isMergedAlertSet,
-  };
+        "userName": userName,
+        "password": password,
+        "avatarImage": avatarImage,
+        "deviceToken": deviceToken,
+        "age": age,
+        "gender": gender,
+        "walkingSpeed": walkingSpeed,
+        "weight": weight,
+        "height": height,
+        "teamName": teamName,
+        "score": score,
+        "jobPosition": jobPosition,
+        "jobType": jobType,
+        "workingDays": workingDays,
+        "workStartTime": workStartTime,
+        "workEndTime": workEndTime,
+        "medicalConditions": medicalConditions,
+        "diseases": diseases,
+        "preferredAlerts": preferredAlerts,
+        "isMergedAlertSet": isMergedAlertSet,
+      };
 
   Map<String, dynamic> toUpdateJson() => {
-    "userName": userName,
-    "avatarImage": avatarImage,
-    "age": age,
-    "gender": gender,
-    "weight": weight,
-    "height": height,
-    "jobPosition": jobPosition,
-    "jobType": jobType,
-    "workingDays": workingDays,
-    "workStartTime": workStartTime,
-    "workEndTime": workEndTime,
-    "medicalConditions": medicalConditions,
-    "diseases": diseases,
-    "preferredAlerts": preferredAlerts,
-  };
+        "userName": userName,
+        "avatarImage": avatarImage,
+        "age": age,
+        "gender": gender,
+        "walkingSpeed": walkingSpeed,
+        "weight": weight,
+        "height": height,
+        "jobPosition": jobPosition,
+        "jobType": jobType,
+        "workingDays": workingDays,
+        "workStartTime": workStartTime,
+        "workEndTime": workEndTime,
+        "medicalConditions": medicalConditions,
+        "diseases": diseases,
+        "preferredAlerts": preferredAlerts,
+      };
 
   factory UserInfo.fromDbMap(Map<String, dynamic> json) => UserInfo(
-    dbId: json["id"],
-    userName: json["userName"],
-    avatarImage: json["avatarImage"],
-    age: json["age"],
-    gender: json["gender"],
-    weight: json["weight"],
-    height: json["height"],
-    teamName: json["teamName"],
-    score: json["score"],
-    jobPosition: json["jobPosition"],
-    jobType: json["jobType"],
-    workingDays: json["workingDays"],
-    workStartTime: json["workStartTime"],
-    workEndTime: json["workEndTime"],
-    medicalConditions: json["medicalConditions"],
-    diseases: json["diseases"],
-    preferredAlerts: json["preferredAlerts"],
-    isMergedAlertSet: json["isMergedAlertSet"] == 1 ? true : false,
-  );
+        dbId: json["id"],
+        userName: json["userName"],
+        avatarImage: json["avatarImage"],
+        age: json["age"],
+        gender: json["gender"],
+        walkingSpeed: json["walkingSpeed"],
+        weight: json["weight"],
+        height: json["height"],
+        teamName: json["teamName"],
+        score: json["score"],
+        jobPosition: json["jobPosition"],
+        jobType: json["jobType"],
+        workingDays: json["workingDays"],
+        workStartTime: json["workStartTime"],
+        workEndTime: json["workEndTime"],
+        medicalConditions: json["medicalConditions"],
+        diseases: json["diseases"],
+        preferredAlerts: json["preferredAlerts"],
+        isMergedAlertSet: json["isMergedAlertSet"] == 1 ? true : false,
+      );
 
   Map<String, dynamic> toDbMap() => {
-    "userName": userName,
-    "avatarImage": avatarImage,
-    "age": age,
-    "gender": gender,
-    "weight": weight,
-    "height": height,
-    "teamName": teamName,
-    "score": score,
-    "jobPosition": jobPosition,
-    "jobType": jobType,
-    "workingDays": workingDays,
-    "workStartTime": workStartTime,
-    "workEndTime": workEndTime,
-    "medicalConditions": medicalConditions,
-    "diseases": diseases,
-    "preferredAlerts": preferredAlerts,
-    "isMergedAlertSet": isMergedAlertSet ?? false ? 1 : 0,
-  };
+        "userName": userName,
+        "avatarImage": avatarImage,
+        "age": age,
+        "gender": gender,
+        "walkingSpeed": walkingSpeed,
+        "weight": weight,
+        "height": height,
+        "teamName": teamName,
+        "score": score,
+        "jobPosition": jobPosition,
+        "jobType": jobType,
+        "workingDays": workingDays,
+        "workStartTime": workStartTime,
+        "workEndTime": workEndTime,
+        "medicalConditions": medicalConditions,
+        "diseases": diseases,
+        "preferredAlerts": preferredAlerts,
+        "isMergedAlertSet": isMergedAlertSet ?? false ? 1 : 0,
+      };
 }
+
+enum WalkingSpeed {
+  fast,
+  medium,
+  slow }
 
 enum Gender {
   none,
@@ -173,10 +187,7 @@ enum UserLevelType {
 }
 
 class UserLevel {
-  UserLevel({
-    required this.levelType,
-    required this.level
-  });
+  UserLevel({required this.levelType, required this.level});
 
   UserLevelType levelType;
   int level;
@@ -189,10 +200,7 @@ enum JobType {
 }
 
 class SnoozeTime {
-  SnoozeTime({
-    required this.duration,
-    required this.isSelected
-  });
+  SnoozeTime({required this.duration, required this.isSelected});
 
   Duration duration;
   bool isSelected;

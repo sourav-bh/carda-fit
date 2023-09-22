@@ -23,6 +23,7 @@ import 'firebase_options.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+// Die `main`-Methode ist der Einstiegspunkt der Anwendung. Diese Klasse initialisiert die Flutter-App und konfiguriert Firebase.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -52,6 +53,7 @@ void main() async {
   runApp(const CardaFitApp());
 }
 
+// Diese Methode konfiguriert Firebase und abonniert ein FCM-Thema.
 _setupFireBase() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -84,6 +86,7 @@ _setupFireBase() async {
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 }
 
+  // Handler für Benachrichtigungen im Vordergrund der App.
 Future<void> foregroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the foreground: ${message.data}');
 
@@ -131,6 +134,7 @@ Future<void> foregroundHandler(RemoteMessage message) async {
   }
 }
 
+// Handler für Benachrichtigungen im Hintergrund der App.
 Future<void> backgroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the background: ${message.data}');
 
@@ -186,11 +190,13 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   }
 }
 
+// Diese Klasse enthält Methoden zum Überprüfen, ob ein Benutzer angemeldet ist.
 _checkIfUserLoggedIn() async {
   bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
   return isUserExist;
 }
 
+// Überprüfen, ob es ein neuer Tag ist und einige Aktionen ausführen.
 _checkIfItsANewDay() async {
   String? lastOpenDay = await SharedPref.instance.getValue(SharedPref.keyLastAppOpenDay);
   String currentDay = DateFormat('yMd').format(DateTime.now());
@@ -203,7 +209,7 @@ _checkIfItsANewDay() async {
     await DatabaseHelper.instance.clearAlertHistoryTable();
   }
 }
-
+// Initialisieren des Plugins und Anfordern von Berechtigungen.
 void initLocalNotificationPlugin() async {
   _requestPermissions();
 
@@ -220,6 +226,7 @@ void initLocalNotificationPlugin() async {
   onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
 }
 
+ // Anfordern von Berechtigungen für Benachrichtigungen auf verschiedenen Plattformen.
 Future<void> _requestPermissions() async {
   if (Platform.isIOS || Platform.isMacOS) {
     await flutterLocalNotificationsPlugin
@@ -248,6 +255,7 @@ Future<void> _requestPermissions() async {
   }
 }
 
+// Handler für das Empfangen von lokalen Benachrichtigungen auf iOS.
 _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
   print('Remote firebase message whilst for iOS');
 
@@ -301,6 +309,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
   }
 }
 
+// Handler für das Empfangen von lokalen Benachrichtigungen.
 void _onDidReceiveLocalNotification(NotificationResponse details) async {
   print('Remote firebase message _onDidReceiveLocalNotification');
 

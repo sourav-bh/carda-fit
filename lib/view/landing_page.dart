@@ -64,53 +64,53 @@ class _LandingPageState extends State<LandingPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _checkIfAllowedToUseTheApp();
+    // _checkIfAllowedToUseTheApp();
   }
 
-  _checkIfAllowedToUseTheApp() async {
-    bool isActive = await ApiManager().checkIfTeamIsActive(AppConstant.teamNameForCustomBuild);
+  // _checkIfAllowedToUseTheApp() async {
+  //   bool isActive = await ApiManager().checkIfTeamIsActive(AppConstant.teamNameForCustomBuild);
 
-    if (!isActive && mounted) {
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Container(
-              width: 300,
-              height: 175,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Fehler!",
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20,),
-                  Expanded(
-                    child: Text("Die Gültigkeit Ihres Kontos ist abgelaufen. Bitte wenden Sie sich an den Administrator Ihrer Organisation.",
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                child: const Text("OK", style: TextStyle(color: AppColor.orange),),
-                onPressed: () {
-                  Navigator.pop(context);
-                  exit(0);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
+  //   if (!isActive && mounted) {
+  //     showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           content: Container(
+  //             width: 300,
+  //             height: 175,
+  //             padding: const EdgeInsets.all(20),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.center,
+  //               children: [
+  //                 Text("Fehler!",
+  //                   style: Theme.of(context).textTheme.titleLarge,
+  //                   textAlign: TextAlign.center,
+  //                 ),
+  //                 const SizedBox(height: 20,),
+  //                 Expanded(
+  //                   child: Text("Die Gültigkeit Ihres Kontos ist abgelaufen. Bitte wenden Sie sich an den Administrator Ihrer Organisation.",
+  //                     style: Theme.of(context).textTheme.bodyLarge,
+  //                     textAlign: TextAlign.center,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               child: const Text("OK", style: TextStyle(color: AppColor.orange),),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //                 exit(0);
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
 
   void _handleTabSelection() {
     setState(() {});

@@ -76,6 +76,7 @@ class DatabaseHelper {
         "avatarImage VARCHAR,"
         "teamName VARCHAR,"
         "gender VARCHAR,"
+        "walkingSpeed VARCHAR,"
         "age INTEGER,"
         "weight INTEGER,"
         "height INTEGER,"

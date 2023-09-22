@@ -37,24 +37,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Gender? _genderValue;
   JobType? _jobTypeValue;
-  final List<bool> _selectedWeekdays = List.filled(CommonUtil.weekdayNames.length, false);
+  final List<bool> _selectedWeekdays =
+      List.filled(CommonUtil.weekdayNames.length, false);
   String? _startTime = '';
   String? _endTime = '';
+  WalkingSpeed? _walkingSpeedValue;
 
   final List<String> _conditionItems = [
-    'Herz', 'Beine', 'Knie', 'Schulter', 'Nacken', 'Rücken', 'Arme', 'Hände', 'Bauch', 'Augen',
+    'Herz',
+    'Beine',
+    'Knie',
+    'Schulter',
+    'Nacken',
+    'Rücken',
+    'Arme',
+    'Hände',
+    'Bauch',
+    'Augen',
   ];
   List<String> _selectedConditions = [];
 
   List<MultiSelectItem<TaskType?>> _items = [];
-  final List<TaskType?> _alertTypes = [TaskType.breaks, TaskType.exercise, TaskType.steps, TaskType.water, TaskType.walkWithExercise, TaskType.waterWithBreak];
+  final List<TaskType?> _alertTypes = [
+    TaskType.breaks,
+    TaskType.exercise,
+    TaskType.steps,
+    TaskType.water,
+    TaskType.walkWithExercise,
+    TaskType.waterWithBreak
+  ];
   List<TaskType> _selectedAlerts = [];
 
   @override
   void initState() {
     super.initState();
 
-    _items = _alertTypes.map((alertType) => MultiSelectItem<TaskType?>(alertType, CommonUtil.getTaskAlertName(alertType))).toList();
+    _items = _alertTypes
+        .map((alertType) => MultiSelectItem<TaskType?>(
+            alertType, CommonUtil.getTaskAlertName(alertType)))
+        .toList();
 
     _loadData();
   }
@@ -62,8 +83,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-
   }
 
   @override
@@ -139,7 +158,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _updateViewState(EditProfilePageViewState.workInfo);
     } else if (_viewState == EditProfilePageViewState.workInfo) {
       _updateViewState(EditProfilePageViewState.medicalConditionAndAlert);
-    } else if (_viewState == EditProfilePageViewState.medicalConditionAndAlert) {
+    } else if (_viewState ==
+        EditProfilePageViewState.medicalConditionAndAlert) {
       _submitAction();
     } else {
       _updateViewState(EditProfilePageViewState.bioInfo);
@@ -147,7 +167,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _loadData() async {
-    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId =
+        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     print(userId);
 
     UserInfo? userRes;
@@ -197,14 +218,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _startTime = userRes.workStartTime.toString();
         _endTime = userRes.workEndTime.toString();
 
-        _selectedConditions = userRes.medicalConditions!.replaceAll(" ", "").split(',');
+        _selectedConditions =
+            userRes.medicalConditions!.replaceAll(" ", "").split(',');
 
         String? userSelAlerts = userRes.preferredAlerts;
         if (!CommonUtil.isNullOrEmpty(userSelAlerts)) {
           List<String> selectedAlerts = userSelAlerts!.split(',');
           for (var alert in selectedAlerts) {
             setState(() {
-              _selectedAlerts.add(TaskType.values.firstWhere((e) => e.name == alert.trim()));
+              _selectedAlerts.add(
+                  TaskType.values.firstWhere((e) => e.name == alert.trim()));
             });
           }
         }
@@ -230,20 +253,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
       conditionValue += ', ';
     }
 
-    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    String? userId =
+        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
 
     var userInfo = UserInfo(
       id: userId,
       age: age,
-      gender: _genderValue != null ? _genderValue.toString().split('.').last : "",
+      gender:
+          _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
       jobPosition: designation,
-      jobType: _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
+      jobType:
+          _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
       workingDays: CommonUtil.getWeekDaySelectionStr(_selectedWeekdays),
       workStartTime: _startTime,
       workEndTime: _endTime,
-      medicalConditions: conditionValue.isNotEmpty ? conditionValue.substring(0, conditionValue.length - 2) : "",
+      medicalConditions: conditionValue.isNotEmpty
+          ? conditionValue.substring(0, conditionValue.length - 2)
+          : "",
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
     );
 
@@ -269,10 +297,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (mounted) {
       if (isApiSuccess) {
-        const snackBar = SnackBar(content: Text('Das Profil wurde erfolgreich aktualisiert!'));
+        const snackBar = SnackBar(
+            content: Text('Das Profil wurde erfolgreich aktualisiert!'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } else {
-        const snackBar = SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
+        const snackBar =
+            SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pop(context);
@@ -299,8 +329,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         backgroundColor: AppColor.lightPink,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: Platform.isIOS ? SystemUiOverlayStyle.light
-              : const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
+          value: Platform.isIOS
+              ? SystemUiOverlayStyle.light
+              : const SystemUiOverlayStyle(
+                  statusBarIconBrightness: Brightness.light),
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -309,7 +341,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Container(
                     width: CommonUtil.getSmallDiameter(context),
                     height: CommonUtil.getSmallDiameter(context),
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColor.lightOrange,)),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColor.lightOrange,
+                    )),
               ),
               Positioned(
                 bottom: 50,
@@ -317,7 +352,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Container(
                   width: CommonUtil.getSmallDiameter(context),
                   height: CommonUtil.getSmallDiameter(context),
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColor.lightBlue,),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.lightBlue,
+                  ),
                 ),
               ),
               Align(
@@ -332,8 +370,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
-                              overlayColor: MaterialStateProperty.all(Colors.transparent),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) =>
+                                    Colors.transparent,
+                              ),
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                             ),
                             onPressed: () {
                               _nextAction();
@@ -341,14 +384,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             child: Ink(
                               decoration: const BoxDecoration(
                                 color: Colors.orangeAccent,
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Container(
-                                constraints: const BoxConstraints(minHeight: 50), // min sizes for Material buttons
+                                constraints: const BoxConstraints(
+                                    minHeight:
+                                        50), // min sizes for Material buttons
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Weiter".toUpperCase(),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700),
                                 ),
                               ),
                             )),
@@ -392,7 +440,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre biologischen Daten ein\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -405,11 +456,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -432,7 +485,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<Gender>(
                     groupValue: _genderValue,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     children: const {
                       Gender.Mannlich: Text('Männlich'),
                       Gender.Weiblich: Text('Weiblich'),
@@ -441,6 +495,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     onValueChanged: (groupValue) {
                       setState(() {
                         _genderValue = groupValue;
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'Lauf-Tempo',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
+                    groupValue: _walkingSpeedValue,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    children: const {
+                      WalkingSpeed.fast: Text('schnell'),
+                      WalkingSpeed.medium: Text('medium'),
+                      WalkingSpeed.slow: Text('langsam'),
+                    },
+                    onValueChanged: (groupValue) {
+                      setState(() {
+                        _walkingSpeedValue = groupValue;
                       });
                     },
                   ),
@@ -454,11 +536,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -476,11 +560,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -514,7 +600,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre arbeitsbezogenen Informationen und Ihren Wochenplan ein\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -527,11 +616,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(width: 1, color: Colors.white12),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.white12),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     fillColor: Colors.grey.shade300,
@@ -542,14 +633,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeitmodell',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeitmodell',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<JobType>(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     groupValue: _jobTypeValue,
                     children: const {
                       JobType.Vollzeit: Text('Vollzeit'),
@@ -564,8 +660,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeitplan',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeitplan',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
@@ -576,18 +676,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ToggleButtons(
                         onPressed: (int index) {
                           setState(() {
-                            _selectedWeekdays[index] = !_selectedWeekdays[index];
+                            _selectedWeekdays[index] =
+                                !_selectedWeekdays[index];
                           });
                         },
                         selectedColor: AppColor.orange,
                         borderRadius: BorderRadius.circular(10),
                         isSelected: _selectedWeekdays,
-                        constraints: const BoxConstraints(minWidth: 55, minHeight: 50),
+                        constraints:
+                            const BoxConstraints(minWidth: 55, minHeight: 50),
                         children: [
                           for (int i = 1; i <= 5; i++)
                             Text(
                               CommonUtil.weekdayNames[i - 1],
-                              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
                         ],
                       ),
@@ -596,21 +699,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text('Arbeitszeiten',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Arbeitszeiten',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(CommonUtil.isNullOrEmpty(_startTime) ? 'Startzeit wählen' : 'Startzeit: $_startTime',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
+                    Text(
+                      CommonUtil.isNullOrEmpty(_startTime)
+                          ? 'Startzeit wählen'
+                          : 'Startzeit: $_startTime',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontWeight: FontWeight.w500, fontSize: 17),
                     ),
                     IconButton(
-                      onPressed: () {
-                        _selectStartTime(context);
-                      },
-                      icon: const Icon(Icons.access_time_rounded, color: AppColor.orange, size: 30,))
+                        onPressed: () {
+                          _selectStartTime(context);
+                        },
+                        icon: const Icon(
+                          Icons.access_time_rounded,
+                          color: AppColor.orange,
+                          size: 30,
+                        ))
                   ],
                 ),
                 Row(
@@ -661,19 +778,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     'Bitte geben Sie unten Ihre medizinischen Bedingungen und die Auswahl der Ausschreibungen\n(optional)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 10),
-                  child: Text('Medizinische Beeinträchtigungen',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                  child: Text(
+                    'Medizinische Beeinträchtigungen',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
                   ),
                 ),
                 SizedBox(
                   child: MultiSelectDialogField<String>(
-                    items: _conditionItems.map((e) => MultiSelectItem(e, e)).toList(),
+                    items: _conditionItems
+                        .map((e) => MultiSelectItem(e, e))
+                        .toList(),
                     listType: MultiSelectListType.CHIP,
                     onConfirm: (values) {
                       _selectedConditions = values;
@@ -683,14 +809,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.1),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      border: Border.all(color: Colors.white12, width: 1,),
+                      border: Border.all(
+                        color: Colors.white12,
+                        width: 1,
+                      ),
                     ),
                     selectedColor: AppColor.orange,
                     buttonText: const Text('Wählen Sie ein Element'),
                     buttonIcon: const Icon(Icons.filter_list),
                     checkColor: AppColor.orange,
-                    itemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.black),
-                    selectedItemsTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                    itemsTextStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16, color: Colors.black),
+                    selectedItemsTextStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16, color: Colors.white),
                   ),
                 ),
                 const SizedBox(
@@ -704,25 +839,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       scroll: false,
                       items: _items,
                       initialValue: _selectedAlerts,
-                      title: Text('Alarme auswählen',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+                      title: Text(
+                        'Alarme auswählen',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(fontSize: 16),
                       ),
                       headerColor: Colors.white,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
-                        border: Border.all(color: Colors.white, width: 1,),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1,
+                        ),
                       ),
                       selectedChipColor: AppColor.orange,
                       validator: (values) {
-                        if ((((values?.contains(TaskType.breaks) ?? false) || (values?.contains(TaskType.water) ?? false))
-                            && (values?.contains(TaskType.waterWithBreak) ?? false))
-                            || (((values?.contains(TaskType.steps) ?? false) || (values?.contains(TaskType.exercise) ?? false))
-                                && (values?.contains(TaskType.walkWithExercise) ?? false))) {
+                        if ((((values?.contains(TaskType.breaks) ?? false) ||
+                                    (values?.contains(TaskType.water) ??
+                                        false)) &&
+                                (values?.contains(TaskType.waterWithBreak) ??
+                                    false)) ||
+                            (((values?.contains(TaskType.steps) ?? false) ||
+                                    (values?.contains(TaskType.exercise) ??
+                                        false)) &&
+                                (values?.contains(TaskType.walkWithExercise) ??
+                                    false))) {
                           return "* Einzelne u. kombinierte dürfen nicht gewählt";
                         }
                       },
-                      selectedTextStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Colors.white),
+                      selectedTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(fontSize: 16, color: Colors.white),
                       onTap: (values) {
                         _selectedAlerts = values.whereType<TaskType>().toList();
                       },
