@@ -31,6 +31,10 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+
+    _quoteIndex = Random().nextInt(DataLoader.quotes.length);
+    AppCache.instance.quoteIndex = _quoteIndex;
+
     // Check if data is already saved in the database
     checkDataSaved().then((isDataSaved) {
       if (isDataSaved) {
@@ -40,11 +44,8 @@ class _SplashPageState extends State<SplashPage> {
         });
       } else {
         // Data is not saved, load and save data from Excel file
-        _loadExerciseDataFromAsset();
-        _loadLearningMaterialFromAsset();
-        _quoteIndex = Random().nextInt(DataLoader.quotes.length);
-        AppCache.instance.quoteIndex = _quoteIndex;
-
+        // _loadExerciseDataFromAsset();
+        // _loadLearningMaterialFromAsset();
         // Move to the next page after a delay
         Timer(const Duration(seconds: 3), () {
           _goToNextPage();

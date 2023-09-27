@@ -120,6 +120,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
   bool _showFilteredList = false;
   String? _userCondition;
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -128,6 +130,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
   }
 
   _loadData() async {
+    setState(() => _isLoading = true);
+
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null &&
@@ -198,6 +202,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
       }
     }
     // _searchRecipes();
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -259,6 +264,11 @@ class _UserLearningPageState extends State<UserLearningPage> {
                 ),
               ),
             ),
+            _isLoading ?
+            const Padding(
+              padding: EdgeInsets.all(50),
+              child: CircularProgressIndicator(),
+            ) :
             Expanded(
               child: ListView.separated(
                 itemBuilder: (BuildContext context, int index) {

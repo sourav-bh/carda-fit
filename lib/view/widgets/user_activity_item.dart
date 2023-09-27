@@ -34,11 +34,7 @@ class UserActivityItemView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(5),
             color: shadeColor,
-            child: Icon(
-              icon,
-              size: 35,
-              color: highlightColor,
-            ),
+            child: Icon(icon, size: 35, color: highlightColor,),
           ),
           const SizedBox(
             width: 10,
@@ -55,32 +51,33 @@ class UserActivityItemView extends StatelessWidget {
                           title,
                           style: Theme.of(context).textTheme.subtitle1,
                         ),
-                        if (title ==
-                            "Step") // Falls title == step, dann zeige info icon
-                          IconButton(
-                            icon: Icon(Icons.info),
-                            color: highlightColor,
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text(title),
-                                    content: Text(
-                                        "Hier können Sie Informationen zu $title anzeigen."),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('Schließen'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                        // if (title == "Step")
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(left: 5),
+                        //     child: GestureDetector(
+                        //       onTap: () {
+                        //         showDialog(
+                        //           context: context,
+                        //           builder: (context) {
+                        //             return AlertDialog(
+                        //               title: Text(title),
+                        //               content: Text(
+                        //                   "Hier können Sie Informationen zu $title anzeigen."),
+                        //               actions: [
+                        //                 TextButton(
+                        //                   onPressed: () {
+                        //                     Navigator.of(context).pop();
+                        //                   },
+                        //                   child: Text('Schließen'),
+                        //                 ),
+                        //               ],
+                        //             );
+                        //           },
+                        //         );
+                        //       },
+                        //       child: Icon(Icons.info, size: 20, color: highlightColor,),
+                        //     ),
+                        //   )// Falls title == step, dann zeige info icon
                       ],
                     ),
                     Text(

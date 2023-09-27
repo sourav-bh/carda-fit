@@ -700,37 +700,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Lauf-Tempo',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
-                  ),
-                ),
-                  SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
-                    groupValue: _walkingSpeedValue,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    children: const {
-                      WalkingSpeed.fast: Text('schnell'),
-                      WalkingSpeed.medium: Text('medium'),
-                      WalkingSpeed.slow: Text('langsam'),
-                    },
-                    onValueChanged: (groupValue) {
-                      setState(() {
-                        _walkingSpeedValue = groupValue;
-                      });
-                    },
-                  ),
-                ),
-                 const SizedBox(
-                  height: 15,
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(vertical: 10),
+                //   child: Text(
+                //     'Lauf-Tempo',
+                //     style: Theme.of(context)
+                //         .textTheme
+                //         .bodyLarge
+                //         ?.copyWith(fontSize: 16),
+                //   ),
+                // ),
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width,
+                //   child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
+                //     groupValue: _walkingSpeedValue,
+                //     padding: const EdgeInsets.symmetric(
+                //         vertical: 10, horizontal: 10),
+                //     children: const {
+                //       WalkingSpeed.fast: Text('schnell'),
+                //       WalkingSpeed.medium: Text('medium'),
+                //       WalkingSpeed.slow: Text('langsam'),
+                //     },
+                //     onValueChanged: (groupValue) {
+                //       setState(() {
+                //         _walkingSpeedValue = groupValue;
+                //       });
+                //     },
+                //   ),
+                // ),
+                const SizedBox(height: 15,),
                 TextField(
                   controller: _weightText,
                   keyboardType: TextInputType.number,

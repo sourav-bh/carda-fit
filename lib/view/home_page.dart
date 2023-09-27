@@ -137,43 +137,42 @@ class _HomePageState extends State<HomePage> {
               opacity: const AlwaysStoppedAnimation(.5),
             ),
           ),
-Align(
-  alignment: Alignment(1.0, -0.8),
-  child: Padding(
-    padding: const EdgeInsets.all(20),
-    child: GestureDetector(
-      onTap: () {
-        _showSnoozeTimeSelected(context);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.snooze, size: 20, color: Colors.black),
-              const SizedBox(width: 10),
-              const Text('Mitteilungen stumm'),
-            ],
-          ),
-        ),
-      ),
-    ),
-  ),
-),
-
+          // Align(
+          //   alignment: Alignment(1.0, -0.8),
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(20),
+          //     child: GestureDetector(
+          //       onTap: () {
+          //         _showSnoozeTimeSelected(context);
+          //       },
+          //       child: Container(
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           borderRadius: BorderRadius.circular(10),
+          //           boxShadow: [
+          //             BoxShadow(
+          //               color: Colors.grey.withOpacity(0.5),
+          //               spreadRadius: 2,
+          //               blurRadius: 5,
+          //               offset: Offset(0, 3),
+          //             ),
+          //           ],
+          //         ),
+          //         child: Padding(
+          //           padding: const EdgeInsets.all(10),
+          //           child: Row(
+          //             mainAxisSize: MainAxisSize.min,
+          //             children: [
+          //               Icon(Icons.snooze, size: 20, color: Colors.black),
+          //               const SizedBox(width: 10),
+          //               const Text('Mitteilungen stumm'),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Align(
             alignment: Alignment.topCenter,
             child: ListView(

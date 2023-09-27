@@ -51,18 +51,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   _loadUserInfo() async {
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-        String? userId = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    String? userAvatar = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
-        _avatarImage = userInfo.avatarImage;
+        _avatarImage = userAvatar;
       });
     }
-      if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-        await ApiManager().updateAvatarInfo(userId!, _avatarImage!);
-      }
   }
 
   void setSnoozeTime(SnoozeTime snoozeTime) async {
@@ -76,11 +72,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 
-  void onAvatarSelected(String? avatar) {
+  void onAvatarSelected(String? avatar) async {
     setState(() {
       _avatarImage = avatar;
-      SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
     });
+
+    await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    if (userInfo != null) {
+      userInfo.avatarImage = avatar;
+      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userDbId);
+    }
+
+    if (_avatarImage != null && _avatarImage!.isNotEmpty) {
+      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
+    }
   }
 
   _checkSnoozeTimeStatus() async {
@@ -189,8 +195,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 : const Icon(Icons.person_outlined, size: 100),
                           ),
                           Positioned(
-                            top: -15,
-                            right: -15,
+                            top: -5,
+                            right: -10,
                             child: ElevatedButton(
                               onPressed: () async {
                                 await showDialog(

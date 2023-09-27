@@ -222,8 +222,9 @@ void initLocalNotificationPlugin() async {
 
   const InitializationSettings initSettings = InitializationSettings(android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
 
-  await flutterLocalNotificationsPlugin.initialize(initSettings,
-  onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+  // await flutterLocalNotificationsPlugin.initialize(initSettings,
+  // onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
 }
 
  // Anfordern von Berechtigungen für Benachrichtigungen auf verschiedenen Plattformen.
