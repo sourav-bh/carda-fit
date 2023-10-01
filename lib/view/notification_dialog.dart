@@ -2,6 +2,8 @@ import 'package:app/util/app_style.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
+//**Diese Klasse erstellt ein benutzerdefiniertes Benachrichtigungsdialogfeld mit einem Hintergrundbild,
+//  einer motivierenden Zitatzeile, einer Fitnessaufgabe und einem Schieberegler zur Bestätigung der Benachrichtigung. */
 class NotificationAlertDialog extends StatelessWidget {
   final String? _image;
   final String? _motivatingQuote;

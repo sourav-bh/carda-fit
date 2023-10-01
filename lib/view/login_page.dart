@@ -25,6 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
   IconData _iconVisible = Icons.visibility_off;
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf das Sichtbarkeits-Symbol im Passwortfeld klickt.
+// Sie ändert den Sichtbarkeitsstatus des Passwortfelds und aktualisiert das Symbol entsprechend. */
   void _toggleObscureText() {
     setState(() {
       _obscureText = !_obscureText;
@@ -53,6 +55,11 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf den Anmelde-Button klickt.
+// Sie liest den eingegebenen Benutzernamen und das Passwort aus den Controllern aus und versucht dann,
+// den Benutzer über die ApiManager().loginUser()-Methode anzumelden.
+//Wenn die Anmeldung erfolgreich ist, wird ein UserInfo-Objekt zurückgegeben, das Informationen zum angemeldeten Benutzer enthält. 
+//Wenn ein Fehler bei der Verbindung mit dem Server auftritt, wird eine Fehlermeldung ausgegeben. */
   void _loginAction() async {
     String userName = _userNameText.value.text;
     String password = _passwordText.value.text;

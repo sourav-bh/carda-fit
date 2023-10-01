@@ -62,6 +62,7 @@ class _CardaFitAppState extends State<CardaFitApp> {
     );
   }
 
+// Die RouteFactory beinhaltet die Routen die mit einem Navigation Call aufgerufen werden können.
   RouteFactory _routes() {
     return (settings) {
       final dynamic arguments = settings.arguments;

@@ -90,6 +90,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+//**Diese Funktionen zeigen Dialoge zur Auswahl der Arbeitszeiten an. 
+//Sie verwenden den showTimePicker-Dialog, um die Arbeitsanfangszeit und das Arbeitsende auszuwählen,
+// und aktualisieren die entsprechenden _startTime- und _endTime-Variablen mit den ausgewählten Zeiten. */
   Future<void> _selectStartTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -122,6 +125,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+// Wird über _selectStartTime erklärt
   Future<void> _selectEndTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -153,6 +157,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf die Schaltfläche "Weiter" klickt. 
+//Je nach dem aktuellen Anzeigemodus (_viewState) wechselt die Funktion zwischen den verschiedenen Schritten:
+// Biografische Informationen, Arbeitsinformationen, medizinische Bedingungen und Alarmeinstellungen.
+// Wenn der Benutzer die letzten Informationen eingeben hat und auf "Weiter" klickt, wird die submitAction()-Funktion aufgerufen. */
   void _nextAction() async {
     if (_viewState == EditProfilePageViewState.bioInfo) {
       _updateViewState(EditProfilePageViewState.workInfo);
@@ -166,6 +174,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+//** Diese Funktion lädt die Benutzerdaten aus der API und füllt die entsprechenden Formularfelder mit den geladenen Daten. 
+//Sie ruft die Benutzerdaten basierend auf der Benutzer-ID aus den SharedPreferences ab und aktualisiert die Formularfelder. */
   void _loadData() async {
     String? userId =
         await SharedPref.instance.getValue(SharedPref.keyUserServerId);
@@ -241,6 +251,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf die Schaltfläche "Speichern" klickt, nachdem er alle erforderlichen Informationen eingegeben hat.
+//Sie validiert und sammelt die eingegebenen Informationen aus den Formularfeldern und erstellt ein UserInfo-Objekt.
+//Das UserInfo-Objekt wird sowohl lokal in der SQLite-Datenbank als auch über die API aktualisiert.
+//Der Benutzer erhält eine Snackbar-Benachrichtigung, die den Erfolg oder das Fehlschlagen des Aktualisieirung- bzw. Speicherungsvorgangs anzeigt. */
   void _submitAction() async {
     int age = int.tryParse(_ageText.value.text) ?? 0;
     int weight = int.tryParse(_weightText.value.text) ?? 0;
@@ -309,6 +323,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+//**Diese Funktion aktualisiert den aktuellen Anzeigemodus (_viewState) basierend auf dem übergebenen viewState-Parameter.
+//Sie wird verwendet, um zwischen den verschiedenen Bearbeitungsschritten in der Editieransicht zu wechseln (Biografische Informationen,
+// Arbeitsinformationen, medizinische Bedingungen und Alarmeinstellungen) */
   void _updateViewState(EditProfilePageViewState viewState) {
     setState(() {
       _viewState = viewState;

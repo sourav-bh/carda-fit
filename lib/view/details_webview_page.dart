@@ -31,11 +31,18 @@ class _DetailsWebState extends State<DetailsWebPage> {
     _loadIntent();
   }
 
+//**Diese Funktion wird aufgerufen, um die Absicht (Intent) für die Anzeige der Detail-Webseite zu laden.
+//Sie verwendet die ModalRoute, um die mit der Route mitgelieferten Argumente abzurufen und setzt _learningContent auf das
+// entsprechende LearningContent-Objekt. */
   _loadIntent() {
     _learningContent = ModalRoute.of(context)?.settings.arguments as LearningContent;
     _loadWebviewController(_learningContent?.contentUri ?? "");
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf die 
+//Daumen-hoch (Like) oder Daumen-runter (Dislike) Schaltflächen in der App-Leiste klickt.
+//Sie erstellt ein UserLearningContent-Objekt, um die Benutzeraktion zu verfolgen 
+//(ob der Inhalt als Favorit markiert wurde oder nicht) und speichert dieses Objekt in der lokalen Datenbank. */
   _likeDislikeAction(bool isLiked) async {
     UserLearningContent userLc = UserLearningContent();
     userLc.userId = AppCache.instance.userDbId;
@@ -46,6 +53,10 @@ class _DetailsWebState extends State<DetailsWebPage> {
     print(id);
   }
 
+//**Diese Funktion initialisiert den WebViewController und konfiguriert ihn für die Anzeige der Webseite.
+//Sie legt die JavaScript-Modus auf "unrestricted" fest und setzt den Hintergrundfarbe.
+//Ein NavigationDelegate wird verwendet, um die Seitenladung zu überwachen und spezielle Aktionen durchzuführen, wie das Verhindern der Navigation zu bestimmten URLs (z. B. YouTube).
+//Schließlich lädt sie die Webseite über die gegebene contentUrl. */
   _loadWebviewController(String contentUrl) {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)

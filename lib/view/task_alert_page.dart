@@ -73,6 +73,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     _loadIntent();
   }
 
+//* Hier werden die relevanten Daten für die Task Page geladen. Zuerst werden Informationen aus dem TaskAlertPageData-Objekt abgerufen, das die Ansichtsmodusinformationen und den Typ der Aufgabe enthält. 
+//  Wenn der Aufgabentyp ein Übungstyp ist (z. B. Fitnessübung oder Teamübung), werden die Übungsinformationen geladen. Andernfalls werden Informationen zu anderen Aufgabentypen (z. B. Trinken von Wasser, Schritte, Pausen) geladen.
+//  Für Übungen wird eine zufällige Übung aus einer vordefinierten Liste von Übungen ausgewählt und die Details dieser Übung (Titel, Schritte, Dauer usw.) angezeigt.
+//  Für andere Aufgabentypen werden entsprechende Informationen angezeigt, z. B. Trinken von Wasser oder Zeit für Pausen und Schritte. */
   _loadIntent() async {
     _taskPageData = ModalRoute.of(context)?.settings.arguments as TaskAlertPageData;
     _taskType = _taskPageData?.taskType;
@@ -154,6 +158,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+//*Hier werden wieder Daten aus einer Excel-Tabelle extrahiert. Die Funktion liest die Übungsdaten aus der Datei aus und erstellt eine Liste von Übungsinformationen, einschließlich Schritten und anderen relevanten Daten.
+// Die Übungen werden basierend auf den in der Datei angegebenen Bedingungen gefiltert, um nur relevante Übungen zu behalten. Zudem werden sie in der App-Cache gespeichert.
+// */
   _loadExerciseDataFromAsset() async {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
@@ -233,6 +240,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+//*Die Funktion vergleicht die UserCondition des Benutzers mit den in der Datenbank gespeicherten Bedingungen und gibt true zurück,
+// wenn eine der Bedingungen des Benutzers in den in der Datenbank gespeicherten Bedingungen enthalten ist. Andernfalls gibt sie false zurück. */
   bool _checkUserConditionInDb(String userCondition, String dbCondition) {
     List<String> userConditionItems = userCondition.split(",");
     for (String singleUserCondition in userConditionItems) {
@@ -242,7 +251,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
     return false;
   }
-
+/* */
   _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
         link: url, cache: const Duration(days: 7),
@@ -255,7 +264,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       });
     }
   }
-
+/**Diese Methode startet einen Timer für die Anzeige der Fortschrittsdauer einer Übung.
+ * Der Timer wird jede Sekunde aktualisiert.
+ */
   void _startExerciseTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (mounted) {
@@ -270,7 +281,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       }
     });
   }
-
+/**Diese Methode startet einen Timer für Aufgabentypen wie Pausen und Schritte.
+ * Der Timer wird jede Sekunde aktualisiert.
+ */
   void _startBreakAndWalkTimer() {
     _targetTotalTimeInSec = 120;
     _timePassedInSec = 0;
@@ -297,6 +310,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     });
   }
 
+/**Diese Methode wird aufgerufen, um den Übungstimer zu beenden, wenn die aktuelle Übung abgeschlossen ist.
+ */
   void _cancelExerciseTimer() {
     if (_timer != null) {
       _timer!.cancel();
@@ -333,7 +348,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       _timer = null;
     }
   }
-
+/**Diese Methode wird aufgerufen, wenn der Benutzer eine Aufgabe abschließt und den Bestätigungsbutton drückt.
+  *Sie aktualisiert den Fortschritt/Punkte des Benutzers und speichert die abgeschlossenen Aufgaben in den App-Daten.
+  *Je nach Aufgabentyp (z. B. Wasser trinken, Schritte, Übungen) werden die entsprechenden Fortschritte/Punkte erhöht.
+  */
   void onSubmitScore() async {
     int? taskHistoryId = _taskPageData?.taskHistoryId;
     if (taskHistoryId != null) {

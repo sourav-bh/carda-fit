@@ -32,6 +32,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     _loadAllUsers();
   }
 
+// Diese Funktion lädt den Benutzernamen des aktuellen Benutzers aus den SharedPreferences und aktualisiert den Wert von _currentUserName.
   _loadUserName() async {
     var userName = await SharedPref.instance.getValue(SharedPref.keyUserName);
     if (userName != null && userName is String) {
@@ -41,6 +42,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     }
   }
 
+//**Diese Funktion ruft alle Benutzer (Teammitglieder) von einem Server ab und speichert sie in der Liste _teamMembersList.
+// Sie sortiert auch die Benutzer nach ihrer Punktzahl in absteigender Reihenfolge. */
   void _loadAllUsers() async {
     setState(() {
       _teamMembersList.clear();
@@ -68,6 +71,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     });
   }
 
+//**Diese Funktion gibt die UserInfo des aktuellen Benutzers zurück, falls ein Benutzer angemeldet ist.
+//  Andernfalls wird ein leeres UserInfo-Objekt zurückgegeben. */
   UserInfo _getCurrentUserInfo() {
     if (_currentUserName != null &&
         _currentUserName!.isNotEmpty &&

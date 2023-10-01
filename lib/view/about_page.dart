@@ -14,6 +14,8 @@ class _AboutUsPageState extends State<AboutUsPage> {
 
   String _version = '1.0.0';
 
+//**Diese Funktion verwendet die PackageInfo-Bibliothek, um Informationen über die aktuelle Version der App zu erhalten.
+//Sie aktualisiert den Zustand der Seite, um die App-Version darzustellen, nachdem die Informationen abgerufen wurden. */
   Future<void> _getSystemDevice() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {

@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
   }
 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+   *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
       _selectedSnoozeTimeVal = snoozeTime;
@@ -64,6 +66,10 @@ class _HomePageState extends State<HomePage> {
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+   *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
+   *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
+   * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
         await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
@@ -86,6 +92,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+//**Diese Funktion lädt Lerninhalte in die _learningMaterials-Liste.
+//Wenn die Liste AppCache.instance.contents nicht leer ist, wird der erste Lerninhalt ausgewählt 
+//und in die Liste _learningMaterials hinzugefügt. */
   _loadLearningContent() async {
     if (AppCache.instance.contents.isNotEmpty) {
       var info = await LearningMaterialInfo.copyContentFromLink(
@@ -98,6 +107,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+//**Diese Funktion lädt den aktuellen Fortschritt des Benutzers. 
+//Sie ruft die abgeschlossenen Aufgaben des Benutzers aus den SharedPreferences ab und berechnet den Fortschritt. 
+//Der Fortschritt wird in Prozent berechnet und in der Variable _currentUserProgress gespeichert. */
   _loadCurrentProgress() async {
     var completedJson = await SharedPref.instance
         .getJsonValue(SharedPref.keyUserCompletedTargets);

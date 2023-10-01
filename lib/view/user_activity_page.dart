@@ -28,6 +28,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
     _loadDailyTarget();
   }
 
+// Hier werden die täglichen Ziele geladen.
   _loadDailyTarget() async {
     var targetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
     if (targetJson != null && targetJson is String && targetJson.isNotEmpty) {

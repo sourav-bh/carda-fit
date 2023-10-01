@@ -18,6 +18,7 @@ import '../model/user_info.dart';
 import '../service/database_helper.dart';
 import '../util/common_util.dart';
 
+// Die Splah Page stellt den Ladebildschirm der App dar.
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
 
@@ -49,7 +50,6 @@ class _SplashPageState extends State<SplashPage> {
         Timer(const Duration(seconds: 3), () {
           _goToNextPage();
         });
-        // Is it possible to leave the timer in didChangeDependencies? 
       }
     });
   }
@@ -58,7 +58,8 @@ class _SplashPageState extends State<SplashPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-
+//**Diese asynchrone Methode überprüft, ob Daten bereits in der Datenbank gespeichert sind, indem sie die Datenbank nach Übungen und Lerninhalten abfragt.
+//*  Sie gibt einen booleschen Wert zurück, der angibt, ob Daten gespeichert sind oder nicht. */
   Future<bool> checkDataSaved() async {
     // bool check if data is saved
     final dbHelper = DatabaseHelper.instance;
@@ -68,6 +69,8 @@ class _SplashPageState extends State<SplashPage> {
     return exercises.isNotEmpty && learningContents.isNotEmpty;
   }
 
+//**Diese Methode lädt Übungsdaten aus einer Excel-Datei (die sich im Annahmefall im Assets-Ordner der App befindet)
+// und fügt sie in eine lokale Datenbank ein. Sie liest Daten aus der Excel-Datei zeilenweise, analysiert Übungsdetails und Schritte. */
   Future<void> _loadExerciseDataFromAsset() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -142,6 +145,9 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
+//** Ähnlich wie _loadExerciseDataFromAsset() lädt diese Methode Lernmaterialien aus einer Excel-Datei und fügt sie in eine lokale Datenbank ein.
+// Sie liest Daten aus der Excel-Datei zeilenweise und erstellt LearningContent-Objekte.
+// */
   Future<void> _loadLearningMaterialFromAsset() async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
@@ -171,6 +177,9 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
+//**Diese Methode ist für das Navigieren zur nächsten Seite der App verantwortlich. 
+//Sie überprüft anhand von gemeinsam genutzten Präferenzen (Shared Preferences), ob ein Benutzer existiert,
+// und je nach Ergebnis navigiert sie entweder zur Startseite oder zur Anmeldeseite mithilfe von Flutters Navigator. */
   _goToNextPage() async {
     bool isUserExist =
         await SharedPref.instance.hasValue(SharedPref.keyUserName);

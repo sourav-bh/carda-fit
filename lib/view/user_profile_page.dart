@@ -50,6 +50,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
   }
 
+// Hier werden die Nutzerdaten geladen
   _loadUserInfo() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -65,6 +66,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
       }
   }
 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+   *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
       _selectedSnoozeTimeVal = snoozeTime;
@@ -75,14 +78,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     await SharedPref.instance.saveIntValue(
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
-
+// Hier wird überprüft ob ein Avatar ausgewählt wurde 
   void onAvatarSelected(String? avatar) {
     setState(() {
       _avatarImage = avatar;
       SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
     });
   }
-
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+   *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
+   *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
+   * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
         await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
@@ -105,6 +111,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+// Wenn der LogOut Button betätigt wird, wird diese Funktion ausgelöst und der Nutzer zu LogIn Seite geleitet.
   _logoutAction() async {
     SharedPref.instance.clearCache();
     Navigator.pushNamed(context, loginRoute);
@@ -115,12 +122,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+// Wenn der EditProfile Button betätigt wird, wird diese Funktion ausgeführt und der Nutzer zur EditProfile Seite geleitet.
   _editProfileAction() async {
     Navigator.pushNamed(context, editProfileRoute, arguments: true);
   }
 
   Color transparentOrange = Colors.orange.withOpacity(0);
 
+// Hier wird mittels Größe und Gewicht der BMI berechnet.
   String _getCalculatedBmiValue(int? weight, int? height) {
     if ((weight != null && weight > 0) && (height != null && height > 0)) {
       return ((weight) / pow(((height) / 100), 2)).toStringAsFixed(1);

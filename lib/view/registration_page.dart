@@ -106,7 +106,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void dispose() {
     super.dispose();
   }
-
+//**Diese Funktion wird aufgerufen, wenn auf den "Weiter"-Button geklickt wird. Sie steuert den Fortschritt des Registrierungsprozesses,
+// indem sie je nach aktuellem Zustand des Registrierungsformulars zur nächsten Ansicht wechselt oder die Registrierung abschließt. */
   void _nextAction() async {
     if (_viewState == RegisterPageViewState.mandatoryInfo) {
       if (_mandatoryFormKey.currentState!.validate()) {
@@ -139,11 +140,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//** Diese Funktion überprüft die Verfügbarkeit eines Benutzernamens, indem sie eine Anfrage an den Server sendet,
+// um sicherzustellen, dass der Benutzername eindeutig ist. */
   Future<bool> _checkUserNameAvailability() async {
     String userName = _userNameText.value.text;
     return await ApiManager().checkIfUserNameAvailable(userName);
   }
 
+//** Diese Funktion wird aufgerufen, wenn der Benutzer auf den "Registrieren"-Button klickt.
+// Sie sammelt die eingegebenen Informationen und sendet sie an den Server, um den Registrierungsprozess abzuschließen. */
   void _submitAction() async {
     String userName = _userNameText.value.text;
     String password = _passwordText.value.text;
@@ -209,6 +214,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//**Diese Funktion ändert den Anzeigemodus des Passwortfelds zwischen verdecktem Text und sichtbarem Text.
+// Sie wird aufgerufen, wenn der Benutzer auf das "Sichtbarkeits"-Symbol im Passwortfeld klickt. */
   void _toggleObscureText() {
     setState(() {
       _obscureText = !_obscureText;
@@ -220,6 +227,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+//**Ähnlich wie _toggleObscureText() ändert diese Funktion den Anzeigemodus des Bestätigungspasswortfelds
+// zwischen verdecktem Text und sichtbarem Text. */
   void _toggleConfirmObscureText() {
     setState(() {
       _confirmObscureText = !_confirmObscureText;
@@ -231,6 +240,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+// Diese Funktion zeigt einen Zeitwahl-Dialog an, wenn der Benutzer auf das Startzeit-Feld klickt, und aktualisiert die ausgewählte Startzeit.
   Future<void> _selectStartTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -262,6 +272,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//Diese Funktion zeigt einen Zeitwahl-Dialog an, wenn der Benutzer auf das Endzeit-Feld klickt, und aktualisiert die ausgewählte Endzeit.
   Future<void> _selectEndTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -292,14 +303,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       });
     }
   }
-
+//**  Diese Funktion aktualisiert den aktuellen Registrierungszustand 
+//(wie "Mandatory Info" oder "Optional Bio Info") und den Anzeigeindex des Fortschrittsbalkens. */
   void _updateViewState(RegisterPageViewState viewState, int viewIndex) {
     setState(() {
       _viewState = viewState;
       _stepIndex = viewIndex;
     });
   }
-
+//**Diese Funktion wird aufgerufen, wenn der Benutzer ein Avatar-Bild auswählt.
+// Sie aktualisiert das ausgewählte Avatar-Bild im Registrierungsformular. */
   void onAvatarSelected(String? avatar) {
     setState(() {
       _avatarImage = avatar;

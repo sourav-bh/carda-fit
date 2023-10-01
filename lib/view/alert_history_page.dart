@@ -26,6 +26,8 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
     _loadData();
   }
 
+//**Diese Funktion wird aufgerufen, um die Daten für die Alarmverlaufseite zu laden.
+//Sie ruft die Liste der Alarmverlaufselemente aus der lokalen Datenbank ab und aktualisiert den Zustand der Seite, um die Daten darzustellen. */
   _loadData() async {
     List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryList();
     setState(() {
@@ -34,6 +36,9 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
     });
   }
 
+//**Diese Funktion gibt ein Icon zurück, das auf den Status eines Alarmverlaufselements hinweist.
+//Sie akzeptiert einen TaskStatus als Eingabe und gibt ein entsprechendes Icon zurück, das den Status visualisiert.
+//Zum Beispiel ein grünes Häkchen für "completed" (erledigt) oder ein rotes Ausrufezeichen für "missed" (verpasst). */
   Icon _getStatusIcon(TaskStatus status) {
     switch (status) {
       case TaskStatus.completed:
@@ -49,6 +54,10 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
     }
   }
 
+//**Diese Funktion gibt einen Bildpfad zurück, der einem bestimmten TaskType entspricht.
+//Sie akzeptiert einen TaskType als Eingabe und gibt den Pfad zu einer Bilddatei zurück,
+// die diesem TaskType zugeordnet ist. Dieses Bild wird verwendet,
+// um den Typ des Alarms zu visualisieren. */
   String _getIconForTaskType(TaskType type) {
     switch (type) {
       case TaskType.steps:

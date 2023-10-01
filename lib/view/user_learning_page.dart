@@ -20,6 +20,7 @@ class UserLearningPage extends StatefulWidget {
   _UserLearningPageState createState() => _UserLearningPageState();
 }
 
+// Diese Klasse steuert die Suche in der Liste von Rezepten.
 class CustomSearchDelegate extends SearchDelegate {
   List<LearningMaterialInfo> searchTerms = [];
 
@@ -50,6 +51,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Hier werden die Ergebnisse generiert
   Widget buildResults(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -77,6 +79,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  // Hier werden die Vorschläge generiert.
   Widget buildSuggestions(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -112,6 +115,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
+// Diese Klasse ist der Zustand der UserLearningPage und steuert die Anzeige der Lernmaterialien.
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
   final List<LearningMaterialInfo> _learningMaterials =
@@ -127,6 +131,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
     _loadData();
   }
 
+//Hier werden die erforderlichen Daten geladen.
   _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -148,6 +153,10 @@ class _UserLearningPageState extends State<UserLearningPage> {
     }
   }
 
+// *Hier werden die Daten aus der Excel Tablle geladen. Die erforderlichen Daten aus den relevanten Zellen in der Excel-Tabelle werden extrahiert.
+// * Zudem wird gefiltert, dass nur relevante Rezepte angezeigt werden, die dem gewählten UserCondition entsprechen.
+// */
+  
   _loadContentsFromAsset(bool isFiltered, String? filerCondition) async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);

@@ -28,7 +28,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Orientation preferred:
+  // Hier wird die präferierte Bildschirmorientierung auf vertikal gesetzt und somit die horizontale Bildschirmansicht blockiert.
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -53,7 +53,9 @@ void main() async {
   runApp(const CardaFitApp());
 }
 
-// Diese Methode konfiguriert Firebase und abonniert ein FCM-Thema.
+//**Diese Funktion konfiguriert Firebase Cloud Messaging (FCM) in der App.
+//Sie fordert Benutzerberechtigungen für das Empfangen von Benachrichtigungen an, abonniert ein FCM-Thema ('team'), ruft das FCM-Token ab und aktualisiert es auf dem Server, wenn der Benutzer angemeldet ist.
+//Die Funktion registriert auch Handler für das Verarbeiten von FCM-Nachrichten im Vordergrund und im Hintergrund der App. */
 _setupFireBase() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -86,7 +88,9 @@ _setupFireBase() async {
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 }
 
-  // Handler für Benachrichtigungen im Vordergrund der App.
+//**Dies ist der Handler für eingehende FCM-Benachrichtigungen, wenn die App im Vordergrund läuft.
+//Der Handler überprüft, ob der Benutzer Benachrichtigungen snoozed hat und erstellt dann einen Eintrag in der lokalen Datenbank für die empfangene Benachrichtigung.
+//Je nach Bedingungen öffnet er die TaskAlertPage, um dem Benutzer Details zur Benachrichtigung anzuzeigen. */
 Future<void> foregroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the foreground: ${message.data}');
 
@@ -134,7 +138,9 @@ Future<void> foregroundHandler(RemoteMessage message) async {
   }
 }
 
-// Handler für Benachrichtigungen im Hintergrund der App.
+//**Dies ist der Handler für eingehende FCM-Benachrichtigungen, wenn die App im Hintergrund läuft.
+//Der Handler überprüft ähnlich wie der foregroundHandler, ob der Benutzer Benachrichtigungen snoozed hat und erstellt einen Eintrag in der lokalen Datenbank.
+//Falls die Benachrichtigung nicht gesnoozed wurde, zeigt der Handler eine lokale Benachrichtigung an. */
 Future<void> backgroundHandler(RemoteMessage message) async {
   print('Remote notification message data whilst in the background: ${message.data}');
 
@@ -190,13 +196,15 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   }
 }
 
-// Diese Klasse enthält Methoden zum Überprüfen, ob ein Benutzer angemeldet ist.
+//**Diese Funktion überprüft, ob der Benutzer in der App angemeldet ist.
+//Sie prüft das Vorhandensein eines Benutzernamens in den Shared Preferences. */
 _checkIfUserLoggedIn() async {
   bool isUserExist = await SharedPref.instance.hasValue(SharedPref.keyUserName);
   return isUserExist;
 }
 
-// Überprüfen, ob es ein neuer Tag ist und einige Aktionen ausführen.
+//**Diese Funktion überprüft, ob ein neuer Tag angebrochen ist.
+//Sie vergleicht den zuletzt geöffneten Tag mit dem aktuellen Tag und setzt die täglichen Ziele zurück, wenn ein neuer Tag beginnt. */
 _checkIfItsANewDay() async {
   String? lastOpenDay = await SharedPref.instance.getValue(SharedPref.keyLastAppOpenDay);
   String currentDay = DateFormat('yMd').format(DateTime.now());
@@ -209,7 +217,10 @@ _checkIfItsANewDay() async {
     await DatabaseHelper.instance.clearAlertHistoryTable();
   }
 }
-// Initialisieren des Plugins und Anfordern von Berechtigungen.
+
+//**Diese Funktion initialisiert das lokale Benachrichtigungsplugin (flutterLocalNotificationsPlugin).
+//Sie fordert auch Berechtigungen für Benachrichtigungen auf verschiedenen Plattformen (Android/iOS) an
+// und konfiguriert die Initialisierungseinstellungen für die Benachrichtigungen. */
 void initLocalNotificationPlugin() async {
   _requestPermissions();
 
@@ -226,7 +237,7 @@ void initLocalNotificationPlugin() async {
   onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
 }
 
- // Anfordern von Berechtigungen für Benachrichtigungen auf verschiedenen Plattformen.
+//**Diese Funktion fordert Benachrichtigungsberechtigungen für Android und iOS an, falls erforderlich. */
 Future<void> _requestPermissions() async {
   if (Platform.isIOS || Platform.isMacOS) {
     await flutterLocalNotificationsPlugin
@@ -255,7 +266,9 @@ Future<void> _requestPermissions() async {
   }
 }
 
-// Handler für das Empfangen von lokalen Benachrichtigungen auf iOS.
+//**Dieser Handler wird aufgerufen, wenn eine lokale Benachrichtigung auf iOS empfangen wird.
+//Ähnlich wie foregroundHandler und backgroundHandler überprüft dieser Handler, 
+//ob der Benutzer die Benachrichtigung gesnoozed hat, erstellt einen Eintrag in der Datenbank und zeigt eine lokale Benachrichtigung an. */
 _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
   print('Remote firebase message whilst for iOS');
 
@@ -308,8 +321,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
         notificationDetails, payload: alertHistoryId.toString());
   }
 }
-
-// Handler für das Empfangen von lokalen Benachrichtigungen.
+//**Dieser Handler wird aufgerufen, wenn eine lokale Benachrichtigung auf iOS empfangen wird,  */
 void _onDidReceiveLocalNotification(NotificationResponse details) async {
   print('Remote firebase message _onDidReceiveLocalNotification');
 
