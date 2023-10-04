@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import '../util/app_constant.dart';
 
+// Diese Klasse repräsentiert eine Seite in der App, auf der Benutzer sich Rezepte anzeigen lassen können.
 class UserLearningPage extends StatefulWidget {
   const UserLearningPage({Key? key}) : super(key: key);
 
@@ -20,7 +21,8 @@ class UserLearningPage extends StatefulWidget {
   _UserLearningPageState createState() => _UserLearningPageState();
 }
 
-// Diese Klasse steuert die Suche in der Liste von Rezepten.
+//**Diese Klasse erweitert SearchDelegate und dient für die Suche nach Rezepten.
+//Sie enthält eine Liste von LearningMaterialInfo-Objekten(Rezepten), auf denen die Suche durchgeführt wird. */
 class CustomSearchDelegate extends SearchDelegate {
   List<LearningMaterialInfo> searchTerms = [];
 
@@ -29,6 +31,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Erstellt die Aktionen in der AppBar während der Suche. Hier wird eine Schaltfläche zum Löschen des Suchbegriffs hinzugefügt.
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
@@ -41,6 +44,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Schaltfläche zum Zurückkehren zur vorherigen Seite während der Suche.
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
@@ -51,7 +55,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
-  //Hier werden die Ergebnisse generiert
+  //Hier werden die Ergebnisse generiert basierend auf der Suchanfrage. Die Ergebnisse werden als Liste zurückgegeben.
   Widget buildResults(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -79,7 +83,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
-  // Hier werden die Vorschläge generiert.
+  //Generiert Suchvorschläge, während der Benutzer den Suchbegriff eingibt. Zeigt eine Liste von Suchvorschlägen an.
   Widget buildSuggestions(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -115,7 +119,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
-// Diese Klasse ist der Zustand der UserLearningPage und steuert die Anzeige der Lernmaterialien.
+//In diesem State werden verschiedene Daten und Logik für die Seite zur Anzeige von Lernmaterialien(Rezepte) verwaltet. */
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
   final List<LearningMaterialInfo> _learningMaterials =
@@ -131,7 +135,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
     _loadData();
   }
 
-//Hier werden die erforderlichen Daten geladen.
+//Hier werden die erforderlichen Daten basierend auf dem Gesundheitszustand des Benutzers geladen.
   _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -153,10 +157,9 @@ class _UserLearningPageState extends State<UserLearningPage> {
     }
   }
 
-// *Hier werden die Daten aus der Excel Tablle geladen. Die erforderlichen Daten aus den relevanten Zellen in der Excel-Tabelle werden extrahiert.
-// * Zudem wird gefiltert, dass nur relevante Rezepte angezeigt werden, die dem gewählten UserCondition entsprechen.
-// */
-  
+//**Diese Methode liest Daten aus einer Excel-Tabelle und erstellt LearningContent-Objekte.
+//Sie filtert die Lernmaterialien basierend auf dem Gesundheitszustand des Benutzers
+// oder zeigt alle an, wenn keine Filterung erforderlich ist. */
   _loadContentsFromAsset(bool isFiltered, String? filerCondition) async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);

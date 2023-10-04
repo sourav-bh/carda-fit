@@ -14,7 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 import '../api/api_manager.dart';
-/* */
+/* Diese Klasse repräsentiert die Benutzerprofilseite in der App.*/
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
 
@@ -22,6 +22,7 @@ class UserProfilePage extends StatefulWidget {
   State<UserProfilePage> createState() => _UserProfilePageState();
 }
 
+// In diesem State werden verschiedene Daten und Logik für die Benutzerprofilseite verwaltet.
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
   String? selectedValue;
@@ -50,7 +51,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
   }
 
-// Hier werden die Nutzerdaten geladen
+// Eine Methode, die die Benutzerinformationen aus einer Datenbank lädt und den _userInfo-State aktualisiert.
   _loadUserInfo() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -78,7 +79,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     await SharedPref.instance.saveIntValue(
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
-// Hier wird überprüft ob ein Avatar ausgewählt wurde 
+// Eine Methode, die aufgerufen wird, wenn der Benutzer ein neues Avatarbild auswählt, und den aktualisierten Avatar-String speichert.
   void onAvatarSelected(String? avatar) {
     setState(() {
       _avatarImage = avatar;
@@ -129,7 +130,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Color transparentOrange = Colors.orange.withOpacity(0);
 
-// Hier wird mittels Größe und Gewicht der BMI berechnet.
+// Hier wird mittels Größe und Gewicht der BMI berechnet und zurückgegeben.
   String _getCalculatedBmiValue(int? weight, int? height) {
     if ((weight != null && weight > 0) && (height != null && height > 0)) {
       return ((weight) / pow(((height) / 100), 2)).toStringAsFixed(1);

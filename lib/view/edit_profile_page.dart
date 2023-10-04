@@ -13,12 +13,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
+//Die Seite hat verschiedene Anzeigemodi, die durch den Enum EditProfilePageViewState repräsentiert werden.
 enum EditProfilePageViewState {
   bioInfo,
   workInfo,
   medicalConditionAndAlert,
 }
 
+//Dies ist eine Klasse, die die gesamte Seite für die Profilbearbeitung darstellt.
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
@@ -26,6 +28,8 @@ class EditProfilePage extends StatefulWidget {
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
+//**Dies ist der zugehörige State für die EditProfilePage. 
+//Der State enthält die Logik für das Anzeigen und Bearbeiten der Benutzerdaten sowie die verschiedenen Anzeigemodi. */
 class _EditProfilePageState extends State<EditProfilePage> {
   final _alertTypeFormKey = GlobalKey<FormState>();
   EditProfilePageViewState _viewState = EditProfilePageViewState.bioInfo;

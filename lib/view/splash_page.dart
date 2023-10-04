@@ -32,7 +32,11 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Check if data is already saved in the database
+
+ //**In der initState-Methode wird überprüft, ob Daten bereits in der Datenbank gespeichert sind (checkDataSaved).
+ // Falls ja, wird nach einer Verzögerung zur nächsten Seite navigiert.
+ //Wenn keine Daten vorhanden sind, werden Übungsdaten und Lernmaterialien aus einer Excel-Datei geladen und
+ // in die Datenbank eingefügt. Dann wird auch zur nächsten Seite navigiert. */
     checkDataSaved().then((isDataSaved) {
       if (isDataSaved) {
         // Data is already saved, go to the next page
@@ -69,8 +73,8 @@ class _SplashPageState extends State<SplashPage> {
     return exercises.isNotEmpty && learningContents.isNotEmpty;
   }
 
-//**Diese Methode lädt Übungsdaten aus einer Excel-Datei (die sich im Annahmefall im Assets-Ordner der App befindet)
-// und fügt sie in eine lokale Datenbank ein. Sie liest Daten aus der Excel-Datei zeilenweise, analysiert Übungsdetails und Schritte. */
+//**Eine Methode zum Laden von Übungsdaten aus einer Excel-Datei im Assets-Ordner der App.
+//Die Daten werden zeilenweise aus der Excel-Datei gelesen, analysiert und in eine lokale Datenbank eingefügt. */
   Future<void> _loadExerciseDataFromAsset() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -145,9 +149,8 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-//** Ähnlich wie _loadExerciseDataFromAsset() lädt diese Methode Lernmaterialien aus einer Excel-Datei und fügt sie in eine lokale Datenbank ein.
-// Sie liest Daten aus der Excel-Datei zeilenweise und erstellt LearningContent-Objekte.
-// */
+//** Ähnlich wie _loadExerciseDataFromAsset() lädt diese Funktion Lernmaterialien aus einer Excel-Datei und fügt sie in eine lokale Datenbank ein.
+// Sie liest Daten aus der Excel-Datei zeilenweise und erstellt LearningContent-Objekte. */
   Future<void> _loadLearningMaterialFromAsset() async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
@@ -178,8 +181,8 @@ class _SplashPageState extends State<SplashPage> {
   }
 
 //**Diese Methode ist für das Navigieren zur nächsten Seite der App verantwortlich. 
-//Sie überprüft anhand von gemeinsam genutzten Präferenzen (Shared Preferences), ob ein Benutzer existiert,
-// und je nach Ergebnis navigiert sie entweder zur Startseite oder zur Anmeldeseite mithilfe von Flutters Navigator. */
+//Sie überprüft anhand von Shared Preferences, ob ein Benutzer existiert,
+//und je nach Ergebnis navigiert sie entweder zur Startseite oder zur Anmeldeseite. */
   _goToNextPage() async {
     bool isUserExist =
         await SharedPref.instance.hasValue(SharedPref.keyUserName);

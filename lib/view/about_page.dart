@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+//** Diese Klasse stellt die About-Us-Seite dar. Sie wird verwendet, um Informationen über die App anzuzeigen, wie beispielsweise die App-Version. */
 class AboutUsPage extends StatefulWidget {
   const AboutUsPage({Key? key}) : super(key: key);
 
@@ -10,6 +11,8 @@ class AboutUsPage extends StatefulWidget {
   _AboutUsPageState createState() => _AboutUsPageState();
 }
 
+//**Dies ist der zugehörige State für die AboutUsPage. 
+//Der State enthält die Logik für das Anzeigen von App-Informationen. */
 class _AboutUsPageState extends State<AboutUsPage> {
 
   String _version = '1.0.0';

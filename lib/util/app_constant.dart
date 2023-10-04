@@ -1,6 +1,8 @@
 import 'package:app/model/exercise.dart';
 import 'package:app/model/learning.dart';
 
+//**Die AppConstant-Klasse enthält Konstanten, die in der gesamten Anwendung verwendet werden, 
+//um bestimmte Einstellungen oder Verhaltensweisen festzulegen. */
 class AppConstant {
   static const productionBuild = false;
   // static const baseURL = "http://10.0.2.2:8075"; // local
@@ -14,6 +16,9 @@ class AppConstant {
   static const breakTaskValue = 1;
 }
 
+//**Die AppCache-Klasse dient dazu, Daten im Anwendungsverlauf zu speichern und
+// sie zwischen verschiedenen Teilen der Anwendung zugänglich zu machen. 
+//Sie wird oft verwendet, um temporäre Daten wie Benutzersitzungen oder zwischengespeicherte Informationen zu verwalten. */
 class AppCache {
   String userName = 'User';
   String userServerId = '';

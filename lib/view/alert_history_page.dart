@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import '../app.dart';
 
+//**Diese Klasse stellt die Alarmverlaufseite dar. Sie wird verwendet, um den Alarmverlauf anzuzeigen, der aus verschiedenen Alarmen besteht, die der Benutzer erhalten hat. */
 class AlertHistoryPage extends StatefulWidget {
   const AlertHistoryPage({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class AlertHistoryPage extends StatefulWidget {
   _AlertHistoryPageState createState() => _AlertHistoryPageState();
 }
 
+//Dies ist der zugehörige State für die AlertHistoryPage. Der State enthält die Logik für das Anzeigen des Alarmverlaufs.
 class _AlertHistoryPageState extends State<AlertHistoryPage> {
 
   final List<AlertHistory> _historyItems = List.empty(growable: true);

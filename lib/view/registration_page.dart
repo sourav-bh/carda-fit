@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+// Ein Enum zur Darstellung der verschiedenen Ansichtszustände der Registrierungsseite, wie "Mandatory Info", "Optional Bio Info" usw.
 enum RegisterPageViewState {
   mandatoryInfo,
   optionalOneBioInfo,
@@ -24,6 +25,8 @@ enum RegisterPageViewState {
   allInfoToSubmit,
 }
 
+//**Diese Klasse stellt die Hauptseite der Registrierung dar.
+//Sie enthält verschiedene Formularelemente und Schritte für die Registrierung. */
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -31,6 +34,8 @@ class RegistrationPage extends StatefulWidget {
   _RegistrationPageState createState() => _RegistrationPageState();
 }
 
+//**Dies ist der zugehörige State für die RegistrationPage.
+//Hier werden die Logik und die Zustände für die Registrierung verwaltet */
 class _RegistrationPageState extends State<RegistrationPage> {
   final _mandatoryFormKey = GlobalKey<FormState>();
   final _alertTypeFormKey = GlobalKey<FormState>();
@@ -227,8 +232,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
-//**Ähnlich wie _toggleObscureText() ändert diese Funktion den Anzeigemodus des Bestätigungspasswortfelds
-// zwischen verdecktem Text und sichtbarem Text. */
+//**Genau wie _toggleObscureText() ändert diese Funktion den Anzeigemodus des Bestätigungspasswortfelds
+// zwischen verdecktem Text und sichtbarem Text. Der einzige Unterschied ist, dass diese Methode, dann aufgerufen wird,
+// wenn das klicken auf das Sichtbarkeits-Symbol erfolgt ist. Erst dann wird das Passwort aufgedeckt. */
   void _toggleConfirmObscureText() {
     setState(() {
       _confirmObscureText = !_confirmObscureText;

@@ -20,6 +20,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
+// Diese Klasse übergibt Informationen über den viewMode und den taskType. 
+// Diese Informationen werden übergeben, damit nachvollziehbar ist welche Art von Task gefordert wird.
 class TaskAlertPageData {
   int viewMode; // 1 for view only, 0 for alert
   int? taskType, taskHistoryId;
@@ -27,6 +29,7 @@ class TaskAlertPageData {
   TaskAlertPageData({required this.viewMode, this.taskType, this.taskHistoryId,});
 }
 
+//Diese Klasse erstellt die Benutzeroberfläche für die 4 vorhandenen Tasks (Wasser,Schritte,Pause,Übung)in der App.
 class TaskAlertPage extends StatefulWidget {
   const TaskAlertPage({Key? key}) : super(key: key);
 
@@ -34,6 +37,7 @@ class TaskAlertPage extends StatefulWidget {
   _TaskAlertPageState createState() => _TaskAlertPageState();
 }
 
+//In diesem State werden Daten und Logik für die Aufgabenseite verwaltet.
 class _TaskAlertPageState extends State<TaskAlertPage> {
   TaskAlertPageData? _taskPageData;
   int? _taskType;
@@ -73,10 +77,10 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     _loadIntent();
   }
 
-//* Hier werden die relevanten Daten für die Task Page geladen. Zuerst werden Informationen aus dem TaskAlertPageData-Objekt abgerufen, das die Ansichtsmodusinformationen und den Typ der Aufgabe enthält. 
-//  Wenn der Aufgabentyp ein Übungstyp ist (z. B. Fitnessübung oder Teamübung), werden die Übungsinformationen geladen. Andernfalls werden Informationen zu anderen Aufgabentypen (z. B. Trinken von Wasser, Schritte, Pausen) geladen.
-//  Für Übungen wird eine zufällige Übung aus einer vordefinierten Liste von Übungen ausgewählt und die Details dieser Übung (Titel, Schritte, Dauer usw.) angezeigt.
-//  Für andere Aufgabentypen werden entsprechende Informationen angezeigt, z. B. Trinken von Wasser oder Zeit für Pausen und Schritte. */
+//**Diese Methode wird aufgerufen, um die relevanten Daten für die Aufgabenseite zu laden.
+//Sie ruft Informationen aus dem TaskAlertPageData-Objekt ab, das den Ansichtsmodus und den Aufgabentyp enthält.
+//Abhängig vom Aufgabentyp werden unterschiedliche Daten geladen, z.B., Übungsdaten, Informationen zu Wassertrinken, Schritten oder Pausen.
+//Die Methode enthält auch Logik zur Auswahl und Anzeige von Übungsinformationen, einschließlich der Fortschrittsdauer. */
   _loadIntent() async {
     _taskPageData = ModalRoute.of(context)?.settings.arguments as TaskAlertPageData;
     _taskType = _taskPageData?.taskType;
@@ -158,9 +162,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
-//*Hier werden wieder Daten aus einer Excel-Tabelle extrahiert. Die Funktion liest die Übungsdaten aus der Datei aus und erstellt eine Liste von Übungsinformationen, einschließlich Schritten und anderen relevanten Daten.
-// Die Übungen werden basierend auf den in der Datei angegebenen Bedingungen gefiltert, um nur relevante Übungen zu behalten. Zudem werden sie in der App-Cache gespeichert.
-// */
+//**Diese Methode wird verwendet, um Übungsdaten aus einer Excel-Tabelle zu extrahieren.
+//Sie liest die Excel-Datei aus den Assets und erstellt eine Liste von Übungen, einschließlich ihrer Schritte und anderer relevanter Daten.
+//Die Übungen werden basierend auf den in der Datei angegebenen Bedingungen gefiltert und im App-Cache gespeichert. */
   _loadExerciseDataFromAsset() async {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
@@ -251,7 +255,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
     return false;
   }
-/* */
+/**Diese Methode lädt Metadaten von einer Webseite anhand einer URL mithilfe des any_link_preview-Pakets.
+//Die Metadaten werden für die Anzeige von Vorschauinformationen verwendet. */
   _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
         link: url, cache: const Duration(days: 7),

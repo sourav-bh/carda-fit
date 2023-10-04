@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 
 import '../model/user_info.dart';
 
+//**Dies ist eine Klasse, die die gesamte Seite für die HomePage darstellt.
+// Sie enthält tägliche Fitnessziele, Lernmaterialien und Optionen zur Einstellung der Snooze-Zeit. */
 class HomePage extends StatefulWidget {
   final void Function(int)? onTabSwitch;
 
@@ -21,6 +23,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+//** Dies ist der zugehörige State für die HomePage. 
+//Der State enthält die Logik für das Laden von Daten und das Verwalten der Snooze-Zeit.*/
 class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials =

@@ -24,6 +24,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+//**Diese Klasse stellt die LandingPage der App dar. 
+//Sie enthält eine Navigationsleiste (BottomNavigationBar) und einen PageView, um zwischen verschiedenen Ansichten zu wechseln. */
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
 
@@ -31,6 +33,9 @@ class LandingPage extends StatefulWidget {
   _LandingPageState createState() => _LandingPageState();
 }
 
+//**Dies ist der zugehörige State für die LandingPage. 
+//Hier wird die Logik für das Navigieren zwischen den Tabs und das Laden von Daten aus Excel-Dateien behandelt.
+//Wichtige Teile dieses States sind: */
 class _LandingPageState extends State<LandingPage> {
   late PageController _pageController;
   int _currentIndex = 0;
@@ -45,6 +50,7 @@ class _LandingPageState extends State<LandingPage> {
     _contentPages.add(const LeaderBoardPage());
     _contentPages.add(const UserProfilePage());
 
+//Ein PageController, der die Seitenansicht für die verschiedenen Tabs steuert.
     _pageController = PageController(initialPage: 0);
     _pageController.addListener(_handleTabSelection);
 

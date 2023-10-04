@@ -5,6 +5,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/user_activity_item.dart';
 import 'package:flutter/material.dart';
 
+//Diese Klasse repräsentiert eine Seite in der App, auf der Benutzer sich ihre täglichen Aktivitätsziele und deren Fortschritt anzeigen lassen können.
 class UserActivityPage extends StatefulWidget {
   const UserActivityPage({Key? key}) : super(key: key);
 
@@ -12,6 +13,7 @@ class UserActivityPage extends StatefulWidget {
   _UserActivityPageState createState() => _UserActivityPageState();
 }
 
+//In diesem State werden Daten und Logik für die Seite zur Anzeige von Aktivitätszielen und deren Fortschritt verwaltet.
 class _UserActivityPageState extends State<UserActivityPage> {
   DailyTarget? _dailyTarget;
   DailyTarget? _completedJobs;
@@ -28,7 +30,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
     _loadDailyTarget();
   }
 
-// Hier werden die täglichen Ziele geladen.
+// Diese Funktion lädt die täglichen Aktivitätsziele und abgeschlossenen Aufgaben aus den Shared Preferences und aktualisiert den Zustand des Widgets.
   _loadDailyTarget() async {
     var targetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserTargets);
     if (targetJson != null && targetJson is String && targetJson.isNotEmpty) {

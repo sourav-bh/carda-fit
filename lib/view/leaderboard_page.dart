@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+//**Dies ist die Klasse, die die Leaderbord Seite darstellt. */
 class LeaderBoardPage extends StatefulWidget {
   const LeaderBoardPage({Key? key}) : super(key: key);
 
@@ -19,6 +20,9 @@ class LeaderBoardPage extends StatefulWidget {
   _LeaderBoardPageState createState() => _LeaderBoardPageState();
 }
 
+
+//**Dies ist der zugehörige State für die LeaderBoardPagee.
+//Hier werden die Logik und die Zustände für die LeaderboardPage verwaltet */
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
   final List<UserInfo> _teamMembersList = List.empty(growable: true);
   String? _currentUserName;

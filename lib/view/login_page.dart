@@ -11,6 +11,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Diese Klasse repräsentiert die Anmeldeseite der App.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -18,6 +19,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+//Diese Klasse verwaltet die Zustände und Logik der Login-Page..
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _userNameText = TextEditingController();
   final TextEditingController _passwordText = TextEditingController();

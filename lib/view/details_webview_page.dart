@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+//Diese Klasse epräsentiert die Seite, auf der die Webansicht für die Inhalte angezeigt wird.
 class DetailsWebPage extends StatefulWidget {
   const DetailsWebPage({Key? key}) : super(key: key);
 
@@ -14,6 +15,8 @@ class DetailsWebPage extends StatefulWidget {
   _DetailsWebState createState() => _DetailsWebState();
 }
 
+//**Dies ist der zugehörige State für die DetailsWebPage. 
+//Der State enthält die Logik für die Webansicht und die Anzeige der Inhalte. */
 class _DetailsWebState extends State<DetailsWebPage> {
   bool _loading = true;
   late WebViewController _webViewController;
