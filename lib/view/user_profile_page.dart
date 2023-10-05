@@ -55,15 +55,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
   _loadUserInfo() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-        String? userId = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
+        String? avatar = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
-        _avatarImage = userInfo.avatarImage;
+        _avatarImage = avatar;
       });
     }
       if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-        await ApiManager().updateAvatarInfo(userId!, _avatarImage!);
+        await ApiManager().updateAvatarInfo(avatar!, _avatarImage!);
       }
   }
 
@@ -80,11 +80,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 // Eine Methode, die aufgerufen wird, wenn der Benutzer ein neues Avatarbild auswählt, und den aktualisierten Avatar-String speichert.
-  void onAvatarSelected(String? avatar) {
+  void onAvatarSelected(String? avatar) async{
     setState(() {
       _avatarImage = avatar;
-      SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
     });
+       await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    if (userInfo != null) {
+      userInfo.avatarImage = avatar;
+      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userDbId);
+    }
+
+    if (_avatarImage != null && _avatarImage!.isNotEmpty) {
+      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
+    }
   }
 /* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
