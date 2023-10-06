@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 
 class ApiClient {
 
+
+// copy the method and create a new method (getrequesturl) pass in whole url 
   Future<http.Response> getRequest(String apiEndPoint) async {
     var url = Uri.parse(Uri.encodeFull('${AppConstant.baseURL}$apiEndPoint'));
     final http.Response response = await http.get(url,

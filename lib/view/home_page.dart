@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-//** Dies ist der zugehörige State für die HomePage. 
+//** Dies ist der zugehörige State für die HomePage.
 //Der State enthält die Logik für das Laden von Daten und das Verwalten der Snooze-Zeit.*/
 class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
   }
 
 //**Diese Funktion lädt Lerninhalte in die _learningMaterials-Liste.
-//Wenn die Liste AppCache.instance.contents nicht leer ist, wird der erste Lerninhalt ausgewählt 
+//Wenn die Liste AppCache.instance.contents nicht leer ist, wird der erste Lerninhalt ausgewählt
 //und in die Liste _learningMaterials hinzugefügt. */
   _loadLearningContent() async {
     if (AppCache.instance.contents.isNotEmpty) {
@@ -111,8 +111,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-//**Diese Funktion lädt den aktuellen Fortschritt des Benutzers. 
-//Sie ruft die abgeschlossenen Aufgaben des Benutzers aus den SharedPreferences ab und berechnet den Fortschritt. 
+//**Diese Funktion lädt den aktuellen Fortschritt des Benutzers.
+//Sie ruft die abgeschlossenen Aufgaben des Benutzers aus den SharedPreferences ab und berechnet den Fortschritt.
 //Der Fortschritt wird in Prozent berechnet und in der Variable _currentUserProgress gespeichert. */
   _loadCurrentProgress() async {
     var completedJson = await SharedPref.instance
@@ -153,85 +153,93 @@ class _HomePageState extends State<HomePage> {
               opacity: const AlwaysStoppedAnimation(.5),
             ),
           ),
-Align(
-  alignment: Alignment(1.0, -0.8),
-  child: Padding(
-    padding: const EdgeInsets.all(20),
-    child: GestureDetector(
-      onTap: () {
-        _showSnoozeTimeSelected(context);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.snooze, size: 20, color: Colors.black),
-              const SizedBox(width: 10),
-              const Text('Mitteilungen stumm'),
-            ],
-          ),
-        ),
-      ),
-    ),
-  ),
-),
-
           Align(
             alignment: Alignment.topCenter,
             child: ListView(
               children: [
                 Visibility(
-                  visible: true,
-                  child: Container(
-                    margin: EdgeInsets.fromLTRB(10, 20,
-                        (MediaQuery.of(context).size.width / 2) - 50, 10),
+                    visible: true,
                     child: Container(
-                      padding: const EdgeInsets.all(5),
-                      child: RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: DataLoader
-                                    .quotes[AppCache.instance.quoteIndex],
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.copyWith(
-                                      color: AppColor.darkBlue,
-                                      fontSize: 24,
-                                      fontStyle: FontStyle.normal,
-                                    )),
-                            TextSpan(
-                              text:
-                                  '\n ${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(
-                                      color: Colors.black54,
-                                      fontSize: 16,
-                                      fontStyle: FontStyle.italic),
-                            ),
-                          ],
-                        ),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 10.0, top: 10.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        // Zitat
+                                        TextSpan(
+                                          text: DataLoader.quotes[
+                                              AppCache.instance.quoteIndex],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                color: AppColor.darkBlue,
+                                                fontSize: 24,
+                                                fontStyle: FontStyle.normal,
+                                              ),
+                                        ),
+                                        // Zitatautor
+                                        TextSpan(
+                                          text:
+                                              '\n${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                color: Colors.black54,
+                                                fontSize: 16,
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showSnoozeTimeSelected(context);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.snooze,
+                                                size: 20, color: Colors.black),
+                                            const SizedBox(width: 10),
+                                            const Text('Stummschalten'),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )),
                       ),
-                    ),
-                  ),
-                ),
+                    )),
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   padding: const EdgeInsets.all(15),
