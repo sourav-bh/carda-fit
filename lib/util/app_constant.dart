@@ -25,7 +25,7 @@ class AppCache {
   int userDbId = 0;
   int quoteIndex = 0;
   List<Exercise> exercises = [];
-  List<LearningContent> contents = [];
+  List<LearningContent> learningContents = [];
   String authToken = "";
   String fcmToken = "";
   bool didNotificationLaunchApp = false;

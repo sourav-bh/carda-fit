@@ -243,7 +243,7 @@ class _LandingPageState extends State<LandingPage> {
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
 
-    AppCache.instance.contents.clear();
+    AppCache.instance.learningContents.clear();
     List<LearningContent> learningContents = [];
     for (var table in excel.tables.keys) {
       Sheet? sheet = excel.tables[table];
@@ -259,7 +259,7 @@ class _LandingPageState extends State<LandingPage> {
           content.contentUri = linkCell?.value.toString();
           learningContents.add(content);
 
-          AppCache.instance.contents.add(content);
+          AppCache.instance.learningContents.add(content);
           DatabaseHelper.instance.addLearningContent(content);
         }
 

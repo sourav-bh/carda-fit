@@ -51,7 +51,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _designationText = TextEditingController();
 
   Gender? _genderValue;
-  WalkingSpeed? _walkingSpeedValue;
+  WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
   JobType? _jobTypeValue;
   String? _avatarImage;
 
@@ -177,6 +177,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
+      walkingSpeed: _walkingSpeedValue.toString().split('.').last,
       teamName: AppConstant.teamNameForCustomBuild,
       score: 0,
       jobPosition: designation,
@@ -736,9 +737,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 10),
                     children: const {
-                      WalkingSpeed.fast: Text('schnell'),
-                      WalkingSpeed.medium: Text('medium'),
-                      WalkingSpeed.slow: Text('langsam'),
+                      WalkingSpeed.fast: Text('Schnell'),
+                      WalkingSpeed.medium: Text('Medium'),
+                      WalkingSpeed.slow: Text('Langsam'),
                     },
                     onValueChanged: (groupValue) {
                       setState(() {

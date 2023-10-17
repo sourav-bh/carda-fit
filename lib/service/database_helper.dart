@@ -53,8 +53,8 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version: 7,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
+      onCreate: _onCreate, // new users
+      onUpgrade: _onUpgrade, // old users
     );
   }
 
@@ -199,6 +199,7 @@ class DatabaseHelper {
         'ADD workingDays VARCHAR,'
         'ADD workStartTime VARCHAR,'
         'ADD workEndTime VARCHAR,'
+        'ADD walkingSpeed VARCHAR,'
         'ADD diseases VARCHAR,'
         'ADD preferredAlerts VARCHAR,'
         'ADD isMergedAlertSet INTEGER;');

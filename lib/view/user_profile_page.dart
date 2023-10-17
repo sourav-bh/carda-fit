@@ -6,6 +6,7 @@ import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_picker_dialog.dart';
 import 'package:flutter/foundation.dart';
@@ -221,13 +222,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   },
                                 );
                               },
-                              child: Icon(Icons.edit, size: 20),
                               style: ElevatedButton.styleFrom(
-                                shape: CircleBorder(),
-                                padding: EdgeInsets.all(8),
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(8),
                                 primary: Colors.white,
                                 elevation: 0,
                               ),
+                              child: const Icon(Icons.edit, size: 20),
                             ),
                           ),
                         ],
@@ -320,8 +321,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             context: context,
                             icon: Icons.notifications,
                             label: 'Alarme:',
-                            value: _userInfo?.preferredAlerts ??
-                                "Nicht ausgewählt",
+                            value: CommonUtil.convertPreferredAlertNames(
+                                _userInfo?.preferredAlerts ?? "Nicht ausgewählt"),
                           ),
                         ],
                       ),

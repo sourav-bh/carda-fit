@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:app/app.dart';
+import 'package:app/model/learning.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
+
   SnoozeTime? _selectedSnoozeTimeVal;
   final List<SnoozeTime> _snoozeTimeItems = [
     SnoozeTime(duration: const Duration(minutes: 5), isSelected: false),
@@ -47,7 +49,7 @@ class _HomePageState extends State<HomePage> {
 
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
 
-    // _createRandomAlerts();
+    _checkSnoozeTimeStatus();
     _loadCurrentProgress();
     _loadLearningContent();
   }
@@ -57,7 +59,7 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
   }
 
-/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit,
    *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 
-/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
    *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
    * */
@@ -100,9 +102,9 @@ class _HomePageState extends State<HomePage> {
 //Wenn die Liste AppCache.instance.contents nicht leer ist, wird der erste Lerninhalt ausgewählt
 //und in die Liste _learningMaterials hinzugefügt. */
   _loadLearningContent() async {
-    if (AppCache.instance.contents.isNotEmpty) {
+    if (AppCache.instance.learningContents.isNotEmpty) {
       var info = await LearningMaterialInfo.copyContentFromLink(
-          AppCache.instance.contents.first);
+          AppCache.instance.learningContents.first);
       if (mounted) {
         setState(() {
           _learningMaterials.add(info);
@@ -160,86 +162,84 @@ class _HomePageState extends State<HomePage> {
                 Visibility(
                     visible: true,
                     child: Container(
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 10.0, top: 10.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: RichText(
-                                    text: TextSpan(
-                                      children: <TextSpan>[
-                                        // Zitat
-                                        TextSpan(
-                                          text: DataLoader.quotes[
-                                              AppCache.instance.quoteIndex],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.copyWith(
-                                                color: AppColor.darkBlue,
-                                                fontSize: 24,
-                                                fontStyle: FontStyle.normal,
-                                              ),
-                                        ),
-                                        // Zitatautor
-                                        TextSpan(
-                                          text:
-                                              '\n${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.copyWith(
-                                                color: Colors.black54,
-                                                fontSize: 16,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
+                      padding: const EdgeInsets.all(5),
+                      child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 10.0, top: 10.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      // Zitat
+                                      TextSpan(
+                                        text: DataLoader.quotes[
+                                            AppCache.instance.quoteIndex],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              color: AppColor.darkBlue,
+                                              fontSize: 24,
+                                              fontStyle: FontStyle.normal,
+                                            ),
+                                      ),
+                                      // Zitatautor
+                                      TextSpan(
+                                        text:
+                                            '\n${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              color: Colors.black54,
+                                              fontSize: 16,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _showSnoozeTimeSelected(context);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: Offset(0, 3),
-                                          ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showSnoozeTimeSelected(context);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(left: 20),
+                                    decoration: CommonUtil.getRectangleBoxDecoration(
+                                        _selectedSnoozeTimeVal != null
+                                            ? Colors.orangeAccent
+                                            : Colors.white70,
+                                        10
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.snooze, size: 20, color: Colors.black),
+                                          const SizedBox(height: 0),
+                                          Text(_selectedSnoozeTimeVal != null
+                                              ? '${_selectedSnoozeTimeVal!.duration.inMinutes} min'
+                                              : 'Snooze'),
                                         ],
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.snooze,
-                                                size: 20, color: Colors.black),
-                                            const SizedBox(width: 10),
-                                            const Text('Stummschalten'),
-                                          ],
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ),
-                              ],
-                            )),
+                              ),
+                            ],
+                          )
                       ),
-                    )),
+                    )
+                ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   padding: const EdgeInsets.all(15),

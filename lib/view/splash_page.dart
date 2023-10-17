@@ -68,10 +68,11 @@ class _SplashPageState extends State<SplashPage> {
   Future<bool> checkDataSaved() async {
     // bool check if data is saved
     final dbHelper = DatabaseHelper.instance;
-    final exercises = await dbHelper.getExercises();
+    // final exercises = await dbHelper.getExercises();
     final learningContents = await dbHelper.getLearningContents();
+    AppCache.instance.learningContents = learningContents;
 
-    return exercises.isNotEmpty && learningContents.isNotEmpty;
+    return /*exercises.isNotEmpty && */learningContents.isNotEmpty;
   }
 
 //**Eine Methode zum Laden von Übungsdaten aus einer Excel-Datei im Assets-Ordner der App.
@@ -135,20 +136,17 @@ class _SplashPageState extends State<SplashPage> {
             exercise.duration = duration;
             exercise.url = url;
 
-            exercise.stepsJson = json.encode(steps);
-
+            // exercise.stepsJson = json.encode(steps);
             exercise.steps = [];
             exercise.steps?.addAll(steps);
 
-            await dbHelper.addExercise(exercise);
-
-            List<Exercise> exercises = await dbHelper.getExercises();
-
+            // await dbHelper.addExercise(exercise);
+            // List<Exercise> exercises = await dbHelper.getExercises();
               // Deserialize the stepsJson field back into a list of ExerciseStep
-            exercises.forEach((exercise) {
-              List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
-              exercise.steps = stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
-            });
+            // exercises.forEach((exercise) {
+            //   List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
+            //   exercise.steps = stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
+            // });
 
             exerciseName = "";
             duration = 0;
@@ -168,8 +166,7 @@ class _SplashPageState extends State<SplashPage> {
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
 
-    AppCache.instance.contents.clear();
-
+    AppCache.instance.learningContents.clear();
     final dbHelper = DatabaseHelper.instance;
 
     for (var table in excel.tables.keys) {

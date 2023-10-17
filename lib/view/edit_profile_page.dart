@@ -45,7 +45,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       List.filled(CommonUtil.weekdayNames.length, false);
   String? _startTime = '';
   String? _endTime = '';
-  WalkingSpeed? _walkingSpeedValue;
+  WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
 
   final List<String> _conditionItems = [
     'Herz',
@@ -281,6 +281,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
+      walkingSpeed: _walkingSpeedValue.toString().split('.').last,
       jobPosition: designation,
       jobType:
           _jobTypeValue != null ? _jobTypeValue.toString().split('.').last : "",
@@ -537,9 +538,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 10),
                     children: const {
-                      WalkingSpeed.fast: Text('schnell'),
-                      WalkingSpeed.medium: Text('medium'),
-                      WalkingSpeed.slow: Text('langsam'),
+                      WalkingSpeed.fast: Text('Schnell'),
+                      WalkingSpeed.medium: Text('Medium'),
+                      WalkingSpeed.slow: Text('Langsam'),
                     },
                     onValueChanged: (groupValue) {
                       setState(() {

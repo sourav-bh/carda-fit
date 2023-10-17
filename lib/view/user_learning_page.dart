@@ -147,7 +147,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
       });
     }
 
-    _loadContentsFromAsset(true, _userCondition);
+    await _loadContentsFromAsset(true, _userCondition);
 
     if (_learningMaterials.isEmpty) {
       setState(() {
