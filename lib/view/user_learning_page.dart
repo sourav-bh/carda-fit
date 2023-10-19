@@ -108,7 +108,8 @@ class CustomSearchDelegate extends SearchDelegate {
         var result = learningMaterialResults[index];
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, detailsWebRoute, arguments: result.originalContent);
+            Navigator.pushNamed(context, detailsWebRoute,
+                arguments: result.originalContent);
           },
           child: ListTile(
             title: Text(result.title),
@@ -147,14 +148,33 @@ class _UserLearningPageState extends State<UserLearningPage> {
       });
     }
 
+<<<<<<< Updated upstream
     await _loadContentsFromAsset(true, _userCondition);
+=======
+    List<LearningContent> learningContent = await DatabaseHelper.instance
+        .getLearningContents(AppCache.instance.contents);
 
-    if (_learningMaterials.isEmpty) {
+    for (var content in learningContent) {
+      LearningMaterialInfo info =
+          await LearningMaterialInfo.copyContentFromLink(content);
+>>>>>>> Stashed changes
+
       setState(() {
-        _showFilteredList = false;
+        _learningMaterials.add(info);
       });
-      _loadContentsFromAsset(false, null);
     }
+    // for loop that converts each attribute from the list to learningmaterialInfo list
+    // use setState to update UI in the for loop (adding part in the setState method)
+    // copyContentFromLink
+
+    // _loadContentsFromAsset(true, _userCondition);
+
+    // if (_learningMaterials.isEmpty) {
+    //   setState(() {
+    //     _showFilteredList = false;
+    //   });
+    //   _loadContentsFromAsset(false, null);
+    // }
   }
 
 //**Diese Methode liest Daten aus einer Excel-Tabelle und erstellt LearningContent-Objekte.
@@ -278,7 +298,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
                   return GestureDetector(
                     child: UserLearningItemView(itemData: material),
                     onTap: () {
-                      Navigator.pushNamed(context, detailsWebRoute, arguments: material.originalContent);
+                      Navigator.pushNamed(context, detailsWebRoute,
+                          arguments: material.originalContent);
                       // CommonUtil.openUrl(material.videoUrl);
                       // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
                     },

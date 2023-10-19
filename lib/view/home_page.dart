@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
       List.empty(growable: true);
 
   SnoozeTime? _selectedSnoozeTimeVal;
+  List<LearningContent> convertLearningList = [];
+  bool isSelected = false;
   final List<SnoozeTime> _snoozeTimeItems = [
     SnoozeTime(duration: const Duration(minutes: 5), isSelected: false),
     SnoozeTime(duration: const Duration(minutes: 10), isSelected: false),
@@ -46,10 +48,15 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    _checkSnoozeButtonStatus();
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
+<<<<<<< Updated upstream
 
     _checkSnoozeTimeStatus();
+=======
+    isSelected = false;
+    // _createRandomAlerts();
+>>>>>>> Stashed changes
     _loadCurrentProgress();
     _loadLearningContent();
   }
@@ -64,6 +71,7 @@ class _HomePageState extends State<HomePage> {
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
       _selectedSnoozeTimeVal = snoozeTime;
+      isSelected = true;
     });
 
     await SharedPref.instance.saveIntValue(SharedPref.keySnoozeDuration,
@@ -94,6 +102,26 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _selectedSnoozeTimeVal = SnoozeTime(
             duration: Duration(minutes: snoozeDuration), isSelected: true);
+      });
+    }
+  }
+
+  _checkSnoozeButtonStatus() async {
+    int snoozeDuration =
+        await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    int snoozedAt =
+        await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (currentTime - snoozedAt <= snoozeDuration * 60 * 1000) {
+      // Snooze-Zeit ist aktiv
+      setState(() {
+        isSelected = true; // Button ist orange
+      });
+    } else {
+      // Snooze-Zeit ist abgelaufen
+      setState(() {
+        isSelected = false; // Button ist transparent
       });
     }
   }
@@ -203,6 +231,7 @@ class _HomePageState extends State<HomePage> {
                                     ],
                                   ),
                                 ),
+<<<<<<< Updated upstream
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -231,6 +260,43 @@ class _HomePageState extends State<HomePage> {
                                               : 'Snooze'),
                                         ],
                                       ),
+=======
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _checkSnoozeButtonStatus(); // Überprüfe den Button-Status
+                                      _showSnoozeTimeSelected(context);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? Colors.orangeAccent
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.snooze,
+                                                size: 25, color: Colors.black),
+                                            const SizedBox(width: 10),
+                                            Text('Stummschalten',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontSize: 16,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                    )),
+                                          ],
+                                        ),
+                                      ),
+>>>>>>> Stashed changes
                                     ),
                                   ),
                                 ),
@@ -520,9 +586,9 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             onTap: () {
-                              Navigator.pushNamed(context, detailsWebRoute);
-                              // CommonUtil.openUrl(material.videoUrl);
-                              // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
+                              Navigator.pushNamed(context, detailsWebRoute,
+                                  arguments:
+                                      _learningMaterials.first.originalContent);
                             },
                           );
                         },

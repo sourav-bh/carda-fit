@@ -68,9 +68,14 @@ class _SplashPageState extends State<SplashPage> {
   Future<bool> checkDataSaved() async {
     // bool check if data is saved
     final dbHelper = DatabaseHelper.instance;
+<<<<<<< Updated upstream
     // final exercises = await dbHelper.getExercises();
     final learningContents = await dbHelper.getLearningContents();
     AppCache.instance.learningContents = learningContents;
+=======
+    final exercises = await dbHelper.getExercises();
+    final learningContents = await dbHelper.getLearningContents(AppCache.instance.contents);
+>>>>>>> Stashed changes
 
     return /*exercises.isNotEmpty && */learningContents.isNotEmpty;
   }

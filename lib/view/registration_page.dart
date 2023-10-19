@@ -49,11 +49,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _weightText = TextEditingController();
   final TextEditingController _heightText = TextEditingController();
   final TextEditingController _designationText = TextEditingController();
+  final TextEditingController _keywordAPI = TextEditingController();
 
   Gender? _genderValue;
   WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
   JobType? _jobTypeValue;
   String? _avatarImage;
+  List<String> keywords = [];
+  List<String> apiResults = [];
 
   bool _obscureText = true, _confirmObscureText = true;
   IconData _iconVisible = Icons.visibility_off;
@@ -111,6 +114,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void dispose() {
     super.dispose();
   }
+
 //**Diese Funktion wird aufgerufen, wenn auf den "Weiter"-Button geklickt wird. Sie steuert den Fortschritt des Registrierungsprozesses,
 // indem sie je nach aktuellem Zustand des Registrierungsformulars zur nächsten Ansicht wechselt oder die Registrierung abschließt. */
   void _nextAction() async {
@@ -220,6 +224,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//** */
+  void _addToKeywords() async{
+    setState(() {
+      String text = _keywordAPI.text.trim();
+      if (text.isNotEmpty) {
+        keywords.add(text);
+        _keywordAPI.clear();
+      }
+    });
+    await _fetchDataFromAPI();
+  }
+
+
+  Future<void> _fetchDataFromAPI() async {
+    for (String keyword in keywords) {
+      // Verwende die neue Methode, um Daten von der API abzurufen
+      String result = await fetchDataForKeyword(keyword);
+      setState(() {
+        apiResults.add(result);
+        print(result);
+      });
+    }
+  }
+
 //**Diese Funktion ändert den Anzeigemodus des Passwortfelds zwischen verdecktem Text und sichtbarem Text.
 // Sie wird aufgerufen, wenn der Benutzer auf das "Sichtbarkeits"-Symbol im Passwortfeld klickt. */
   void _toggleObscureText() {
@@ -310,7 +338,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       });
     }
   }
-//**  Diese Funktion aktualisiert den aktuellen Registrierungszustand 
+
+//**  Diese Funktion aktualisiert den aktuellen Registrierungszustand
 //(wie "Mandatory Info" oder "Optional Bio Info") und den Anzeigeindex des Fortschrittsbalkens. */
   void _updateViewState(RegisterPageViewState viewState, int viewIndex) {
     setState(() {
@@ -318,6 +347,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _stepIndex = viewIndex;
     });
   }
+
 //**Diese Funktion wird aufgerufen, wenn der Benutzer ein Avatar-Bild auswählt.
 // Sie aktualisiert das ausgewählte Avatar-Bild im Registrierungsformular. */
   void onAvatarSelected(String? avatar) {
@@ -730,7 +760,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         ?.copyWith(fontSize: 16),
                   ),
                 ),
-                  SizedBox(
+                SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
                     groupValue: _walkingSpeedValue,
@@ -748,7 +778,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     },
                   ),
                 ),
-                 const SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 TextField(
@@ -1045,6 +1075,61 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         .bodyLarge
                         ?.copyWith(fontSize: 16, color: Colors.white),
                   ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Text(
+                    'weitere Beeinträchtigungen',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        controller: _keywordAPI,
+                        onSubmitted: (value) => _addToKeywords(),
+                        decoration: InputDecoration(
+                          hintText: 'Geben Sie die Beeinträchtigung ein',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: _addToKeywords, 
+                                    
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50, // Höhe des Scrollbereichs anpassen
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: keywords.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.orange),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(keywords[index]),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 20,

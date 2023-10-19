@@ -20,6 +20,21 @@ class ApiClient {
     return response;
   }
 
+  Future<http.Response> compareRequest(String keyword) async {
+  // Construct the API endpoint with the custom keyword
+  var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
+
+  var url = Uri.parse(Uri.encodeFull(apiEndPoint));
+  final http.Response response = await http.get(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+ 
+  return response;
+}
+
   Future<http.Response> postRequest(String apiEndPoint, Map<String, dynamic> body) async {
     var url = Uri.parse(Uri.encodeFull('${AppConstant.baseURL}$apiEndPoint'));
     final http.Response response = await http.post(url,

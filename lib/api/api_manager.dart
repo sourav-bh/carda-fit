@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:app/api/api_client.dart';
 import 'package:app/model/user_info.dart';
+import 'package:http/http.dart' as http;
 
 class ApiManager {
   ApiManager();
@@ -156,3 +157,20 @@ class ApiManager {
     }
   }
 }
+
+Future<String> fetchDataForKeyword(String keyword) async {
+    var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
+    var url = Uri.parse(Uri.encodeFull(apiEndPoint));
+    final http.Response response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      // Hier kannst du Fehlerbehandlung hinzufügen, wenn die API-Anfrage fehlschlägt
+      return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
+    }
+  }

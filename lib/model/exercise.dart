@@ -39,11 +39,13 @@ class Exercise {
       url: json["url"],
       duration: json["duration"],
       difficultyLevel: json["difficulty_level"],
-      steps: List<ExerciseStep>.from(
-          json["steps"].map((x) => ExerciseStep.fromMap(x))),
+       stepsJson: json["steps_json"],
+    steps: (json["steps_json"] as List<dynamic>)
+        .map((stepJson) => ExerciseStep.fromMap(stepJson as Map<String, dynamic>))
+        .toList(),
       createdAt: json["created_at"],
       condition: json["condition"],
-      stepsJson: json["steps_json"]);
+     );
 
   Map<String, dynamic> toMap() => {
         "id": id,
@@ -52,11 +54,11 @@ class Exercise {
         "url": url,
         "duration": duration,
         "difficulty_level": difficultyLevel,
+        "steps_json": stepsJson,
         "steps": steps != null
             ? List<dynamic>.from(steps!.map((x) => x.toMap()))
             : null,
         "created_at": createdAt,
         "condition": condition,
-        "steps_json": stepsJson
       };
 }
