@@ -50,13 +50,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _checkSnoozeButtonStatus();
     _dailyFitnessItems.addAll(FitnessItemInfo.generateDummyList());
-<<<<<<< Updated upstream
 
     _checkSnoozeTimeStatus();
-=======
-    isSelected = false;
-    // _createRandomAlerts();
->>>>>>> Stashed changes
+
     _loadCurrentProgress();
     _loadLearningContent();
   }
@@ -231,7 +227,6 @@ class _HomePageState extends State<HomePage> {
                                     ],
                                   ),
                                 ),
-<<<<<<< Updated upstream
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -260,43 +255,6 @@ class _HomePageState extends State<HomePage> {
                                               : 'Snooze'),
                                         ],
                                       ),
-=======
-                                Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _checkSnoozeButtonStatus(); // Überprüfe den Button-Status
-                                      _showSnoozeTimeSelected(context);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? Colors.orangeAccent
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.snooze,
-                                                size: 25, color: Colors.black),
-                                            const SizedBox(width: 10),
-                                            Text('Stummschalten',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontSize: 16,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    )),
-                                          ],
-                                        ),
-                                      ),
->>>>>>> Stashed changes
                                     ),
                                   ),
                                 ),

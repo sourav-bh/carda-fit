@@ -162,6 +162,14 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+String getButtonText() {
+  if (_isExerciseTask && !_isExerciseSummaryRead) {
+    return "Übung starten";
+  } else {
+    return "Weiter";
+  }
+}
+
 //**Diese Methode wird verwendet, um Übungsdaten aus einer Excel-Tabelle zu extrahieren.
 //Sie liest die Excel-Datei aus den Assets und erstellt eine Liste von Übungen, einschließlich ihrer Schritte und anderer relevanter Daten.
 //Die Übungen werden basierend auf den in der Datei angegebenen Bedingungen gefiltert und im App-Cache gespeichert. */
@@ -629,7 +637,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
                       50), // min sizes for Material buttons
                   alignment: Alignment.center,
                   child: Text(
-                    "Weiter".toUpperCase(),
+                    getButtonText().toUpperCase(),
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),

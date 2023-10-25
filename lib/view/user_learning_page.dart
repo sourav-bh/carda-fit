@@ -148,21 +148,9 @@ class _UserLearningPageState extends State<UserLearningPage> {
       });
     }
 
-<<<<<<< Updated upstream
+
     await _loadContentsFromAsset(true, _userCondition);
-=======
-    List<LearningContent> learningContent = await DatabaseHelper.instance
-        .getLearningContents(AppCache.instance.contents);
 
-    for (var content in learningContent) {
-      LearningMaterialInfo info =
-          await LearningMaterialInfo.copyContentFromLink(content);
->>>>>>> Stashed changes
-
-      setState(() {
-        _learningMaterials.add(info);
-      });
-    }
     // for loop that converts each attribute from the list to learningmaterialInfo list
     // use setState to update UI in the for loop (adding part in the setState method)
     // copyContentFromLink

@@ -189,33 +189,32 @@ class DatabaseHelper {
 //**Diese Methode wird aufgerufen, wenn die Datenbank auf eine neue Version aktualisiert wird.
 // Sie enthält SQL-Anweisungen zum Aktualisieren der Tabellenstruktur, wenn sich das Datenbankschema zwischen den Versionen geändert hat. */
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    await db.execute('ALTER TABLE $TABLE_USER '
-        'DROP COLUMN fullName, '
-        'RENAME COLUMN avatar TO userName,'
-        'RENAME COLUMN avatar_image TO avatarImage,'
-        'RENAME COLUMN designation TO jobPosition,'
-        'RENAME COLUMN job_type TO jobType,'
-        'RENAME COLUMN condition TO medicalConditions,'
-        'ADD teamName VARCHAR,'
-        'ADD score INTEGER,'
-        'ADD workingDays VARCHAR,'
-        'ADD workStartTime VARCHAR,'
-        'ADD workEndTime VARCHAR,'
-        'ADD walkingSpeed VARCHAR,'
-        'ADD diseases VARCHAR,'
-        'ADD preferredAlerts VARCHAR,'
-        'ADD isMergedAlertSet INTEGER');
-    await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
-        "id INTEGER PRIMARY KEY,"
-        "title VARCHAR,"
-        "description VARCHAR,"
-        "taskType INTEGER,"
-        "taskStatus INTEGER,"
-        "taskCreatedAt VARCHAR,"
-        "completedAt VARCHAR)");
-    await db.execute("Create Table $TABLE_EXERCISES("
-        "RENAME COLUMN steps TO stepsJson"
-        );
+    // await db.execute('ALTER TABLE $TABLE_USER '
+    //     'DROP COLUMN fullName, '
+    //     'RENAME COLUMN avatar TO userName,'
+    //     'RENAME COLUMN avatar_image TO avatarImage,'
+    //     'RENAME COLUMN designation TO jobPosition,'
+    //     'RENAME COLUMN job_type TO jobType,'
+    //     'RENAME COLUMN condition TO medicalConditions,'
+    //     'ADD teamName VARCHAR,'
+    //     'ADD score INTEGER,'
+    //     'ADD workingDays VARCHAR,'
+    //     'ADD workStartTime VARCHAR,'
+    //     'ADD workEndTime VARCHAR,'
+    //     'ADD walkingSpeed VARCHAR,'
+    //     'ADD diseases VARCHAR,'
+    //     'ADD preferredAlerts VARCHAR,'
+    //     'ADD isMergedAlertSet INTEGER;');
+    // await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
+    //     "id INTEGER PRIMARY KEY,"
+    //     "title VARCHAR,"
+    //     "description VARCHAR,"
+    //     "taskType INTEGER,"
+    //     "taskStatus INTEGER,"
+    //     "taskCreatedAt VARCHAR,"
+    //     "completedAt VARCHAR)");
+    // await db.execute("ALTER TABLE $TABLE_EXERCISES("
+    //     "RENAME COLUMN steps TO stepsJson)");
   }
 
   ///user
@@ -330,7 +329,7 @@ class DatabaseHelper {
 
   /// learning contents
 
-  Future<List<LearningContent>> getLearningContents(List<LearningContent> contents) async {
+  Future<List<LearningContent>> getLearningContents() async {
     Database db = await instance.database;
     var learnings = await db.query(TABLE_LEARNING, orderBy: 'title');
     List<LearningContent> learningList = learnings.isNotEmpty
