@@ -123,13 +123,13 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     } else if (_taskType == TaskType.water.index) {
       setState(() {
         _title = 'Trinke jetzt ein Glas Wasser!';
-        _subTitle = '8 Gläser Wasser pro Tag, halten den Arzt fern';
+        _subTitle = '8 Gläser Wasser pro Tag halten den Arzt fern';
         _staticImage = 'assets/animations/anim_water.gif';
         _showHideCloseButton = 1.0;
       });
     } else if (_taskType == TaskType.steps.index) {
       setState(() {
-        _title = 'Bleib nun zwei Minuten in Bewegung!';
+        _title = 'Bleibe nun zwei Minuten in Bewegung!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
 
@@ -137,7 +137,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       });
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
-        _title = 'Lege nun eine zwei minütige Pause ein!';
+        _title = 'Lege nun eine zweiminütige Pause ein!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
 

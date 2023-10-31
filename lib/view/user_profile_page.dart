@@ -283,7 +283,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             label: 'BMI:',
                             value:
                                 '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
-                                '(Größe: ${_userInfo?.weight} kg, Gewicht: ${_userInfo?.height} cm)',
+                                '(Größe: ${_userInfo?.weight} cm, Gewicht: ${_userInfo?.height} kg)',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(

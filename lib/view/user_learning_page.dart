@@ -148,21 +148,14 @@ class _UserLearningPageState extends State<UserLearningPage> {
       });
     }
 
-
     await _loadContentsFromAsset(true, _userCondition);
 
-    // for loop that converts each attribute from the list to learningmaterialInfo list
-    // use setState to update UI in the for loop (adding part in the setState method)
-    // copyContentFromLink
-
-    // _loadContentsFromAsset(true, _userCondition);
-
-    // if (_learningMaterials.isEmpty) {
-    //   setState(() {
-    //     _showFilteredList = false;
-    //   });
-    //   _loadContentsFromAsset(false, null);
-    // }
+    if (_learningMaterials.isEmpty) {
+      setState(() {
+        _showFilteredList = false;
+      });
+      _loadContentsFromAsset(false, null);
+    }
   }
 
 //**Diese Methode liest Daten aus einer Excel-Tabelle und erstellt LearningContent-Objekte.
