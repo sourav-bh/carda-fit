@@ -251,7 +251,6 @@ String getButtonText() {
       }
     }
   }
-
 //*Die Funktion vergleicht die UserCondition des Benutzers mit den in der Datenbank gespeicherten Bedingungen und gibt true zurück,
 // wenn eine der Bedingungen des Benutzers in den in der Datenbank gespeicherten Bedingungen enthalten ist. Andernfalls gibt sie false zurück. */
   bool _checkUserConditionInDb(String userCondition, String dbCondition) {
@@ -440,144 +439,139 @@ String getButtonText() {
     );
   }
 
-  Widget buildMainView(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Visibility(
-              visible: _isExerciseTask,
-              child: Text(_stepNo ?? "",
-                style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 36, color: Colors.brown),
-                textAlign: TextAlign.center,
-              )),
-          const SizedBox(height: 30),
-          Visibility(
-            visible: _isExerciseTask,
-            child: SizedBox(
-              width: 120,
-              height: 120,
-              child: Stack(
-                children: [
-                  Positioned(
-                    width: 120,
-                    height: 120,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 20,
-                      backgroundColor: Colors.white,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.orange),
-                      value: _timerProgress,
-                    ),
+Widget buildMainView(BuildContext context) {
+  return Align(
+    alignment: Alignment.topCenter, // Oben in der Mitte des Bildschirms
+    child: Column(
+      children: <Widget>[
+        Visibility(
+          visible: _isExerciseTask,
+          child: Text(
+            _stepNo ?? "",
+            style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 36, color: Colors.brown),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 30),
+        Visibility(
+          visible: _isExerciseTask,
+          child: SizedBox(
+            width: 120,
+            height: 120,
+            child: Stack(
+              children: [
+                Positioned(
+                  width: 120,
+                  height: 120,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 20,
+                    backgroundColor: Colors.white,
+                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                    value: _timerProgress,
                   ),
-                  Center(
-                      child: Text(
+                ),
+                Center(
+                  child: Text(
                     CommonUtil.formatTimeDurationToDisplay(_passedExerciseSec),
-                    style: Theme.of(context)
-                        .textTheme
-                        .caption
-                        ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                    style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                     textAlign: TextAlign.center,
-                  ))
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(_title,
-              style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Visibility(
-            visible: (_taskType == TaskType.breaks.index ||
-                _taskType == TaskType.steps.index ||
-                _taskType == TaskType.waterWithBreak.index ||
-                _taskType == TaskType.walkWithExercise.index),
-            child: SizedBox(
-              width: 120,
-              height: 120,
-              child: Stack(
-                children: [
-                  Positioned(
-                    width: 120,
-                    height: 120,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 20,
-                      backgroundColor: Colors.white,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
-                      value: _timerProgress,
-                    ),
                   ),
-                  Center(child: Text(
+                )
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 30),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            _title,
+            style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Visibility(
+          visible: (_taskType == TaskType.breaks.index ||
+              _taskType == TaskType.steps.index ||
+              _taskType == TaskType.waterWithBreak.index ||
+              _taskType == TaskType.walkWithExercise.index),
+          child: SizedBox(
+            width: 120,
+            height: 120,
+            child: Stack(
+              children: [
+                Positioned(
+                  width: 120,
+                  height: 120,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 20,
+                    backgroundColor: Colors.white,
+                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                    value: _timerProgress,
+                  ),
+                ),
+                Center(
+                  child: Text(
                     CommonUtil.formatTimeDurationToDisplay(_targetTotalTimeInSec - _timePassedInSec),
                     style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                     textAlign: TextAlign.center,
-                  ))
-                ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            _subTitle,
+            style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 20),
+        Container(
+          height: 150,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            child: _image.isNotEmpty
+                ? Image.network(_image)
+                : Image.asset(_staticImage),
+          ),
+        ),
+        SizedBox(height: 10),
+        Visibility(
+          visible: _showHideCloseButton == 1.0,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
+            child: GradientSlideToAct(
+              text: "Schieben zum\nBestätigen",
+              dragableIconBackgroundColor: Colors.greenAccent,
+              textStyle: Theme.of(context)
+                  .textTheme
+                  .bodyText2
+                  ?.copyWith(fontSize: 18),
+              backgroundColor: Colors.white,
+              onSubmit: () {
+                onSubmitScore();
+              },
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColor.primary, AppColor.primaryLight],
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              _subTitle,
-              style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            color: Colors.transparent,
-            height: 150,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-                child: _image.isNotEmpty
-                    ? Image.network(_image)
-                    : Image.asset(_staticImage,)),
-          ),
-          Opacity(
-            opacity: _showHideCloseButton,
-            // showButton if exercise done
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: GradientSlideToAct(
-                  // width: 400,
-                  text: "Schieben zum\nBestätigen",
-                  dragableIconBackgroundColor: Colors.greenAccent,
-                  textStyle: Theme.of(context)
-                      .textTheme
-                      .bodyText2
-                      ?.copyWith(fontSize: 18),
-                  backgroundColor: Colors.white,
-                  onSubmit: () {
-                    onSubmitScore();
-                    // Future.delayed(const Duration(seconds: 1), () {
-                    //   Navigator.of(context).pop();
-                    //   Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context, landingRoute, (r) => false);
-                    // },);
-                  },
-                  gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColor.primary,
-                        AppColor.primaryLight,
-                      ]),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget buildExerciseSummaryView(BuildContext context, List<ExerciseStep> steps) {
     return ListView(
