@@ -34,10 +34,10 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
- //**In der initState-Methode wird überprüft, ob Daten bereits in der Datenbank gespeichert sind (checkDataSaved).
- // Falls ja, wird nach einer Verzögerung zur nächsten Seite navigiert.
- //Wenn keine Daten vorhanden sind, werden Übungsdaten und Lernmaterialien aus einer Excel-Datei geladen und
- // in die Datenbank eingefügt. Dann wird auch zur nächsten Seite navigiert. */
+    //**In der initState-Methode wird überprüft, ob Daten bereits in der Datenbank gespeichert sind (checkDataSaved).
+    // Falls ja, wird nach einer Verzögerung zur nächsten Seite navigiert.
+    //Wenn keine Daten vorhanden sind, werden Übungsdaten und Lernmaterialien aus einer Excel-Datei geladen und
+    // in die Datenbank eingefügt. Dann wird auch zur nächsten Seite navigiert. */
     checkDataSaved().then((isDataSaved) {
       if (isDataSaved) {
         // Data is already saved, go to the next page
@@ -46,8 +46,7 @@ class _SplashPageState extends State<SplashPage> {
         });
       } else {
         // Data is not saved, load and save data from Excel file
-        _loadExerciseDataFromAsset();
-        _loadLearningMaterialFromAsset();
+         _loadDataFromDatabase();
         _quoteIndex = Random().nextInt(DataLoader.quotes.length);
         AppCache.instance.quoteIndex = _quoteIndex;
 
@@ -63,6 +62,7 @@ class _SplashPageState extends State<SplashPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
+
 //**Diese asynchrone Methode überprüft, ob Daten bereits in der Datenbank gespeichert sind, indem sie die Datenbank nach Übungen und Lerninhalten abfragt.
 //*  Sie gibt einen booleschen Wert zurück, der angibt, ob Daten gespeichert sind oder nicht. */
   Future<bool> checkDataSaved() async {
@@ -73,8 +73,15 @@ class _SplashPageState extends State<SplashPage> {
     final learningContents = await dbHelper.getLearningContents();
     AppCache.instance.learningContents = learningContents;
 
+    return /*exercises.isNotEmpty && */ learningContents.isNotEmpty;
+  }
 
-    return /*exercises.isNotEmpty && */learningContents.isNotEmpty;
+  Future<void> _loadDataFromDatabase() async {
+    final dbHelper = DatabaseHelper.instance;
+
+    // Daten aus der Datenbank abrufen
+    final learningContents = await dbHelper.getLearningContents();
+    AppCache.instance.learningContents = learningContents;
   }
 
 //**Eine Methode zum Laden von Übungsdaten aus einer Excel-Datei im Assets-Ordner der App.
@@ -143,12 +150,13 @@ class _SplashPageState extends State<SplashPage> {
             exercise.steps?.addAll(steps);
 
             await dbHelper.addExercise(exercise);
-            
+
             List<Exercise> exercises = await dbHelper.getExercises();
-             // Deserialize the stepsJson field back into a list of ExerciseStep
+            // Deserialize the stepsJson field back into a list of ExerciseStep
             exercises.forEach((exercise) {
               List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
-              exercise.steps = stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
+              exercise.steps =
+                  stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
             });
 
             exerciseName = "";
@@ -192,7 +200,7 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
-//**Diese Methode ist für das Navigieren zur nächsten Seite der App verantwortlich. 
+//**Diese Methode ist für das Navigieren zur nächsten Seite der App verantwortlich.
 //Sie überprüft anhand von Shared Preferences, ob ein Benutzer existiert,
 //und je nach Ergebnis navigiert sie entweder zur Startseite oder zur Anmeldeseite. */
   _goToNextPage() async {
