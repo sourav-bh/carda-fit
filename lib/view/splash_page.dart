@@ -151,13 +151,13 @@ class _SplashPageState extends State<SplashPage> {
 
             await dbHelper.addExercise(exercise);
 
-            List<Exercise> exercises = await dbHelper.getExercises();
-            // Deserialize the stepsJson field back into a list of ExerciseStep
-            exercises.forEach((exercise) {
-              List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
-              exercise.steps =
-                  stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
-            });
+            // List<Exercise> exercises = await dbHelper.getExercises();
+            // // Deserialize the stepsJson field back into a list of ExerciseStep
+            // exercises.forEach((exercise) {
+            //   List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
+            //   exercise.steps =
+            //       stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
+            // });
 
             exerciseName = "";
             duration = 0;

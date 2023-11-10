@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/api/api_manager.dart';
@@ -18,6 +19,7 @@ import 'package:app/view/widgets/exercise_summary_item.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
 // Diese Klasse übergibt Informationen über den viewMode und den taskType. 
@@ -53,6 +55,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   int _totalExerciseSec = 0;
   int _passedExerciseSec = 0;
   bool _isExerciseSummaryRead = false;
+  bool _isExerciseStepStarted = false;
 
   String? _stepNo;
   String _title = "";
@@ -64,16 +67,36 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   int _targetTotalTimeInSec = 120;
   int _timePassedInSec = 0;
 
+  FlutterTts flutterTts = FlutterTts();
+  String _textToSpeak = "";
+
   @override
   void initState() {
-    // match function wether its a new day (build outside and call its inside)
     super.initState();
+  }
+
+  _initTts() async {
+    List<dynamic> languages = await flutterTts.getLanguages;
+    print(languages);
+
+    if (Platform.isAndroid) {
+      await flutterTts.getDefaultEngine;
+      await flutterTts.getDefaultVoice;
+      await flutterTts.setSilence(100);
+      await flutterTts.setQueueMode(1);
+    }
+
+    if (Platform.isIOS) {
+      await flutterTts.setSharedInstance(true);
+    }
+
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    _initTts();
     _loadIntent();
   }
 
@@ -110,7 +133,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
       });
 
       if ((exerciseNow.steps?.length ?? 0) > 1) {
-        _stepNo = exerciseNow.steps?.elementAt(1).serialNo;
+        _stepNo = '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0)-2}';
         _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
         _currentStep = 1;
         _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
@@ -118,6 +141,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
         _totalExerciseSec = exerciseNow.duration ?? 10;
       }
 
+      setState(() {
+        _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
+      });
       _passedExerciseSec = 0;
 
     } else if (_taskType == TaskType.water.index) {
@@ -162,13 +188,27 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
-String getButtonText() {
-  if (_isExerciseTask && !_isExerciseSummaryRead) {
-    return "Übung starten";
-  } else {
-    return "Weiter";
+  String getButtonText() {
+    if (_isExerciseTask && !_isExerciseSummaryRead) {
+      return "Übung starten";
+    } else {
+      return "Weiter";
+    }
   }
-}
+
+  Future _speakStep() async{
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.setLanguage("de-DE");
+    await flutterTts.setVolume(0.7);
+    await flutterTts.setSpeechRate(0.4);
+    await flutterTts.setPitch(1.0);
+
+    await flutterTts.speak(_textToSpeak);
+  }
+
+  Future _stopSpeaking() async{
+    await flutterTts.stop();
+  }
 
 //**Diese Methode wird verwendet, um Übungsdaten aus einer Excel-Tabelle zu extrahieren.
 //Sie liest die Excel-Datei aus den Assets und erstellt eine Liste von Übungen, einschließlich ihrer Schritte und anderer relevanter Daten.
@@ -280,6 +320,11 @@ String getButtonText() {
  * Der Timer wird jede Sekunde aktualisiert.
  */
   void _startExerciseTimer() {
+    setState(() {
+      _isExerciseStepStarted = true;
+    });
+    _speakStep();
+
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (mounted) {
         setState(() {
@@ -330,19 +375,23 @@ String getButtonText() {
       _timer = null;
     }
 
+    _stopSpeaking();
+
     if (mounted) {
       setState(() {
         _currentStep += 1;
 
         if ((_exercise?.steps?.isNotEmpty ?? false) &&
             (_exercise?.steps?.length ?? 0) - 1 > _currentStep) {
-          _stepNo = _exercise?.steps?.elementAt(_currentStep).serialNo;
+          _stepNo = '${_exercise?.steps?.elementAt(_currentStep).serialNo} von ${(_exercise?.steps?.length ?? 0)-2}';
           _subTitle = _exercise?.steps?.elementAt(_currentStep).name ?? "";
+
+          _textToSpeak = '$_subTitle für ${_exercise?.steps?.elementAt(_currentStep).duration ?? 5} Sekunden';
 
           _timerProgress = 0;
           _totalExerciseSec = _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
           _passedExerciseSec = _totalExerciseSec;
-          _startExerciseTimer();
+          _isExerciseStepStarted = false;
         } else if ((_exercise?.steps?.length ?? 0) - 1 == _currentStep) {
           _showHideCloseButton = 1.0;
           // else if show the button
@@ -433,9 +482,10 @@ String getButtonText() {
           title: _isExerciseTask && !_isExerciseSummaryRead ? const Text('Zusammenfassung') : const Text(''),
         ),
         backgroundColor: Colors.pink.shade50,
-        body: _isExerciseTask && !_isExerciseSummaryRead ?
-          buildExerciseSummaryView(context, (_exercise?.steps?.length ?? 0) > 0 ? _exercise?.steps?.sublist(1, (_exercise?.steps?.length ?? 0)-1) ?? [] : []) :
+        body: /*_isExerciseTask && !_isExerciseSummaryRead ?
+          buildExerciseSummaryView(context, (_exercise?.steps?.length ?? 0) > 0 ? _exercise?.steps?.sublist(1, (_exercise?.steps?.length ?? 0)-1) ?? [] : []) :*/
           buildMainView(context)
+
     );
   }
 
@@ -452,7 +502,7 @@ Widget buildMainView(BuildContext context) {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         Visibility(
           visible: _isExerciseTask,
           child: SizedBox(
@@ -481,7 +531,7 @@ Widget buildMainView(BuildContext context) {
             ),
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
@@ -490,7 +540,7 @@ Widget buildMainView(BuildContext context) {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Visibility(
@@ -524,7 +574,7 @@ Widget buildMainView(BuildContext context) {
             ),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
@@ -533,7 +583,7 @@ Widget buildMainView(BuildContext context) {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Container(
           height: 150,
           child: ClipRRect(
@@ -543,7 +593,38 @@ Widget buildMainView(BuildContext context) {
                 : Image.asset(_staticImage),
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 20),
+        Visibility(
+          visible: _isExerciseTask && !_isExerciseStepStarted,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+            child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                ),
+                onPressed: () {
+                  _startExerciseTimer();
+                },
+                child: Ink(
+                  decoration: const BoxDecoration(
+                    color: Colors.orangeAccent,
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                        minHeight:
+                        50), // min sizes for Material buttons
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Übung starten".toUpperCase(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                )),
+          ),
+        ),
         Visibility(
           visible: _showHideCloseButton == 1.0,
           child: Padding(

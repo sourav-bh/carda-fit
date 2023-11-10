@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:app/app.dart';
@@ -10,6 +11,7 @@ import 'package:app/util/data_loader.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../model/user_info.dart';
 
@@ -287,7 +289,18 @@ class _HomePageState extends State<HomePage> {
                               onTap: () {
                                 widget.onTabSwitch?.call(1);
                               },
-                              child: const Icon(Icons.more_horiz)),
+                              child: Text(
+                                "Details",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                  color: AppColor.orange,
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.normal,
+                                ),
+                              )
+                          ),
                         ],
                       ),
                       const SizedBox(
@@ -370,7 +383,8 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 18,
                                       fontStyle: FontStyle.normal,
                                     ),
-                              )),
+                              )
+                          ),
                         ],
                       ),
                       const SizedBox(
