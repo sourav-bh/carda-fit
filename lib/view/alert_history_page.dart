@@ -146,7 +146,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
                 ),
                 trailing: _getStatusIcon(historyItem.taskStatus),
                 onTap: () {
-                    if (historyItem.taskStatus == TaskStatus.snoozed && historyItem.taskStatus == TaskStatus.pending) {
+                    if (historyItem.taskStatus == TaskStatus.snoozed || historyItem.taskStatus == TaskStatus.pending) {
                       TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: historyItem.taskType.index);
                         Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
                  }
