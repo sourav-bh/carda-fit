@@ -42,11 +42,12 @@ class _SplashPageState extends State<SplashPage> {
       if (isDataSaved) {
         // Data is already saved, go to the next page
         Timer(const Duration(seconds: 3), () {
+          _loadDataFromDatabase();
           _goToNextPage();
         });
       } else {
         // Data is not saved, load and save data from Excel file
-         _loadDataFromDatabase();
+        _loadExerciseDataFromAsset();
         _quoteIndex = Random().nextInt(DataLoader.quotes.length);
         AppCache.instance.quoteIndex = _quoteIndex;
 
@@ -73,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
     final learningContents = await dbHelper.getLearningContents();
     AppCache.instance.learningContents = learningContents;
 
-    return /*exercises.isNotEmpty && */ learningContents.isNotEmpty;
+    return/*exercises.isNotEmpty && */  learningContents.isNotEmpty;
   }
 
   Future<void> _loadDataFromDatabase() async {

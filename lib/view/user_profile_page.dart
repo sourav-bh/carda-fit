@@ -372,7 +372,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               MaterialStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
-                          _logoutAction();
+                          _logoutActionField(context);
                         },
                         child: Ink(
                           decoration: const BoxDecoration(
@@ -429,6 +429,37 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ],
     );
   }
+
+  // Diese Funktion wird aufgerufen, wenn der Benutzer sich abmelden möchte.
+ _logoutActionField(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Abmeldung bestätigen'),
+        content: Text('Möchten Sie sich wirklich abmelden?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Schließt den Dialog
+            },
+            child: Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () async {
+              // Führt die Abmeldung durch und navigiert zur Login-Seite
+              SharedPref.instance.clearCache();
+              Navigator.pushNamedAndRemoveUntil(
+                  context, loginRoute, (r) => false);
+            },
+            child: Text('Abmelden'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   void _showSnoozeTimeSelected(BuildContext context) {
     showDialog(
@@ -535,4 +566,5 @@ class _UserProfilePageState extends State<UserProfilePage> {
           });
         });
   }
+  
 }

@@ -196,6 +196,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     }
   }
 
+/*Die Funktion _speakStep wird verwendet, um einen gegebenen Text (_textToSpeak) in deutscher Sprache vorzulesen,
+ wobei spezifische Einstellungen für Lautstärke, Sprechgeschwindigkeit und Tonhöhe berücksichtigt werden,
+ während _stopSpeaking die laufende Sprachausgabe stoppt. */
   Future _speakStep() async{
     await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.setLanguage("de-DE");
