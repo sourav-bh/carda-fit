@@ -190,8 +190,7 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, top: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, top: 10.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -231,26 +230,28 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: GestureDetector(
                                   onTap: () {
-                                    _showSnoozeTimeSelected(context);
+                                    // _showSnoozeTimeSelected(context);
+                                    Navigator.pushNamed(context, snoozeRoute);
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 20),
-                                    decoration: CommonUtil.getRectangleBoxDecoration(
-                                        _selectedSnoozeTimeVal != null
-                                            ? Colors.orangeAccent
-                                            : Colors.white70,
-                                        10
-                                    ),
+                                    decoration:
+                                        CommonUtil.getRectangleBoxDecoration(
+                                            _selectedSnoozeTimeVal != null
+                                                ? Colors.orangeAccent
+                                                : Colors.white70,
+                                            10),
                                     child: Padding(
                                       padding: const EdgeInsets.all(5),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.snooze, size: 20, color: Colors.black),
+                                          const Icon(Icons.snooze,
+                                              size: 20, color: Colors.black),
                                           const SizedBox(height: 0),
                                           Text(_selectedSnoozeTimeVal != null
                                               ? '${_selectedSnoozeTimeVal!.duration.inMinutes} min'
@@ -262,10 +263,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ],
-                          )
-                      ),
-                    )
-                ),
+                          )),
+                    )),
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   padding: const EdgeInsets.all(15),
@@ -295,12 +294,11 @@ class _HomePageState extends State<HomePage> {
                                     .textTheme
                                     .titleLarge
                                     ?.copyWith(
-                                  color: AppColor.orange,
-                                  fontSize: 18,
-                                  fontStyle: FontStyle.normal,
-                                ),
-                              )
-                          ),
+                                      color: AppColor.orange,
+                                      fontSize: 18,
+                                      fontStyle: FontStyle.normal,
+                                    ),
+                              )),
                         ],
                       ),
                       const SizedBox(
@@ -383,8 +381,7 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 18,
                                       fontStyle: FontStyle.normal,
                                     ),
-                              )
-                          ),
+                              )),
                         ],
                       ),
                       const SizedBox(

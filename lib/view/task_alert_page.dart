@@ -75,6 +75,9 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
     super.initState();
   }
 
+/*Die Methode _initTts initialisiert und konfiguriert die Text-to-Speech-Funktionen in Flutter, 
+indem sie verfügbare Sprachen abruft und plattformspezifische Einstellungen wie den Standard-TTS-Motor 
+und Pausen zwischen Sätzen festlegt.*/
   _initTts() async {
     List<dynamic> languages = await flutterTts.getLanguages;
     print(languages);

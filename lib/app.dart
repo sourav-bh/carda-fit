@@ -14,6 +14,7 @@ import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
+import 'package:app/view/widgets/snooze_page.dart';
 import 'package:flutter/material.dart';
 
 const splashRoute = '/';
@@ -30,6 +31,7 @@ const editProfileRoute = '/profile/edit';
 const taskAlertRoute = '/alert';
 const alertHistoryRoute = '/alert/history';
 const aboutUsRoute = '/aboutUs';
+const snoozeRoute = '/snooze';
 
 class CardaFitApp extends StatefulWidget {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -109,6 +111,9 @@ class _CardaFitAppState extends State<CardaFitApp> {
           break;
         case aboutUsRoute:
           screen = const AboutUsPage();
+          break;
+        case snoozeRoute:
+          screen = const SnoozePage();
           break;
         default:
           return null;
