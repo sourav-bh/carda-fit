@@ -12,6 +12,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:app/view/snooze_page.dart';
 
 import '../model/user_info.dart';
 
@@ -19,8 +20,10 @@ import '../model/user_info.dart';
 // Sie enthält tägliche Fitnessziele, Lernmaterialien und Optionen zur Einstellung der Snooze-Zeit. */
 class HomePage extends StatefulWidget {
   final void Function(int)? onTabSwitch;
+  final void Function()? onUpdateState;
 
-  const HomePage({Key? key, this.onTabSwitch}) : super(key: key);
+  const HomePage({Key? key, this.onTabSwitch, this.onUpdateState})
+      : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -62,6 +65,15 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+
+  // In der _HomePageState-Klasse
+  void onUpdateState() {
+    setState(() {
+      _checkSnoozeButtonStatus();
+      _checkSnoozeTimeStatus();
+      // Fügen Sie weitere Aktualisierungen hinzu, falls erforderlich
+    });
   }
 
 /* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit,
@@ -236,6 +248,13 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     // _showSnoozeTimeSelected(context);
                                     Navigator.pushNamed(context, snoozeRoute);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SnoozePage(
+                                            onUpdateState: onUpdateState),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 20),

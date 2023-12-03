@@ -14,7 +14,7 @@ import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
-import 'package:app/view/widgets/snooze_page.dart';
+import 'package:app/view/snooze_page.dart';
 import 'package:flutter/material.dart';
 
 const splashRoute = '/';

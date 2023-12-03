@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:app/model/user_info.dart';
 import 'package:intl/intl.dart';
 
-import '../../util/app_style.dart';
-import '../../util/common_util.dart';
-import '../../util/shared_preference.dart';
+import '../util/app_style.dart';
+import '../util/common_util.dart';
+import '../util/shared_preference.dart';
 
 class SnoozePage extends StatefulWidget {
-  const SnoozePage({Key? key}) : super(key: key);
+  final void Function()? onUpdateState;
+
+  const SnoozePage({Key? key, this.onUpdateState}) : super(key: key);
 
   @override
   _SnoozePageState createState() => _SnoozePageState();
@@ -27,6 +29,7 @@ class _SnoozePageState extends State<SnoozePage> {
   SnoozeTime? _selectedSnoozeTimeVal;
   DateTime? _startTime;
   DateTime? _endTime;
+  bool? isSelected;
 
   TextStyle _getTextStyle(bool isSelected) {
     Color textColor = isSelected ? Colors.orange : Colors.black;
@@ -329,7 +332,8 @@ class _SnoozePageState extends State<SnoozePage> {
                     overlayColor: MaterialStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pushNamed(context,homeRoute);
+                    widget.onUpdateState?.call();
                   },
                   child: Ink(
                     decoration: const BoxDecoration(
@@ -414,7 +418,8 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                   onPressed: () {
                     _calculateAndSaveCustomSnoozeTime();
-                    Navigator.pop(context);
+                    Navigator.pushNamed(context,homeRoute);
+                    widget.onUpdateState?.call();
                   },
                   child: Ink(
                     decoration: const BoxDecoration(
@@ -457,7 +462,8 @@ class _SnoozePageState extends State<SnoozePage> {
                         _selectedSnoozeTimeVal = null;
                       });
                       resetSnooze();
-                      Navigator.pushNamed(context, homeRoute);
+                      Navigator.pushNamed(context,homeRoute);
+                      widget.onUpdateState?.call();
                     },
                     child: Ink(
                       decoration: const BoxDecoration(
@@ -489,7 +495,7 @@ class _SnoozePageState extends State<SnoozePage> {
               child: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pushNamed(context,homeRoute);
                 },
               ),
             ),
