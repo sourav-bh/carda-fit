@@ -12,6 +12,7 @@ import 'package:app/util/shared_preference.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:app/view/snooze_page.dart';
 
 import '../model/user_info.dart';
 
@@ -19,8 +20,10 @@ import '../model/user_info.dart';
 // Sie enthält tägliche Fitnessziele, Lernmaterialien und Optionen zur Einstellung der Snooze-Zeit. */
 class HomePage extends StatefulWidget {
   final void Function(int)? onTabSwitch;
+  final void Function()? onUpdateState;
 
-  const HomePage({Key? key, this.onTabSwitch}) : super(key: key);
+  const HomePage({Key? key, this.onTabSwitch, this.onUpdateState})
+      : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -64,8 +67,17 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
   }
 
+  // In der _HomePageState-Klasse
+  void onUpdateState() {
+    setState(() {
+      _checkSnoozeButtonStatus();
+      _checkSnoozeTimeStatus();
+      // Fügen Sie weitere Aktualisierungen hinzu, falls erforderlich
+    });
+  }
+
 /* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit,
-   *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference. */
+   *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
       _selectedSnoozeTimeVal = snoozeTime;
@@ -80,7 +92,8 @@ class _HomePageState extends State<HomePage> {
 
 /* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
-   *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist. */
+   *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
+   * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
     await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
@@ -111,12 +124,12 @@ class _HomePageState extends State<HomePage> {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (currentTime - snoozedAt <= snoozeDuration * 60 * 1000) {
-      // Snooze-Zeit ist aktiv.
+      // Snooze-Zeit ist aktiv
       setState(() {
         isSelected = true; // Button ist orange
       });
     } else {
-      // Snooze-Zeit ist abgelaufen.
+      // Snooze-Zeit ist abgelaufen
       setState(() {
         isSelected = false; // Button ist transparent
       });
@@ -189,8 +202,7 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       child: Padding(
-                          padding:
-                          const EdgeInsets.only(left: 10.0, top: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, top: 10.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -230,26 +242,35 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10),
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 10),
                                 child: GestureDetector(
                                   onTap: () {
-                                    _showSnoozeTimeSelected(context);
+                                    // _showSnoozeTimeSelected(context);
+                                    Navigator.pushNamed(context, snoozeRoute);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SnoozePage(
+                                            onUpdateState: onUpdateState),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 20),
-                                    decoration: CommonUtil.getRectangleBoxDecoration(
+                                    decoration:
+                                    CommonUtil.getRectangleBoxDecoration(
                                         _selectedSnoozeTimeVal != null
                                             ? Colors.orangeAccent
                                             : Colors.white70,
-                                        10
-                                    ),
+                                        10),
                                     child: Padding(
                                       padding: const EdgeInsets.all(5),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.snooze, size: 20, color: Colors.black),
+                                          const Icon(Icons.snooze,
+                                              size: 20, color: Colors.black),
                                           const SizedBox(height: 0),
                                           Text(_selectedSnoozeTimeVal != null
                                               ? '${_selectedSnoozeTimeVal!.duration.inMinutes} min'
@@ -261,10 +282,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ],
-                          )
-                      ),
-                    )
-                ),
+                          )),
+                    )),
                 GestureDetector(
                   onTap: () {
                     widget.onTabSwitch?.call(1);
@@ -376,8 +395,7 @@ class _HomePageState extends State<HomePage> {
                                   fontSize: 18,
                                   fontStyle: FontStyle.normal,
                                 ),
-                              )
-                          ),
+                              )),
                         ],
                       ),
                       const SizedBox(
