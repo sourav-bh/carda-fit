@@ -283,7 +283,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             label: 'BMI:',
                             value:
                                 '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
-                                '(Größe: ${_userInfo?.weight} cm, Gewicht: ${_userInfo?.height} kg)',
+                                '(Gewicht: ${_userInfo?.weight} kg, Größe: ${_userInfo?.height} cm)',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -382,7 +382,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           child: Container(
                             constraints: const BoxConstraints(
                                 minHeight:
-                                    40), // min sizes for Material buttons
+                                    40), // Mindestgrößen für Material Buttons.
                             alignment: Alignment.center,
                             child: Text(
                               "Abmeldung".toUpperCase(),
@@ -404,7 +404,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Helper method to build each row in the profile
+  // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
       {required BuildContext context,
       required IconData icon,
