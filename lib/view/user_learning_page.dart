@@ -192,7 +192,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
             } else if (filerCondition == null) {
               addContent = true;
             } else {
-              // skip this learning content, since it is not useful for the user condition specified
+              // Überspringe den Lerninhalt, da er nicht relevant ist für die Nutzerbedingungen.
             }
           } else {
             addContent = true;

@@ -35,7 +35,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 //**Dies ist der zugehörige State für die RegistrationPage.
-//Hier werden die Logik und die Zustände für die Registrierung verwaltet */
+//Hier werden die Logik und die Zustände für die Registrierung verwaltet. */
 class _RegistrationPageState extends State<RegistrationPage> {
   final _mandatoryFormKey = GlobalKey<FormState>();
   final _alertTypeFormKey = GlobalKey<FormState>();
@@ -217,7 +217,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         AppCache.instance.userServerId = userServerId;
         CommonUtil.createUserTargets(userInfo);
       } else {
-        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        const snackBar = SnackBar(content: Text('Registrierung fehlgeschlagen'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
@@ -284,13 +284,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -316,13 +316,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -768,7 +768,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         vertical: 10, horizontal: 10),
                     children: const {
                       WalkingSpeed.fast: Text('Schnell'),
-                      WalkingSpeed.medium: Text('Medium'),
+                      WalkingSpeed.medium: Text('Mittel'),
                       WalkingSpeed.slow: Text('Langsam'),
                     },
                     onValueChanged: (groupValue) {

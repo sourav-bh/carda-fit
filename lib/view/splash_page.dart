@@ -40,18 +40,18 @@ class _SplashPageState extends State<SplashPage> {
     // in die Datenbank eingefügt. Dann wird auch zur nächsten Seite navigiert. */
     checkDataSaved().then((isDataSaved) {
       if (isDataSaved) {
-        // Data is already saved, go to the next page
+        // Daten sind bereits gespeichert, gehe weiter zur nächsten Seite.
         Timer(const Duration(seconds: 3), () {
           _loadDataFromDatabase();
           _goToNextPage();
         });
       } else {
-        // Data is not saved, load and save data from Excel file
+        // Daten sind nicht gespeichert, lade und speicher die Daten aus der Excel-Datei.
         _loadExerciseDataFromAsset();
         _quoteIndex = Random().nextInt(DataLoader.quotes.length);
         AppCache.instance.quoteIndex = _quoteIndex;
 
-        // Move to the next page after a delay
+        // Gehe weiter zur nächsten Seite nach kurzer Verzögerung.
         Timer(const Duration(seconds: 3), () {
           _goToNextPage();
         });

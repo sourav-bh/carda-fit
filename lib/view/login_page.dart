@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-//Diese Klasse verwaltet die Zustände und Logik der Login-Page..
+//Diese Klasse verwaltet die Zustände und Logik der Login-Page.
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _userNameText = TextEditingController();
   final TextEditingController _passwordText = TextEditingController();
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
       }
     } else if (mounted) {
-      const snackBar = SnackBar(content: Text('Login fehlschlagen'));
+      const snackBar = SnackBar(content: Text('Login fehlgeschlagen'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
@@ -156,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: Text('Geben Sie Ihren Nutzername und Ihr Passwort ein, um sich anzumelden',
+                                    child: Text('Geben Sie Ihren Nutzernamen und Ihr Passwort ein, um sich anzumelden',
                                       style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
                                       textAlign: TextAlign.center,
                                     ),

@@ -248,7 +248,7 @@ und Pausen zwischen Sätzen festlegt.*/
 
   void _exerciseResumeTimer() {
     if (_isTimerPaused) {
-      // Setzen Sie den Timer zurück, indem Sie _startExerciseTimer aufrufen
+      // Setzen Sie den Timer zurück, indem Sie _startExerciseTimer aufrufen.
       _startExerciseTimer();
       setState(() {
         _isTimerPaused = false;
@@ -278,7 +278,7 @@ und Pausen zwischen Sätzen festlegt.*/
   void _breakandWaterResumeTimer() {
     if (_isTimerPaused) {
       // Setzen Sie den Timer fort, indem Sie _startBreakAndWalkTimer nicht aufrufen,
-      // sondern direkt _breakAndWaterResume aufrufen
+      // sondern direkt _breakAndWaterResume aufrufen.
       _breakAndWaterResume();
       //_startBreakAndWalkTimer();
       setState(() {
@@ -365,7 +365,7 @@ und Pausen zwischen Sätzen festlegt.*/
           step.media = linkCell?.value.toString();
           steps.add(step);
           splitConditionList = userCondition.split(",");
-          // split the multi String in to a List of single Strings
+          // Trennt den multi String in eine Liste aus einzelnen Strings.
 
           if (stepVal == "End") {
             Exercise exercise = Exercise();
@@ -380,12 +380,12 @@ und Pausen zwischen Sätzen festlegt.*/
             if (exercise.condition != null &&
                 userCondition.isNotEmpty &&
                 _checkUserConditionInDb(userCondition, exercise.condition!)) {
-              //check if exercise.conditions match with items of the userConditionList
+              // Überprüfe ob exercise.conditions mit den Inhalten der userConditionList übereinstimmt.
               addContent = true;
             } else if (userCondition.isEmpty) {
               addContent = true;
             } else {
-              // skip this learning content, since it is not useful for the user condition specified
+              //  Überspringe diesen Lerninhalt, da er für die angegebene Nutzerbedingung nicht nützlich ist.
             }
 
             if (addContent) exercises.add(exercise);
@@ -760,7 +760,7 @@ und Pausen zwischen Sätzen festlegt.*/
                     ),
                     child: Container(
                       constraints: const BoxConstraints(
-                          minHeight: 50), // min sizes for Material buttons
+                          minHeight: 50), // Mindestgrößen für Material Buttons
                       alignment: Alignment.center,
                       child: Text(
                         "Übung starten".toUpperCase(),
@@ -792,7 +792,7 @@ und Pausen zwischen Sätzen festlegt.*/
                     ),
                     child: Container(
                       constraints: const BoxConstraints(
-                          minHeight: 50), // min sizes for Material buttons
+                          minHeight: 50), // Mindestgrößen für Material Buttons
                       alignment: Alignment.center,
                       child: Text(
                         _isTimerPaused
@@ -826,7 +826,7 @@ und Pausen zwischen Sätzen festlegt.*/
                     ),
                     child: Container(
                       constraints: const BoxConstraints(
-                          minHeight: 50), // min sizes for Material buttons
+                          minHeight: 50), // Mindestgrößen für Material Buttons
                       alignment: Alignment.center,
                       child: Text(
                         _isTimerPaused
@@ -928,7 +928,7 @@ und Pausen zwischen Sätzen festlegt.*/
                 ),
                 child: Container(
                   constraints: const BoxConstraints(
-                      minHeight: 50), // min sizes for Material buttons
+                      minHeight: 50), // Mindestgrößen für Material Buttons
                   alignment: Alignment.center,
                   child: Text(
                     getButtonText().toUpperCase(),
