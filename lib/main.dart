@@ -179,13 +179,13 @@ Future<void> backgroundHandler(RemoteMessage message) async {
       completedAt: "");
 
   if (!isUserSnoozedNow) {
-    // Mark all previous history items as missed alerts, for the same type of task
+    // Markiert alle vorherigen Verlaufselemente als verpasste Alarme für denselben Aufgabentypen.
     await DatabaseHelper.instance
         .batchUpdateAlertHistoryItemAsMissed(alertType);
   } else {
     debugPrint('Marking previous history items as missed alerts');
    
-    // User is snoozed, don't show the alert
+    // Nutzer hat Snooze (Schlummern) aktiviert, daher Alarm nicht zeigen.
     debugPrint('User is snoozed, not showing the alert');
     return;
   }
@@ -199,7 +199,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
   await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
 
-  // Show the alert notification
+  // Zeigt die Alarm-Benachrichtigung.
   const AndroidNotificationDetails androidNotificationDetails =
       AndroidNotificationDetails('carda_fit', 'CardaFit',
           channelDescription: 'CardaFit Alerts',
@@ -210,9 +210,9 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   const DarwinNotificationDetails iOSNotificationDetails =
       DarwinNotificationDetails(
     presentAlert:
-        true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+        true, // Spielt einen Alarm, wenn die Benachrichtigung angezeigt wird und die Anwendung im Vordergrund ist (nur ab iOS 10).
     presentSound:
-        true, // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+        true, // Spielt einen Ton ab, wenn die Benachrichtigung angezeigt wird und die Anwendung im Vordergrund ist (nur ab iOS 10).
   );
 
   const NotificationDetails notificationDetails = NotificationDetails(
@@ -326,7 +326,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
       completedAt: "");
 
   if (!isUserSnoozedNow) {
-    // mark all previous history items as missed alerts, for the same type of task
+    // Markiert alle vorherigen Verlaufselemente als verpasste Alarme für denselben Aufgabentypen.
     await DatabaseHelper.instance
         .batchUpdateAlertHistoryItemAsMissed(alertType);
   }
@@ -337,7 +337,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
       "-------> Alert history item saved in DB from background listener: $alertHistoryId");
 
   if (isUserSnoozedNow) {
-    return; // don't show the alert as user set a snooze time currently
+    return; // den Alarm nicht zeigen, da der Nutzer Schlummerzeit (snooze time) eingestellt hat.
   } else {
     await SharedPref.instance.deleteValue(SharedPref.keySnoozeDuration);
     await SharedPref.instance.deleteValue(SharedPref.keySnoozedAt);
@@ -353,9 +353,9 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
     const DarwinNotificationDetails iOSNotificationDetails =
         DarwinNotificationDetails(
       presentAlert:
-          true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+          true, // Spielt einen Alarm, wenn die Benachrichtigung angezeigt wird und die Anwendung im Vordergrund ist (nur ab iOS 10).
       presentSound:
-          true, // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+          true, // Spielt einen Ton ab, wenn die Benachrichtigung angezeigt wird und die Anwendung im Vordergrund ist (nur ab iOS 10).
     );
 
     const NotificationDetails notificationDetails = NotificationDetails(
@@ -371,7 +371,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
 void _onDidReceiveLocalNotification(NotificationResponse details) async {
   print('Remote firebase message _onDidReceiveLocalNotification');
 
-  // only handle for iOS platform
+  // Nur für iOS-Plattform handhaben.
   if (!Platform.isIOS) return;
 
   String? payload = details.payload;
