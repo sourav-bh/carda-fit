@@ -22,13 +22,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
 
-// Diese Klasse übergibt Informationen über den viewMode und den taskType. 
+// Diese Klasse übergibt Informationen über den viewMode und den taskType.
 // Diese Informationen werden übergeben, damit nachvollziehbar ist welche Art von Task gefordert wird.
 class TaskAlertPageData {
   int viewMode; // 1 for view only, 0 for alert
   int? taskType, taskHistoryId;
 
-  TaskAlertPageData({required this.viewMode, this.taskType, this.taskHistoryId,});
+  TaskAlertPageData({
+    required this.viewMode,
+    this.taskType,
+    this.taskHistoryId,
+  });
 }
 
 //Diese Klasse erstellt die Benutzeroberfläche für die 4 vorhandenen Tasks (Wasser,Schritte,Pause,Übung)in der App.
@@ -44,6 +48,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   TaskAlertPageData? _taskPageData;
   int? _taskType;
   Timer? _timer;
+  Timer? _breakAndWaterTimer;
 
   // hide button if exercise is not finished
   double _showHideCloseButton = 0.0;
@@ -56,6 +61,7 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   int _passedExerciseSec = 0;
   bool _isExerciseSummaryRead = false;
   bool _isExerciseStepStarted = false;
+  bool _isBreakAndWalkTimerStarted = false;
 
   String? _stepNo;
   String _title = "";
@@ -94,7 +100,6 @@ und Pausen zwischen Sätzen festlegt.*/
     if (Platform.isIOS) {
       await flutterTts.setSharedInstance(true);
     }
-
   }
 
   @override
@@ -110,7 +115,8 @@ und Pausen zwischen Sätzen festlegt.*/
 //Abhängig vom Aufgabentyp werden unterschiedliche Daten geladen, z.B., Übungsdaten, Informationen zu Wassertrinken, Schritten oder Pausen.
 //Die Methode enthält auch Logik zur Auswahl und Anzeige von Übungsinformationen, einschließlich der Fortschrittsdauer. */
   _loadIntent() async {
-    _taskPageData = ModalRoute.of(context)?.settings.arguments as TaskAlertPageData;
+    _taskPageData =
+        ModalRoute.of(context)?.settings.arguments as TaskAlertPageData;
     _taskType = _taskPageData?.taskType;
 
     if (_taskType == TaskType.exercise.index ||
@@ -138,7 +144,8 @@ und Pausen zwischen Sätzen festlegt.*/
       });
 
       if ((exerciseNow.steps?.length ?? 0) > 1) {
-        _stepNo = '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0)-2}';
+        _stepNo =
+            '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
         _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
         _currentStep = 1;
         _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
@@ -147,10 +154,10 @@ und Pausen zwischen Sätzen festlegt.*/
       }
 
       setState(() {
-        _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
+        _textToSpeak =
+            '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
       });
       _passedExerciseSec = 0;
-
     } else if (_taskType == TaskType.water.index) {
       setState(() {
         _title = 'Trinke jetzt ein Glas Wasser!';
@@ -176,7 +183,8 @@ und Pausen zwischen Sätzen festlegt.*/
       });
     } else if (_taskType == TaskType.waterWithBreak.index) {
       setState(() {
-        _title = 'Machen Sie eine kurze Pause und trinken Sie auch ein Glas Wasser!';
+        _title =
+            'Machen Sie eine kurze Pause und trinken Sie auch ein Glas Wasser!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
 
@@ -184,7 +192,8 @@ und Pausen zwischen Sätzen festlegt.*/
       });
     } else if (_taskType == TaskType.walkWithExercise.index) {
       setState(() {
-        _title = 'Gehen Sie eine Weile spazieren und strecken Sie Ihre Hände ein wenig!';
+        _title =
+            'Gehen Sie eine Weile spazieren und strecken Sie Ihre Hände ein wenig!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_break_time.gif';
 
@@ -204,7 +213,7 @@ und Pausen zwischen Sätzen festlegt.*/
 /*Die Funktion _speakStep wird verwendet, um einen gegebenen Text (_textToSpeak) in deutscher Sprache vorzulesen,
  wobei spezifische Einstellungen für Lautstärke, Sprechgeschwindigkeit und Tonhöhe berücksichtigt werden,
  während _stopSpeaking die laufende Sprachausgabe stoppt. */
-  Future _speakStep() async{
+  Future _speakStep() async {
     await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.setLanguage("de-DE");
     await flutterTts.setVolume(0.7);
@@ -214,46 +223,103 @@ und Pausen zwischen Sätzen festlegt.*/
     await flutterTts.speak(_textToSpeak);
   }
 
-  Future _stopSpeaking() async{
+  Future _stopSpeaking() async {
     await flutterTts.stop();
   }
 
-void _togglePauseResume() {
-  if (_isExerciseStepStarted) {
-    if (_isTimerPaused) {
-      _resumeTimer();
-    } else {
-      _pauseTimer();
+  void _exerciseTogglePauseResume() {
+    if (_isExerciseStepStarted) {
+      if (_isTimerPaused) {
+        _exerciseResumeTimer();
+      } else {
+        _exercisePauseTimer();
+      }
     }
   }
-}
 
-void _pauseTimer() {
-  if (_timer != null && _timer!.isActive) {
-    _timer!.cancel();
-    setState(() {
-      _isTimerPaused = true;
+  void _exercisePauseTimer() {
+    if (_timer != null && _timer!.isActive) {
+      _timer!.cancel();
+      setState(() {
+        _isTimerPaused = true;
+      });
+    }
+  }
+
+  void _exerciseResumeTimer() {
+    if (_isTimerPaused) {
+      // Setzen Sie den Timer zurück, indem Sie _startExerciseTimer aufrufen
+      _startExerciseTimer();
+      setState(() {
+        _isTimerPaused = false;
+      });
+    }
+  }
+
+  void _breakAndWaterTogglePauseResume() {
+    if (_isBreakAndWalkTimerStarted) {
+      if (_isTimerPaused) {
+        _breakandWaterResumeTimer();
+      } else {
+        _breakAndWaterPauseTimer();
+      }
+    }
+  }
+
+  void _breakAndWaterPauseTimer() {
+    if (_breakAndWaterTimer != null && _breakAndWaterTimer!.isActive) {
+      _breakAndWaterTimer!.cancel();
+      setState(() {
+        _isTimerPaused = true;
+      });
+    }
+  }
+
+  void _breakandWaterResumeTimer() {
+    if (_isTimerPaused) {
+      // Setzen Sie den Timer fort, indem Sie _startBreakAndWalkTimer nicht aufrufen,
+      // sondern direkt _breakAndWaterResume aufrufen
+      _breakAndWaterResume();
+      //_startBreakAndWalkTimer();
+      setState(() {
+        _isTimerPaused = false;
+      });
+    }
+  }
+
+  void _breakAndWaterResume() {
+    // Hier setzt der Timer an der gestoppten Zeit fort
+    _breakAndWaterTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted && _timePassedInSec <= _targetTotalTimeInSec) {
+        setState(() {
+          _timePassedInSec++;
+          if (_timerProgress >= 1) {
+            if (_timer != null) {
+              _timer!.cancel();
+              _timer = null;
+            }
+          } else {
+            _timerProgress += 1 / _targetTotalTimeInSec;
+          }
+        });
+      } else if (mounted) {
+        setState(() {
+          _showHideCloseButton = 1.0;
+        });
+        timer.cancel();
+      }
     });
   }
-}
-
-void _resumeTimer() {
-  if (!_isTimerPaused) {
-    _startExerciseTimer();
-    setState(() {
-      _isTimerPaused = false;
-    });
-  }
-}
-
 
 //**Diese Methode wird verwendet, um Übungsdaten aus einer Excel-Tabelle zu extrahieren.
 //Sie liest die Excel-Datei aus den Assets und erstellt eine Liste von Übungen, einschließlich ihrer Schritte und anderer relevanter Daten.
 //Die Übungen werden basierend auf den in der Datei angegebenen Bedingungen gefiltert und im App-Cache gespeichert. */
   _loadExerciseDataFromAsset() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
-    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+    if (userInfo != null &&
+        !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       userCondition = userInfo.medicalConditions!;
     }
 
@@ -273,11 +339,16 @@ void _resumeTimer() {
         String? condition;
         List<ExerciseStep> steps = [];
         for (int rowIndex = 1; rowIndex < (sheet?.maxRows ?? 0); rowIndex++) {
-          Data? stepCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
-          Data? detailsCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
-          Data? durationCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
-          Data? linkCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
-          Data? conditionCell = sheet?.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
+          Data? stepCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+          Data? detailsCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+          Data? durationCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+          Data? linkCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+          Data? conditionCell = sheet?.cell(
+              CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
 
           String stepVal = stepCell?.value.toString() ?? "";
           if (stepVal == "Start") {
@@ -306,7 +377,8 @@ void _resumeTimer() {
             exercise.steps?.addAll(steps);
 
             bool addContent = false;
-            if (exercise.condition != null && userCondition.isNotEmpty &&
+            if (exercise.condition != null &&
+                userCondition.isNotEmpty &&
                 _checkUserConditionInDb(userCondition, exercise.condition!)) {
               //check if exercise.conditions match with items of the userConditionList
               addContent = true;
@@ -328,6 +400,7 @@ void _resumeTimer() {
       }
     }
   }
+
 //*Die Funktion vergleicht die UserCondition des Benutzers mit den in der Datenbank gespeicherten Bedingungen und gibt true zurück,
 // wenn eine der Bedingungen des Benutzers in den in der Datenbank gespeicherten Bedingungen enthalten ist. Andernfalls gibt sie false zurück. */
   bool _checkUserConditionInDb(String userCondition, String dbCondition) {
@@ -339,12 +412,15 @@ void _resumeTimer() {
     }
     return false;
   }
+
 /**Diese Methode lädt Metadaten von einer Webseite anhand einer URL mithilfe des any_link_preview-Pakets.
 //Die Metadaten werden für die Anzeige von Vorschauinformationen verwendet. */
   _loadWebsiteMetaData(String url) async {
     Metadata? _metadata = await AnyLinkPreview.getMetadata(
-        link: url, cache: const Duration(days: 7),
-        proxyUrl: "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU");
+        link: url,
+        cache: const Duration(days: 7),
+        proxyUrl:
+            "https://i.picsum.photos/id/239/1739/1391.jpg?hmac=-Zh20gMdOuV7tHr4wGEUqACAxdvb7gkDlKKS9MIE1TU");
     print(_metadata?.title);
     print(_metadata?.image);
     if (mounted) {
@@ -353,6 +429,7 @@ void _resumeTimer() {
       });
     }
   }
+
 /**Diese Methode startet einen Timer für die Anzeige der Fortschrittsdauer einer Übung.
  * Der Timer wird jede Sekunde aktualisiert.
  */
@@ -375,14 +452,19 @@ void _resumeTimer() {
       }
     });
   }
+
 /**Diese Methode startet einen Timer für Aufgabentypen wie Pausen und Schritte.
  * Der Timer wird jede Sekunde aktualisiert.
  */
   void _startBreakAndWalkTimer() {
+    setState(() {
+      _isBreakAndWalkTimerStarted = true;
+    });
+
     _targetTotalTimeInSec = 120;
     _timePassedInSec = 0;
 
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _breakAndWaterTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted && _timePassedInSec <= _targetTotalTimeInSec) {
         setState(() {
           _timePassedInSec++;
@@ -420,13 +502,16 @@ void _resumeTimer() {
 
         if ((_exercise?.steps?.isNotEmpty ?? false) &&
             (_exercise?.steps?.length ?? 0) - 1 > _currentStep) {
-          _stepNo = '${_exercise?.steps?.elementAt(_currentStep).serialNo} von ${(_exercise?.steps?.length ?? 0)-2}';
+          _stepNo =
+              '${_exercise?.steps?.elementAt(_currentStep).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
           _subTitle = _exercise?.steps?.elementAt(_currentStep).name ?? "";
 
-          _textToSpeak = '$_subTitle für ${_exercise?.steps?.elementAt(_currentStep).duration ?? 5} Sekunden';
+          _textToSpeak =
+              '$_subTitle für ${_exercise?.steps?.elementAt(_currentStep).duration ?? 5} Sekunden';
 
           _timerProgress = 0;
-          _totalExerciseSec = _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
+          _totalExerciseSec =
+              _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
           _passedExerciseSec = _totalExerciseSec;
           _isExerciseStepStarted = false;
         } else if ((_exercise?.steps?.length ?? 0) - 1 == _currentStep) {
@@ -446,6 +531,7 @@ void _resumeTimer() {
       _timer = null;
     }
   }
+
 /**Diese Methode wird aufgerufen, wenn der Benutzer eine Aufgabe abschließt und den Bestätigungsbutton drückt.
   *Sie aktualisiert den Fortschritt/Punkte des Benutzers und speichert die abgeschlossenen Aufgaben in den App-Daten.
   *Je nach Aufgabentyp (z. B. Wasser trinken, Schritte, Übungen) werden die entsprechenden Fortschritte/Punkte erhöht.
@@ -456,13 +542,16 @@ void _resumeTimer() {
       await DatabaseHelper.instance.updateAlertHistory(taskHistoryId);
     }
 
-    var complTargetJson = await SharedPref.instance.getJsonValue(SharedPref.keyUserCompletedTargets);
+    var complTargetJson = await SharedPref.instance
+        .getJsonValue(SharedPref.keyUserCompletedTargets);
     DailyTarget completedTarget;
     if (complTargetJson != null &&
-        complTargetJson is String && complTargetJson.isNotEmpty) {
+        complTargetJson is String &&
+        complTargetJson.isNotEmpty) {
       completedTarget = DailyTarget.fromRawJson(complTargetJson);
     } else {
-      completedTarget = DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
+      completedTarget =
+          DailyTarget(breaks: 0, waterGlasses: 0, exercises: 0, steps: 0);
     }
 
     switch (_taskType) {
@@ -492,12 +581,14 @@ void _resumeTimer() {
       default:
         break;
     }
-    SharedPref.instance.saveJsonValue(SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
+    SharedPref.instance.saveJsonValue(
+        SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     // only add score if it's for actual task alert, not for view only mode
     if (_taskPageData?.viewMode == 0) {
       int score = DataLoader.getScoreForTask(_taskType ?? -1);
-      String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+      String? userId =
+          await SharedPref.instance.getValue(SharedPref.keyUserServerId);
       if (userId != null && userId.isNotEmpty) {
         await ApiManager().updateUserScore(userId, score);
       }
@@ -516,182 +607,268 @@ void _resumeTimer() {
           elevation: 0,
           backgroundColor: Colors.pink.shade50,
           centerTitle: false,
-          title: _isExerciseTask && !_isExerciseSummaryRead ? const Text('Zusammenfassung') : const Text(''),
+          title: _isExerciseTask && !_isExerciseSummaryRead
+              ? const Text('')
+              : const Text(''),
         ),
         backgroundColor: Colors.pink.shade50,
         body: /*_isExerciseTask && !_isExerciseSummaryRead ?
           buildExerciseSummaryView(context, (_exercise?.steps?.length ?? 0) > 0 ? _exercise?.steps?.sublist(1, (_exercise?.steps?.length ?? 0)-1) ?? [] : []) :*/
-          buildMainView(context)
-
-    );
+            buildMainView(context));
   }
 
-Widget buildMainView(BuildContext context) {
-  return Align(
-    alignment: Alignment.topCenter, // Oben in der Mitte des Bildschirms
-    child: Column(
-      children: <Widget>[
-        Visibility(
-          visible: _isExerciseTask,
-          child: Text(
-            _stepNo ?? "",
-            style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 36, color: Colors.brown),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 30),
-        Visibility(
-          visible: _isExerciseTask,
-          child: SizedBox(
-            width: 120,
-            height: 120,
-            child: Stack(
-              children: [
-                Positioned(
-                  width: 120,
-                  height: 120,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 20,
-                    backgroundColor: Colors.white,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
-                    value: _timerProgress,
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    CommonUtil.formatTimeDurationToDisplay(_passedExerciseSec),
-                    style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              ],
+  Widget buildMainView(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter, // Oben in der Mitte des Bildschirms
+      child: Column(
+        children: <Widget>[
+          Visibility(
+            visible: _isExerciseTask,
+            child: Text(
+              _stepNo ?? "",
+              style: Theme.of(context)
+                  .textTheme
+                  .caption
+                  ?.copyWith(fontSize: 36, color: Colors.brown),
+              textAlign: TextAlign.center,
             ),
           ),
-        ),
-        const SizedBox(height: 30),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            _title,
-            style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Visibility(
-          visible: (_taskType == TaskType.breaks.index ||
-              _taskType == TaskType.steps.index ||
-              _taskType == TaskType.waterWithBreak.index ||
-              _taskType == TaskType.walkWithExercise.index),
-          child: SizedBox(
-            width: 120,
-            height: 120,
-            child: Stack(
-              children: [
-                Positioned(
-                  width: 120,
-                  height: 120,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 20,
-                    backgroundColor: Colors.white,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
-                    value: _timerProgress,
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    CommonUtil.formatTimeDurationToDisplay(_targetTotalTimeInSec - _timePassedInSec),
-                    style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 30, color: AppColor.darkBlue),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            _subTitle,
-            style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          height: 150,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            child: _image.isNotEmpty
-                ? Image.network(_image)
-                : Image.asset(_staticImage),
-          ),
-        ),
-        const SizedBox(height: 20),
-        Visibility(
-          visible: _isExerciseTask && !_isExerciseStepStarted,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
-            child: TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                ),
-                onPressed: () {
-                  _startExerciseTimer();
-                },
-                child: Ink(
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius:
-                    BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Container(
-                    constraints: const BoxConstraints(
-                        minHeight:
-                        50), // min sizes for Material buttons
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Übung starten".toUpperCase(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          const SizedBox(height: 30),
+          Visibility(
+            visible: _isExerciseTask,
+            child: SizedBox(
+              width: 120,
+              height: 120,
+              child: Stack(
+                children: [
+                  Positioned(
+                    width: 120,
+                    height: 120,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 20,
+                      backgroundColor: Colors.white,
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.orange),
+                      value: _timerProgress,
                     ),
                   ),
-                )),
-          ),
-        ),
-        Visibility(
-          visible: _showHideCloseButton == 1.0,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
-            child: GradientSlideToAct(
-              text: "Schieben zum\nBestätigen",
-              dragableIconBackgroundColor: Colors.greenAccent,
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .bodyText2
-                  ?.copyWith(fontSize: 18),
-              backgroundColor: Colors.white,
-              onSubmit: () {
-                onSubmitScore();
-              },
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColor.primary, AppColor.primaryLight],
+                  Center(
+                    child: Text(
+                      CommonUtil.formatTimeDurationToDisplay(
+                          _passedExerciseSec),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              _title,
+              style: Theme.of(context)
+                  .textTheme
+                  .caption
+                  ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Visibility(
+            visible: (_taskType == TaskType.breaks.index ||
+                _taskType == TaskType.steps.index ||
+                _taskType == TaskType.waterWithBreak.index ||
+                _taskType == TaskType.walkWithExercise.index),
+            child: SizedBox(
+              width: 120,
+              height: 120,
+              child: Stack(
+                children: [
+                  Positioned(
+                    width: 120,
+                    height: 120,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 20,
+                      backgroundColor: Colors.white,
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.orange),
+                      value: _timerProgress,
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      CommonUtil.formatTimeDurationToDisplay(
+                          _targetTotalTimeInSec - _timePassedInSec),
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              _subTitle,
+              style:
+                  Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            height: 150,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              child: _image.isNotEmpty
+                  ? Image.network(_image)
+                  : Image.asset(_staticImage),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Visibility(
+            visible: _isExerciseTask && !_isExerciseStepStarted,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+              child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) => Colors.transparent,
+                    ),
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  ),
+                  onPressed: () {
+                    _startExerciseTimer();
+                  },
+                  child: Ink(
+                    decoration: const BoxDecoration(
+                      color: Colors.orangeAccent,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Container(
+                      constraints: const BoxConstraints(
+                          minHeight: 50), // min sizes for Material buttons
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Übung starten".toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  )),
+            ),
+          ),
+          Visibility(
+            visible: _isExerciseTask && _isExerciseStepStarted,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+              child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) => Colors.transparent,
+                    ),
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  ),
+                  onPressed: () {
+                    _exerciseTogglePauseResume();
+                  },
+                  child: Ink(
+                    decoration: const BoxDecoration(
+                      color: Colors.orangeAccent,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Container(
+                      constraints: const BoxConstraints(
+                          minHeight: 50), // min sizes for Material buttons
+                      alignment: Alignment.center,
+                      child: Text(
+                        _isTimerPaused
+                            ? "Fortsetzen".toUpperCase()
+                            : "Pause".toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  )),
+            ),
+          ),
+          Visibility(
+            visible: _isBreakAndWalkTimerStarted,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+              child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) => Colors.transparent,
+                    ),
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  ),
+                  onPressed: () {
+                    _breakAndWaterTogglePauseResume();
+                  },
+                  child: Ink(
+                    decoration: const BoxDecoration(
+                      color: Colors.orangeAccent,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Container(
+                      constraints: const BoxConstraints(
+                          minHeight: 50), // min sizes for Material buttons
+                      alignment: Alignment.center,
+                      child: Text(
+                        _isTimerPaused
+                            ? "Fortsetzen".toUpperCase()
+                            : "Pause".toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  )),
+            ),
+          ),
+          Visibility(
+            visible: _showHideCloseButton == 1.0,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
+              child: GradientSlideToAct(
+                text: "Schieben zum\nBestätigen",
+                dragableIconBackgroundColor: Colors.greenAccent,
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .bodyText2
+                    ?.copyWith(fontSize: 18),
+                backgroundColor: Colors.white,
+                onSubmit: () {
+                  onSubmitScore();
+                },
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColor.primary, AppColor.primaryLight],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-
-  Widget buildExerciseSummaryView(BuildContext context, List<ExerciseStep> steps) {
+  Widget buildExerciseSummaryView(
+      BuildContext context, List<ExerciseStep> steps) {
     return ListView(
       // crossAxisAlignment: CrossAxisAlignment.center,
       // mainAxisAlignment: MainAxisAlignment.center,
@@ -701,7 +878,10 @@ Widget buildMainView(BuildContext context) {
           padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
           child: Text(
             'Übung: ${steps.isNotEmpty ? steps[0].name ?? "" : ""}',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColor.orange),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(color: AppColor.orange),
             textAlign: TextAlign.center,
           ),
         ),
@@ -714,7 +894,9 @@ Widget buildMainView(BuildContext context) {
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 ExerciseStep step = steps[index];
-                return ExerciseSummaryItemView(itemData: step,);
+                return ExerciseSummaryItemView(
+                  itemData: step,
+                );
               },
               separatorBuilder: (context, index) {
                 return const Divider(endIndent: 0, color: Colors.transparent);
@@ -728,7 +910,9 @@ Widget buildMainView(BuildContext context) {
           padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
           child: TextButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) => Colors.transparent,),
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) => Colors.transparent,
+                ),
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
               ),
               onPressed: () {
@@ -740,17 +924,16 @@ Widget buildMainView(BuildContext context) {
               child: Ink(
                 decoration: const BoxDecoration(
                   color: Colors.orangeAccent,
-                  borderRadius:
-                  BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Container(
                   constraints: const BoxConstraints(
-                      minHeight:
-                      50), // min sizes for Material buttons
+                      minHeight: 50), // min sizes for Material buttons
                   alignment: Alignment.center,
                   child: Text(
                     getButtonText().toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               )),
@@ -760,7 +943,7 @@ Widget buildMainView(BuildContext context) {
   }
 }
 
-// Pause/Resume kann so eingefügt werden 
+// Pause/Resume kann so eingefügt werden
 
 // ElevatedButton(
 //   onPressed: () {
