@@ -154,8 +154,7 @@ und Pausen zwischen Sätzen festlegt.*/
       }
 
       setState(() {
-        _textToSpeak =
-            '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
+        _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
       });
       _passedExerciseSec = 0;
     } else if (_taskType == TaskType.water.index) {
@@ -202,14 +201,6 @@ und Pausen zwischen Sätzen festlegt.*/
     }
   }
 
-  String getButtonText() {
-    if (_isExerciseTask && !_isExerciseSummaryRead) {
-      return "Übung starten";
-    } else {
-      return "Weiter";
-    }
-  }
-
 /*Die Funktion _speakStep wird verwendet, um einen gegebenen Text (_textToSpeak) in deutscher Sprache vorzulesen,
  wobei spezifische Einstellungen für Lautstärke, Sprechgeschwindigkeit und Tonhöhe berücksichtigt werden,
  während _stopSpeaking die laufende Sprachausgabe stoppt. */
@@ -237,7 +228,9 @@ und Pausen zwischen Sätzen festlegt.*/
     }
   }
 
-  void _exercisePauseTimer() {
+  void _exercisePauseTimer() async {
+    _stopSpeaking();
+
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
       setState(() {
@@ -246,7 +239,9 @@ und Pausen zwischen Sätzen festlegt.*/
     }
   }
 
-  void _exerciseResumeTimer() {
+  void _exerciseResumeTimer() async {
+    _speakStep();
+
     if (_isTimerPaused) {
       // Setzen Sie den Timer zurück, indem Sie _startExerciseTimer aufrufen.
       _startExerciseTimer();
@@ -506,13 +501,11 @@ und Pausen zwischen Sätzen festlegt.*/
               '${_exercise?.steps?.elementAt(_currentStep).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
           _subTitle = _exercise?.steps?.elementAt(_currentStep).name ?? "";
 
-          _textToSpeak =
-              '$_subTitle für ${_exercise?.steps?.elementAt(_currentStep).duration ?? 5} Sekunden';
+          _textToSpeak = '$_subTitle für ${_exercise?.steps?.elementAt(_currentStep).duration ?? 5} Sekunden';
 
           _timerProgress = 0;
-          _totalExerciseSec =
-              _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
-          _passedExerciseSec = _totalExerciseSec;
+          _totalExerciseSec = _exercise?.steps?.elementAt(_currentStep).duration ?? 5;
+          _passedExerciseSec = 0;
           _isExerciseStepStarted = false;
         } else if ((_exercise?.steps?.length ?? 0) - 1 == _currentStep) {
           _showHideCloseButton = 1.0;
@@ -655,7 +648,7 @@ und Pausen zwischen Sätzen festlegt.*/
                   Center(
                     child: Text(
                       CommonUtil.formatTimeDurationToDisplay(
-                          _passedExerciseSec),
+                          _totalExerciseSec - _passedExerciseSec),
                       style: Theme.of(context)
                           .textTheme
                           .caption
@@ -759,8 +752,7 @@ und Pausen zwischen Sätzen festlegt.*/
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     child: Container(
-                      constraints: const BoxConstraints(
-                          minHeight: 50), // Mindestgrößen für Material Buttons
+                      constraints: const BoxConstraints(minHeight: 50, maxWidth: 250), // min sizes for Material buttons
                       alignment: Alignment.center,
                       child: Text(
                         "Übung starten".toUpperCase(),
@@ -772,7 +764,7 @@ und Pausen zwischen Sätzen festlegt.*/
             ),
           ),
           Visibility(
-            visible: _isExerciseTask && _isExerciseStepStarted,
+            visible: _isExerciseTask && _isExerciseStepStarted && _showHideCloseButton != 1.0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
               child: TextButton(
@@ -791,8 +783,7 @@ und Pausen zwischen Sätzen festlegt.*/
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     child: Container(
-                      constraints: const BoxConstraints(
-                          minHeight: 50), // Mindestgrößen für Material Buttons
+                      constraints: const BoxConstraints(minHeight: 50, maxWidth: 250), // min sizes for Material buttons
                       alignment: Alignment.center,
                       child: Text(
                         _isTimerPaused
@@ -806,7 +797,7 @@ und Pausen zwischen Sätzen festlegt.*/
             ),
           ),
           Visibility(
-            visible: _isBreakAndWalkTimerStarted,
+            visible: _isBreakAndWalkTimerStarted && _showHideCloseButton != 1.0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
               child: TextButton(
@@ -825,8 +816,7 @@ und Pausen zwischen Sätzen festlegt.*/
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     child: Container(
-                      constraints: const BoxConstraints(
-                          minHeight: 50), // Mindestgrößen für Material Buttons
+                      constraints: const BoxConstraints(minHeight: 50, maxWidth: 250), // min sizes for Material buttons
                       alignment: Alignment.center,
                       child: Text(
                         _isTimerPaused
@@ -864,81 +854,6 @@ und Pausen zwischen Sätzen festlegt.*/
           ),
         ],
       ),
-    );
-  }
-
-  Widget buildExerciseSummaryView(
-      BuildContext context, List<ExerciseStep> steps) {
-    return ListView(
-      // crossAxisAlignment: CrossAxisAlignment.center,
-      // mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-          child: Text(
-            'Übung: ${steps.isNotEmpty ? steps[0].name ?? "" : ""}',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: AppColor.orange),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        Expanded(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                ExerciseStep step = steps[index];
-                return ExerciseSummaryItemView(
-                  itemData: step,
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const Divider(endIndent: 0, color: Colors.transparent);
-              },
-              itemCount: steps.length,
-              scrollDirection: Axis.vertical,
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
-          child: TextButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) => Colors.transparent,
-                ),
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-              ),
-              onPressed: () {
-                setState(() {
-                  _isExerciseSummaryRead = true;
-                });
-                _startExerciseTimer();
-              },
-              child: Ink(
-                decoration: const BoxDecoration(
-                  color: Colors.orangeAccent,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Container(
-                  constraints: const BoxConstraints(
-                      minHeight: 50), // Mindestgrößen für Material Buttons
-                  alignment: Alignment.center,
-                  child: Text(
-                    getButtonText().toUpperCase(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              )),
-        ),
-      ],
     );
   }
 }

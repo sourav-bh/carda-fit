@@ -66,6 +66,7 @@ enum TaskStatus { completed, pending, missed, snoozed, upcoming }
 
 class AlertHistory {
   AlertHistory({
+    required this.dbId,
     required this.title,
     required this.description,
     required this.taskType,
@@ -74,6 +75,7 @@ class AlertHistory {
     required this.completedAt,
   });
 
+  int dbId;
   String title;
   String description;
   TaskType taskType;
@@ -86,6 +88,7 @@ class AlertHistory {
   String toRawJson() => json.encode(toMap());
 
   factory AlertHistory.fromMap(Map<String, dynamic> json) => AlertHistory(
+    dbId: json["id"],
     title: json["title"],
     description: json["description"],
     taskType: TaskType.values[json["taskType"]],
@@ -95,6 +98,7 @@ class AlertHistory {
   );
 
   Map<String, dynamic> toMap() => {
+    "id": dbId,
     "title": title,
     "description": description,
     "taskType": taskType.index,

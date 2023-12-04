@@ -94,11 +94,19 @@ class _UserActivityPageState extends State<UserActivityPage> {
                       style: Theme.of(context).textTheme.caption?.copyWith(
                             color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,)
                   ),
-                  IconButton(
-                    onPressed: () {
+                  InkWell(
+                    onTap: () {
                       Navigator.pushNamed(context, alertHistoryRoute);
                     },
-                    icon: const Icon(Icons.list_alt, color: AppColor.primary, size: 30,)
+                    child: Row(
+                      children: [
+                        Text("",
+                            style: Theme.of(context).textTheme.caption?.copyWith(
+                              color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,)
+                        ),
+                        const Icon(Icons.list_alt, color: AppColor.primary, size: 30,)
+                      ],
+                    ),
                   ),
                 ],
               ),

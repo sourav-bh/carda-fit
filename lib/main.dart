@@ -110,6 +110,7 @@ Future<void> foregroundHandler(RemoteMessage message) async {
   int alertType = int.parse(message.data["text"]);
 
   AlertHistory alertHistory = AlertHistory(
+      dbId: 0,
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
@@ -171,6 +172,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   int alertType = int.parse(message.data["text"]);
 
   AlertHistory alertHistory = AlertHistory(
+      dbId: 0,
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
@@ -318,6 +320,7 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
   int alertType = int.parse(payload);
 
   AlertHistory alertHistory = AlertHistory(
+      dbId: 0,
       title: title,
       description: body,
       taskType: TaskType.values[alertType],
@@ -327,12 +330,10 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
 
   if (!isUserSnoozedNow) {
     // Markiert alle vorherigen Verlaufselemente als verpasste Alarme für denselben Aufgabentypen.
-    await DatabaseHelper.instance
-        .batchUpdateAlertHistoryItemAsMissed(alertType);
+    await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
   }
 
-  int alertHistoryId =
-      await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  int alertHistoryId = await DatabaseHelper.instance.addAlertHistory(alertHistory);
   debugPrint(
       "-------> Alert history item saved in DB from background listener: $alertHistoryId");
 

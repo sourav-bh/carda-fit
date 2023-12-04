@@ -213,8 +213,8 @@ class DatabaseHelper {
     //     "taskStatus INTEGER,"
     //     "taskCreatedAt VARCHAR,"
     //     "completedAt VARCHAR)");
-    // await db.execute("ALTER TABLE $TABLE_EXERCISES("
-    //     "RENAME COLUMN steps TO stepsJson)");
+    // await db.execute('ALTER TABLE $TABLE_EXERCISES '
+    //     'RENAME COLUMN steps TO stepsJson;');
   }
 
   ///user

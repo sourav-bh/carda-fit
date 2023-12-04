@@ -126,7 +126,7 @@ class _UserLearningPageState extends State<UserLearningPage> {
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
   int? _selectedTab = 1;
-  bool _showFilteredList = false;
+  bool _showNoFilteredItemMsg = false;
   String? _userCondition;
 
   @override
@@ -140,19 +140,16 @@ class _UserLearningPageState extends State<UserLearningPage> {
   _loadData() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null &&
-        !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       setState(() {
-        _showFilteredList = true;
         _userCondition = userInfo.medicalConditions;
       });
     }
 
     await _loadContentsFromAsset(true, _userCondition);
-
     if (_learningMaterials.isEmpty) {
       setState(() {
-        _showFilteredList = false;
+        _showNoFilteredItemMsg = true;
       });
       _loadContentsFromAsset(false, null);
     }
@@ -185,9 +182,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
 
           bool addContent = false;
           if (isFiltered) {
-            if (content.condition != null &&
-                filerCondition != null &&
-                filerCondition.contains(content.condition ?? "")) {
+            print("+++++++++++++++++filter condition: $filerCondition");
+            if (content.condition != null && filerCondition != null && filerCondition.contains(content.condition ?? "")) {
               addContent = true;
             } else if (filerCondition == null) {
               addContent = true;
@@ -258,18 +254,16 @@ class _UserLearningPageState extends State<UserLearningPage> {
                 ),
               ),
             ),
-            Visibility(
-              visible: _showFilteredList,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                child: Text(
-                  'Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: AppColor.darkBlue, fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: Text(_showNoFilteredItemMsg ?
+                'Es wurde leider kein Lernmaterial zu den von Ihnen genannten Krankheiten gefunden. Sie sehen jetzt alle Inhalte' :
+                'Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColor.darkBlue, fontSize: 20),
+                textAlign: TextAlign.center,
               ),
             ),
             Expanded(

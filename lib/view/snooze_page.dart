@@ -223,14 +223,14 @@ class _SnoozePageState extends State<SnoozePage> {
     return Scaffold(
       backgroundColor: AppColor.lightPink,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
         child: Stack(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Zentrierter Text oben
-                Center(
+                const Center(
                   child: Text(
                     'Snooze-Zeit wählen',
                     style: TextStyle(

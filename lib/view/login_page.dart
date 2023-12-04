@@ -77,6 +77,7 @@ class _LoginPageState extends State<LoginPage> {
       int userDbId = await DatabaseHelper.instance.addUser(userRes);
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
       AppCache.instance.userName = userName;
+
       SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
       AppCache.instance.userDbId = userDbId;
 

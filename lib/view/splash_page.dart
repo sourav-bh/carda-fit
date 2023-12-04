@@ -146,11 +146,11 @@ class _SplashPageState extends State<SplashPage> {
             exercise.duration = duration;
             exercise.url = url;
 
-            exercise.stepsJson = json.encode(steps);
+            // exercise.stepsJson = json.encode(steps);
             exercise.steps = [];
             exercise.steps?.addAll(steps);
 
-            await dbHelper.addExercise(exercise);
+            // await dbHelper.addExercise(exercise);
 
             // List<Exercise> exercises = await dbHelper.getExercises();
             // // Deserialize the stepsJson field back into a list of ExerciseStep
