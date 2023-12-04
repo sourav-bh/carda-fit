@@ -34,7 +34,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<FitnessItemInfo> _dailyFitnessItems = List.empty(growable: true);
   final List<LearningMaterialInfo> _learningMaterials =
-      List.empty(growable: true);
+  List.empty(growable: true);
 
   SnoozeTime? _selectedSnoozeTimeVal;
   List<LearningContent> convertLearningList = [];
@@ -96,9 +96,9 @@ class _HomePageState extends State<HomePage> {
    * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
     int snoozedAt =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (currentTime - snoozedAt > snoozeDuration * 60 * 1000) {
@@ -118,9 +118,9 @@ class _HomePageState extends State<HomePage> {
 
   _checkSnoozeButtonStatus() async {
     int snoozeDuration =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
     int snoozedAt =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (currentTime - snoozedAt <= snoozeDuration * 60 * 1000) {
@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
       double percentagePerTask = 100 / (totalTaskValues * 8);
       setState(() {
         _currentUserProgress = (min(completedJobs.waterGlasses ?? 0, 8) *
-                percentagePerTask) +
+            percentagePerTask) +
             (min(completedJobs.exercises ?? 0, 8) * percentagePerTask) +
             ((min(completedJobs.steps ?? 0, 800) / 100) * percentagePerTask) +
             (min(completedJobs.breaks ?? 0, 8) * percentagePerTask);
@@ -214,28 +214,28 @@ class _HomePageState extends State<HomePage> {
                                       // Zitat
                                       TextSpan(
                                         text: DataLoader.quotes[
-                                            AppCache.instance.quoteIndex],
+                                        AppCache.instance.quoteIndex],
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelLarge
                                             ?.copyWith(
-                                              color: AppColor.darkBlue,
-                                              fontSize: 24,
-                                              fontStyle: FontStyle.normal,
-                                            ),
+                                          color: AppColor.darkBlue,
+                                          fontSize: 24,
+                                          fontStyle: FontStyle.normal,
+                                        ),
                                       ),
                                       // Zitatautor
                                       TextSpan(
                                         text:
-                                            '\n${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
+                                        '\n${DataLoader.quotesAuthor[AppCache.instance.quoteIndex]}',
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelLarge
                                             ?.copyWith(
-                                              color: Colors.black54,
-                                              fontSize: 16,
-                                              fontStyle: FontStyle.italic,
-                                            ),
+                                          color: Colors.black54,
+                                          fontSize: 16,
+                                          fontStyle: FontStyle.italic,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                const EdgeInsets.symmetric(horizontal: 10),
                                 child: GestureDetector(
                                   onTap: () {
                                     // _showSnoozeTimeSelected(context);
@@ -259,11 +259,11 @@ class _HomePageState extends State<HomePage> {
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 20),
                                     decoration:
-                                        CommonUtil.getRectangleBoxDecoration(
-                                            _selectedSnoozeTimeVal != null
-                                                ? Colors.orangeAccent
-                                                : Colors.white70,
-                                            10),
+                                    CommonUtil.getRectangleBoxDecoration(
+                                        _selectedSnoozeTimeVal != null
+                                            ? Colors.orangeAccent
+                                            : Colors.white70,
+                                        10),
                                     child: Padding(
                                       padding: const EdgeInsets.all(5),
                                       child: Column(
@@ -284,94 +284,89 @@ class _HomePageState extends State<HomePage> {
                             ],
                           )),
                     )),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                  padding: const EdgeInsets.all(15),
-                  decoration:
-                      CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.crisis_alert_rounded,
-                            color: Colors.black54,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Text("Tagesziele"),
-                          const Spacer(),
-                          GestureDetector(
+                GestureDetector(
+                  onTap: () {
+                    widget.onTabSwitch?.call(1);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                    padding: const EdgeInsets.all(15),
+                    decoration: CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.crisis_alert_rounded,
+                              color: Colors.black54,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            const Text("Tagesziele"),
+                            const Spacer(),
+                            GestureDetector(
                               onTap: () {
                                 widget.onTabSwitch?.call(1);
                               },
-                              child: Text(
-                                "Details",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: AppColor.orange,
-                                      fontSize: 18,
-                                      fontStyle: FontStyle.normal,
-                                    ),
-                              )),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "Schritt für Schritt erreichen Sie Ihr Ziel",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              child: const Icon(Icons.more_horiz),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Schritt für Schritt erreichen Sie Ihr Ziel",
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: AppColor.darkBlue,
                             fontSize: 20,
                             fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "Sie machen sich heute gut, machen Sie weiter, um Ihre Tagesziele zu erreichen!",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              child: LinearProgressIndicator(
-                                value: _currentUserProgress / 100,
-                                color: Colors.pink,
-                                backgroundColor: Colors.white,
-                                minHeight: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Sie machen sich heute gut, machen Sie weiter, um Ihre Tagesziele zu erreichen!",
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                child: LinearProgressIndicator(
+                                  value: _currentUserProgress / 100,
+                                  color: Colors.pink,
+                                  backgroundColor: Colors.white,
+                                  minHeight: 20,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "${_currentUserProgress.round()} %",
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                        ],
-                      )
-                    ],
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "${_currentUserProgress.round()} %",
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   padding: const EdgeInsets.all(15),
                   decoration:
-                      CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                  CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -396,10 +391,10 @@ class _HomePageState extends State<HomePage> {
                                     .textTheme
                                     .titleLarge
                                     ?.copyWith(
-                                      color: AppColor.orange,
-                                      fontSize: 18,
-                                      fontStyle: FontStyle.normal,
-                                    ),
+                                  color: AppColor.orange,
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.normal,
+                                ),
                               )),
                         ],
                       ),
@@ -436,9 +431,9 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 onTap: () {
                                   TaskAlertPageData alertPageData =
-                                      TaskAlertPageData(
-                                          viewMode: 1,
-                                          taskType: item.taskType.index);
+                                  TaskAlertPageData(
+                                      viewMode: 1,
+                                      taskType: item.taskType.index);
 
                                   print(
                                       "-------> opening task alert page from on home page item click");
@@ -462,7 +457,7 @@ class _HomePageState extends State<HomePage> {
                   margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   padding: const EdgeInsets.all(15),
                   decoration:
-                      CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
+                  CommonUtil.getRectangleBoxDecoration(Colors.white70, 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -489,10 +484,10 @@ class _HomePageState extends State<HomePage> {
                                   .textTheme
                                   .titleLarge
                                   ?.copyWith(
-                                    color: AppColor.orange,
-                                    fontSize: 18,
-                                    fontStyle: FontStyle.normal,
-                                  ),
+                                color: AppColor.orange,
+                                fontSize: 18,
+                                fontStyle: FontStyle.normal,
+                              ),
                             ),
                           ),
                         ],
@@ -514,7 +509,7 @@ class _HomePageState extends State<HomePage> {
                       ListView.separated(
                         itemBuilder: (BuildContext context, int index) {
                           LearningMaterialInfo material =
-                              _learningMaterials[index];
+                          _learningMaterials[index];
                           return GestureDetector(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -534,12 +529,12 @@ class _HomePageState extends State<HomePage> {
                                 Expanded(
                                   child: Container(
                                     margin:
-                                        const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                    const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                      MainAxisAlignment.spaceAround,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           material.title.trim(),
@@ -576,7 +571,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               Navigator.pushNamed(context, detailsWebRoute,
                                   arguments:
-                                      _learningMaterials.first.originalContent);
+                                  _learningMaterials.first.originalContent);
                             },
                           );
                         },
@@ -640,18 +635,18 @@ class _HomePageState extends State<HomePage> {
                                     label: Text(
                                         '${(snoozeTime.duration.inMinutes)} min'),
                                     labelStyle:
-                                        const TextStyle(color: Colors.white),
+                                    const TextStyle(color: Colors.white),
                                     selected: snoozeTime.isSelected,
                                     onSelected: (bool selected) {
                                       setState(() {
                                         for (var i = 0;
-                                            i < _snoozeTimeItems.length;
-                                            i += 1) {
+                                        i < _snoozeTimeItems.length;
+                                        i += 1) {
                                           _snoozeTimeItems[i].isSelected =
-                                              false;
+                                          false;
                                         }
                                         snoozeTime.isSelected =
-                                            !(snoozeTime.isSelected);
+                                        !(snoozeTime.isSelected);
                                         setSnoozeTime(snoozeTime);
                                       });
                                     },
@@ -677,7 +672,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Text(
                                   'OK',
                                   style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                  Theme.of(context).textTheme.titleMedium,
                                 )),
                           )
                         ],

@@ -77,7 +77,7 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
     }
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -88,79 +88,123 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> {
       ),
       backgroundColor: AppColor.lightPink,
       body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: _historyItems.isNotEmpty ?
-            ListView.separated(
-          itemCount: _historyItems.length,
-          separatorBuilder: (BuildContext context, int index) =>
-              const SizedBox(height: 8),
-          itemBuilder: (context, index) {
-            final historyItem = _historyItems[index];
-            return Card(
-              color: Colors.white,
-              elevation: 2,
-              shape: RoundedRectangleBorder( 
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    leading: CircleAvatar(
-                      radius: 30, 
-                      backgroundImage: AssetImage(
-                        _getIconForTaskType(historyItem.taskType),
-                      ),
-                    ),
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          historyItem.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          historyItem.completedAt.isNotEmpty
-                              ? CommonUtil.convertDbTimeStampToTimeOnlyStr(historyItem.completedAt)
-                              : CommonUtil.convertDbTimeStampToTimeOnlyStr(historyItem.taskCreatedAt),
-                          style: const TextStyle(fontSize: 12,
-                          color: AppColor.lightBlack
-                          )
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      historyItem.description,
-                      style: const TextStyle(fontSize: 12,
-                       color: AppColor.lightBlack),
-                    ),
-                  ],
+          padding: const EdgeInsets.all(8),
+          child: _historyItems.isNotEmpty ?
+          ListView.separated(
+            itemCount: _historyItems.length,
+            separatorBuilder: (BuildContext context, int index) =>
+            const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final historyItem = _historyItems[index];
+              return Card(
+                color: Colors.white,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                trailing: _getStatusIcon(historyItem.taskStatus),
-                onTap: () {
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(12),
+                  leading: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage(
+                      _getIconForTaskType(historyItem.taskType),
+                    ),
+                  ),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            historyItem.title,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                              historyItem.completedAt.isNotEmpty
+                                  ? CommonUtil.convertDbTimeStampToTimeOnlyStr(historyItem.completedAt)
+                                  : CommonUtil.convertDbTimeStampToTimeOnlyStr(historyItem.taskCreatedAt),
+                              style: const TextStyle(fontSize: 12,
+                                  color: AppColor.lightBlack
+                              )
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        historyItem.description,
+                        style: const TextStyle(fontSize: 12,
+                            color: AppColor.lightBlack),
+                      ),
+                    ],
+                  ),
+                  trailing: _getStatusIcon(historyItem.taskStatus),
+                  onTap: () {
                     if (historyItem.taskStatus == TaskStatus.snoozed || historyItem.taskStatus == TaskStatus.pending) {
                       TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 0, taskType: historyItem.taskType.index);
-                        Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
-                 }
-                },
-              ),
-            );
-          },
-        ) :
-            Center(
-              child: Text('Noch keine Alarme erhalten!',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-            )
+                      Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
+                    }  else if (historyItem.taskStatus == TaskStatus.completed) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Aufgabe abgeschlossen'),
+                            content: const Text('Diese Aufgabe wurde erfolgreich abgeschlossen.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else if (historyItem.taskStatus == TaskStatus.missed) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Aufgabe verpasst'),
+                            content: const Text('Diese Aufgabe wurde verpasst und kann nicht nachgeholt werden, da kein Snooze-Alarm festgelegt wurde.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Ok',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              );
+            },
+          ) :
+          Center(
+            child: Text('Noch keine Alarme erhalten!',
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+          )
       ),
     );
   }
