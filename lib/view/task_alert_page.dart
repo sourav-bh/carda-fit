@@ -70,6 +70,8 @@ class _TaskAlertPageState extends State<TaskAlertPage> {
   FlutterTts flutterTts = FlutterTts();
   String _textToSpeak = "";
 
+  bool _isTimerPaused = false;
+
   @override
   void initState() {
     super.initState();
@@ -215,6 +217,35 @@ und Pausen zwischen Sätzen festlegt.*/
   Future _stopSpeaking() async{
     await flutterTts.stop();
   }
+
+void _togglePauseResume() {
+  if (_isExerciseStepStarted) {
+    if (_isTimerPaused) {
+      _resumeTimer();
+    } else {
+      _pauseTimer();
+    }
+  }
+}
+
+void _pauseTimer() {
+  if (_timer != null && _timer!.isActive) {
+    _timer!.cancel();
+    setState(() {
+      _isTimerPaused = true;
+    });
+  }
+}
+
+void _resumeTimer() {
+  if (!_isTimerPaused) {
+    _startExerciseTimer();
+    setState(() {
+      _isTimerPaused = false;
+    });
+  }
+}
+
 
 //**Diese Methode wird verwendet, um Übungsdaten aus einer Excel-Tabelle zu extrahieren.
 //Sie liest die Excel-Datei aus den Assets und erstellt eine Liste von Übungen, einschließlich ihrer Schritte und anderer relevanter Daten.
@@ -728,3 +759,12 @@ Widget buildMainView(BuildContext context) {
     );
   }
 }
+
+// Pause/Resume kann so eingefügt werden 
+
+// ElevatedButton(
+//   onPressed: () {
+//     _togglePauseResume();
+//   },
+//   child: Text(_isTimerPaused ? 'Resume' : 'Pause'),
+// ),

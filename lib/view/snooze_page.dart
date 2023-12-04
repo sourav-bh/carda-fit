@@ -332,7 +332,7 @@ class _SnoozePageState extends State<SnoozePage> {
                     overlayColor: MaterialStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context,homeRoute);
+                    Navigator.pushNamed(context, homeRoute);
                     widget.onUpdateState?.call();
                   },
                   child: Ink(
@@ -418,7 +418,7 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                   onPressed: () {
                     _calculateAndSaveCustomSnoozeTime();
-                    Navigator.pushNamed(context,homeRoute);
+                    Navigator.pushNamed(context, homeRoute);
                     widget.onUpdateState?.call();
                   },
                   child: Ink(
@@ -462,7 +462,7 @@ class _SnoozePageState extends State<SnoozePage> {
                         _selectedSnoozeTimeVal = null;
                       });
                       resetSnooze();
-                      Navigator.pushNamed(context,homeRoute);
+                      Navigator.pushNamed(context, homeRoute);
                       widget.onUpdateState?.call();
                     },
                     child: Ink(
@@ -495,7 +495,7 @@ class _SnoozePageState extends State<SnoozePage> {
               child: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  Navigator.pushNamed(context,homeRoute);
+                  Navigator.pushNamed(context, homeRoute);
                 },
               ),
             ),
