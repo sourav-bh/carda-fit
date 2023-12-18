@@ -239,7 +239,7 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 // Klickbare Snooze-Zeiten
                 for (int i = 0; i < _snoozeTimeItems.length; i += 2)
                   Row(
@@ -442,7 +442,7 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                 ),
                 SizedBox(
-                  height: 80,
+                  height: 60,
                 ),
                 // "Annullieren"-Button
                 Container(
