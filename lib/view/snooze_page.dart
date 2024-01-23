@@ -1,6 +1,7 @@
 import 'package:app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:app/model/user_info.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../util/app_style.dart';
@@ -156,7 +157,7 @@ class _SnoozePageState extends State<SnoozePage> {
 
     // Hier wird die Bestätigung angezeigt
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Snooze wurde erfolgreich aufgehoben.'),
         duration: Duration(
             seconds:
@@ -196,7 +197,7 @@ class _SnoozePageState extends State<SnoozePage> {
 
       // Zeigen Sie eine Bestätigungsnachricht an
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Snooze wurde erfolgreich gespeichert.'),
           duration: Duration(seconds: 2),
         ),
@@ -204,7 +205,7 @@ class _SnoozePageState extends State<SnoozePage> {
     } else {
       // Zeigen Sie eine Fehlermeldung an, wenn Start- oder Endzeit fehlen
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Bitte wählen Sie sowohl Start- als auch Endzeit aus.'),
           duration: Duration(seconds: 2),
         ),
@@ -222,24 +223,19 @@ class _SnoozePageState extends State<SnoozePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.lightPink,
+      appBar: AppBar(
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        centerTitle: false,
+        title: const Text('Snooze-Zeit wählen'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Stack(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Zentrierter Text oben
-                Center(
-                  child: Text(
-                    'Snooze-Zeit wählen',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 // Klickbare Snooze-Zeiten
                 for (int i = 0; i < _snoozeTimeItems.length; i += 2)
                   Row(
@@ -257,13 +253,10 @@ class _SnoozePageState extends State<SnoozePage> {
                           });
                         },
                         child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 30),
+                          margin: const EdgeInsets.symmetric(vertical: 10),
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            // _selectedSnoozeTimeVal == _snoozeTimeItems[i]
-                            //     ? Colors.orangeAccent
-                            //     : Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: _selectedSnoozeTimeVal ==
@@ -295,14 +288,10 @@ class _SnoozePageState extends State<SnoozePage> {
                             });
                           },
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 30),
+                            margin: const EdgeInsets.symmetric(vertical: 10),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              // _selectedSnoozeTimeVal ==
-                              //         _snoozeTimeItems[i + 1]
-                              //     ? Colors.orangeAccent
-                              //     : Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: _selectedSnoozeTimeVal ==
@@ -355,7 +344,7 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                 ),
                 // Spacer(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -380,14 +369,14 @@ class _SnoozePageState extends State<SnoozePage> {
                         ))
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text(
                       _endTime == null
-                          ? ' Snooze Startzeit wählen'
-                          : 'Startzeit: ${DateFormat('HH:mm').format(_endTime!)}',
+                          ? ' Snooze Endzeit wählen'
+                          : 'Endzeit: ${DateFormat('HH:mm').format(_endTime!)}',
                       // Änderung hier
                       style: Theme.of(context)
                           .textTheme
@@ -405,7 +394,6 @@ class _SnoozePageState extends State<SnoozePage> {
                         ))
                   ],
                 ),
-
                 const SizedBox(height: 10),
                 // Bestätigungsbutton für die Differenzberechnung
                 ElevatedButton(
@@ -431,9 +419,9 @@ class _SnoozePageState extends State<SnoozePage> {
                         minHeight: 40,
                       ),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         'gewählte Zeit bestätigen',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
@@ -441,8 +429,8 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 60,
+                const SizedBox(
+                  height: 30,
                 ),
                 // "Annullieren"-Button
                 Container(
@@ -475,9 +463,9 @@ class _SnoozePageState extends State<SnoozePage> {
                           minHeight: 40,
                         ),
                         alignment: Alignment.center,
-                        child: Text(
+                        child: const Text(
                           'Snooze annullieren',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
@@ -486,19 +474,9 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10), // Platz zwischen Text und Button
+                const SizedBox(height: 10), // Platz zwischen Text und Button
               ],
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pushNamed(context, homeRoute);
-                },
-              ),
-            ),
+            )
           ],
         ),
       ),

@@ -178,6 +178,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double deviceWidth = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: AppColor.lightPink,
       body: Stack(
@@ -248,13 +249,13 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     // _showSnoozeTimeSelected(context);
                                     Navigator.pushNamed(context, snoozeRoute);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SnoozePage(
-                                            onUpdateState: onUpdateState),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) => SnoozePage(
+                                    //         onUpdateState: onUpdateState),
+                                    //   ),
+                                    // );
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 20),
@@ -282,8 +283,10 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ],
-                          )),
-                    )),
+                          )
+                      ),
+                    )
+                ),
                 GestureDetector(
                   onTap: () {
                     widget.onTabSwitch?.call(1);
@@ -414,37 +417,30 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Container(
                         height: 100,
-                        decoration: CommonUtil.getRectangleBoxDecoration(
-                            Colors.white12, 10),
+                        decoration: CommonUtil.getRectangleBoxDecoration(Colors.white12, 10),
                         child: ListView.separated(
                             itemBuilder: (BuildContext context, int index) {
                               FitnessItemInfo item = _dailyFitnessItems[index];
                               return GestureDetector(
                                 child: ClipOval(
                                   child: SizedBox.fromSize(
-                                    size: const Size.fromRadius(50),
-                                    child: Image.asset(
-                                      item.image,
-                                      fit: BoxFit.fill,
+                                    // 45 is for 3x15 gap between the items and 62 is for 30 + 32 padding + margin of the parent & this view
+                                    size: Size.fromRadius((deviceWidth-45-62)/8),
+                                    child: Container(
+                                        color: Colors.white,
+                                        child: Image.asset(item.image, fit: BoxFit.cover,)
                                     ),
                                   ),
                                 ),
                                 onTap: () {
-                                  TaskAlertPageData alertPageData =
-                                  TaskAlertPageData(
-                                      viewMode: 1,
-                                      taskType: item.taskType.index);
-
-                                  print(
-                                      "-------> opening task alert page from on home page item click");
-                                  Navigator.pushNamed(context, taskAlertRoute,
-                                      arguments: alertPageData);
+                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: item.taskType.index);
+                                  print("-------> opening task alert page from on home page item click");
+                                  Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
                                 },
                               );
                             },
                             separatorBuilder: (context, index) {
-                              return const Divider(
-                                  endIndent: 15, color: Colors.transparent);
+                              return const Divider(endIndent: 15, color: Colors.transparent);
                             },
                             // itemCount: _homeFeed?.popularProducts?.length ?? 0,
                             itemCount: _dailyFitnessItems.length,

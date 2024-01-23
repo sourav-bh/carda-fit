@@ -38,6 +38,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _weightText = TextEditingController();
   final TextEditingController _heightText = TextEditingController();
   final TextEditingController _designationText = TextEditingController();
+  final TextEditingController _otherMedConditionText = TextEditingController();
 
   Gender? _genderValue;
   JobType? _jobTypeValue;
@@ -45,8 +46,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   List.filled(CommonUtil.weekdayNames.length, false);
   String? _startTime = '';
   String? _endTime = '';
-  WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
 
+  WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
   final List<String> _conditionItems = [
     'Herz',
     'Beine',
@@ -60,6 +61,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     'Augen',
   ];
   List<String> _selectedConditions = [];
+  List<String> _otherMedConditions = [];
 
   List<MultiSelectItem<TaskType?>> _items = [];
   final List<TaskType?> _alertTypes = [
@@ -107,13 +109,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -140,13 +142,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -234,8 +236,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _startTime = userRes.workStartTime.toString();
         _endTime = userRes.workEndTime.toString();
 
-        _selectedConditions =
-            userRes.medicalConditions!.replaceAll(" ", "").split(',');
+        _selectedConditions = userRes.medicalConditions!.replaceAll(" ", "").split(',');
+        filterOutOtherMedConditions();
 
         String? userSelAlerts = userRes.preferredAlerts;
         if (!CommonUtil.isNullOrEmpty(userSelAlerts)) {
@@ -272,9 +274,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
       conditionValue += condition;
       conditionValue += ', ';
     }
+    if (conditionValue.startsWith(",")) conditionValue = conditionValue.substring(1).trim();
 
-    String? userId =
-    await SharedPref.instance.getValue(SharedPref.keyUserServerId);
+    print(conditionValue);
+    print(_otherMedConditions);
+    for (String othCondition in _otherMedConditions) {
+      conditionValue += othCondition;
+      conditionValue += ', ';
+    }
+    if (conditionValue.endsWith(",")) conditionValue = conditionValue.substring(0, conditionValue.length-1).trim();
+    print(conditionValue);
+
+    String? userId = await SharedPref.instance.getValue(SharedPref.keyUserServerId);
 
     var userInfo = UserInfo(
       id: userId,
@@ -296,17 +307,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       preferredAlerts: CommonUtil.getPreferredAlertStr(_selectedAlerts),
     );
 
+    int userDbId = await SharedPref.instance.getValue(SharedPref.keyUserDbId);
+    UserInfo? userFromDb = await DatabaseHelper.instance.getUserInfo(userDbId);
+
     // Ruft den vorhandenen Avatar und Benutzernamen aus der vorherigen UserInfo ab.
-    String? avatarImage =
-    await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
-    String? userName =
-    await SharedPref.instance.getValue(SharedPref.keyUserName);
+    String? avatarImage = userFromDb?.avatarImage;
+    String? userName = await SharedPref.instance.getValue(SharedPref.keyUserName);
 
     // Legt die abgerufenen Werte auf die neue userInfo fest.
     userInfo.avatarImage = avatarImage;
     userInfo.userName = userName;
 
-    int userDbId = await SharedPref.instance.getValue(SharedPref.keyUserDbId);
     DatabaseHelper.instance.updateUser(userInfo, userDbId);
 
     bool isApiSuccess = false;
@@ -326,7 +337,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         SnackBar(content: Text('Profil aktualisieren fehlgeschlagen!'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 
@@ -337,6 +348,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() {
       _viewState = viewState;
     });
+  }
+
+  void _addToOtherMedConditions() async{
+    setState(() {
+      String text = _otherMedConditionText.text.trim();
+      if (text.isNotEmpty) {
+        _otherMedConditions.add(text);
+        _otherMedConditionText.clear();
+      }
+    });
+  }
+
+  void filterOutOtherMedConditions() {
+    // compare _selectedConditions with _conditionItems
+    // and list out the items not exist in _conditionItems
+    print("--------------filter out called");
+    for (String condition in List.from(_selectedConditions)) {
+      if (condition.isNotEmpty && !_conditionItems.contains(condition)) {
+        setState(() {
+          _selectedConditions.remove(condition);
+          _otherMedConditions.add(condition);
+        });
+      }
+    }
   }
 
   @override
@@ -575,7 +610,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context, true);
                                     },
                                     child: const Text('Schließen', style: TextStyle(color: Colors.orange),),
                                   ),
@@ -906,6 +941,86 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         .bodyLarge
                         ?.copyWith(fontSize: 16, color: Colors.white),
                   ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Text(
+                    'Weitere Beeinträchtigungen',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: TextField(
+                        controller: _otherMedConditionText,
+                        onSubmitted: (value) => _addToOtherMedConditions(),
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: _addToOtherMedConditions,
+                          ),
+                          hintText: 'Geben Sie die Beeinträchtigung ein',
+                          hintStyle: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      height: 50, // Höhe des Scrollbereichs anpassen
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _otherMedConditions.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.orange),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: -20,
+                                    right: -26,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _otherMedConditions.removeAt(index);
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        padding: const EdgeInsets.all(8),
+                                        primary: Colors.white,
+                                        elevation: 0,
+                                      ),
+                                      child: const Icon(Icons.close, size: 16),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(_otherMedConditions[index]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 20,

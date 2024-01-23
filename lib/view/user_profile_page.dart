@@ -54,17 +54,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
 // Eine Methode, die die Benutzerinformationen aus einer Datenbank lädt und den _userInfo-State aktualisiert.
   _loadUserInfo() async {
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-        String? avatar = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
+    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
-        _avatarImage = avatar;
+        _avatarImage = userInfo.avatarImage;
       });
     }
       if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-        await ApiManager().updateAvatarInfo(avatar!, _avatarImage!);
+        await ApiManager().updateAvatarInfo(_avatarImage!, _avatarImage!);
       }
   }
 
@@ -85,7 +84,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     setState(() {
       _avatarImage = avatar;
     });
-       await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
+
+    await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       userInfo.avatarImage = avatar;
@@ -135,7 +135,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
 // Wenn der EditProfile Button betätigt wird, wird diese Funktion ausgeführt und der Nutzer zur EditProfile Seite geleitet.
   _editProfileAction() async {
-    Navigator.pushNamed(context, editProfileRoute, arguments: true);
+    Navigator.pushNamed(context, editProfileRoute, arguments: true).whenComplete(() {
+      _loadUserInfo();
+    });
   }
 
   Color transparentOrange = Colors.orange.withOpacity(0);
@@ -209,7 +211,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 : const Icon(Icons.person_outlined, size: 100),
                           ),
                           Positioned(
-                            top: -15,
+                            top: -5,
                             right: -15,
                             child: ElevatedButton(
                               onPressed: () async {
@@ -283,7 +285,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             label: 'BMI:',
                             value:
                                 '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
-                                '(Größe: ${_userInfo?.weight} cm, Gewicht: ${_userInfo?.height} kg)',
+                                '(Größe: ${_userInfo?.height} cm, Gewicht: ${_userInfo?.weight} kg)',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -382,7 +384,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           child: Container(
                             constraints: const BoxConstraints(
                                 minHeight:
-                                    40), // min sizes for Material buttons
+                                    40), // Mindestgrößen für Material Buttons.
                             alignment: Alignment.center,
                             child: Text(
                               "Abmeldung".toUpperCase(),
@@ -404,7 +406,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Helper method to build each row in the profile
+  // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
       {required BuildContext context,
       required IconData icon,

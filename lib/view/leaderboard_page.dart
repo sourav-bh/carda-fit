@@ -21,8 +21,8 @@ class LeaderBoardPage extends StatefulWidget {
 }
 
 
-//**Dies ist der zugehörige State für die LeaderBoardPagee.
-//Hier werden die Logik und die Zustände für die LeaderboardPage verwaltet */
+//**Dies ist der zugehörige State für die LeaderBoardPage.
+//Hier werden die Logik und die Zustände für die LeaderboardPage verwaltet. */
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
   final List<UserInfo> _teamMembersList = List.empty(growable: true);
   String? _currentUserName;

@@ -220,7 +220,7 @@ class _LandingPageState extends State<LandingPage> {
             } else if (userCondition.isEmpty) {
               addContent = true;
             } else {
-              // skip this learning content, since it is not useful for the user condition specified
+              // Überspringe den Lerninhalt, da er für die angegebene Nutzerbedingung nicht nützlich ist.
             }
 
             if (addContent) exercises.add(exercise);

@@ -35,7 +35,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 //**Dies ist der zugehörige State für die RegistrationPage.
-//Hier werden die Logik und die Zustände für die Registrierung verwaltet */
+//Hier werden die Logik und die Zustände für die Registrierung verwaltet. */
 class _RegistrationPageState extends State<RegistrationPage> {
   final _mandatoryFormKey = GlobalKey<FormState>();
   final _alertTypeFormKey = GlobalKey<FormState>();
@@ -49,14 +49,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _weightText = TextEditingController();
   final TextEditingController _heightText = TextEditingController();
   final TextEditingController _designationText = TextEditingController();
-  final TextEditingController _keywordAPI = TextEditingController();
+  final TextEditingController _otherMedConditionText = TextEditingController();
 
   Gender? _genderValue;
   WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
   JobType? _jobTypeValue;
   String? _avatarImage;
-  List<String> keywords = [];
-  List<String> apiResults = [];
 
   bool _obscureText = true, _confirmObscureText = true;
   IconData _iconVisible = Icons.visibility_off;
@@ -80,6 +78,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     'Augen',
   ];
   List<String> _selectedConditions = [];
+  List<String> _otherMedConditions = [];
+  List<String> apiResults = [];
 
   List<MultiSelectItem<TaskType?>> _items = [];
   final List<TaskType?> _alertTypes = [
@@ -171,6 +171,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
       conditionValue += condition;
       conditionValue += ', ';
     }
+    if (conditionValue.startsWith(",")) conditionValue = conditionValue.substring(1).trim();
+
+    for (String othCondition in _otherMedConditions) {
+      conditionValue += othCondition;
+      conditionValue += ', ';
+    }
+    if (conditionValue.endsWith(",")) conditionValue = conditionValue.substring(0, conditionValue.length-1).trim();
 
     var userInfo = UserInfo(
       userName: userName,
@@ -217,7 +224,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         AppCache.instance.userServerId = userServerId;
         CommonUtil.createUserTargets(userInfo);
       } else {
-        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        const snackBar = SnackBar(content: Text('Registrierung fehlgeschlagen'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
@@ -225,20 +232,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
 //** */
-  void _addToKeywords() async{
+  void _addToOtherMedConditions() async{
     setState(() {
-      String text = _keywordAPI.text.trim();
+      String text = _otherMedConditionText.text.trim();
       if (text.isNotEmpty) {
-        keywords.add(text);
-        _keywordAPI.clear();
+        _otherMedConditions.add(text);
+        _otherMedConditionText.clear();
       }
     });
-    await _fetchDataFromAPI();
+    // await _fetchDataFromAPI();
   }
 
 
   Future<void> _fetchDataFromAPI() async {
-    for (String keyword in keywords) {
+    for (String keyword in _otherMedConditions) {
       // Verwende die neue Methode, um Daten von der API abzurufen
       String result = await fetchDataForKeyword(keyword);
       setState(() {
@@ -284,13 +291,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -316,13 +323,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -768,7 +775,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         vertical: 10, horizontal: 10),
                     children: const {
                       WalkingSpeed.fast: Text('Schnell'),
-                      WalkingSpeed.medium: Text('Medium'),
+                      WalkingSpeed.medium: Text('Mittel'),
                       WalkingSpeed.slow: Text('Langsam'),
                     },
                     onValueChanged: (groupValue) {
@@ -1094,13 +1101,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: TextField(
-                        controller: _keywordAPI,
-                        onSubmitted: (value) => _addToKeywords(),
+                        controller: _otherMedConditionText,
+                        onSubmitted: (value) => _addToOtherMedConditions(),
                         decoration: InputDecoration(
                           hintText: 'Geben Sie die Beeinträchtigung ein',
                           suffixIcon: IconButton(
                             icon: Icon(Icons.add),
-                            onPressed: _addToKeywords, 
+                            onPressed: _addToOtherMedConditions,
                                     
                           ),
                         ),
@@ -1110,7 +1117,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50, // Höhe des Scrollbereichs anpassen
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: keywords.length,
+                        itemCount: _otherMedConditions.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
@@ -1120,9 +1127,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 border: Border.all(color: Colors.orange),
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(keywords[index]),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: -20,
+                                    right: -26,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _otherMedConditions.removeAt(index);
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        padding: const EdgeInsets.all(8),
+                                        primary: Colors.white,
+                                        elevation: 0,
+                                      ),
+                                      child: const Icon(Icons.close, size: 16),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(_otherMedConditions[index]),
+                                  ),
+                                ],
                               ),
                             ),
                           );
