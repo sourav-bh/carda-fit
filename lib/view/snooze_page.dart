@@ -156,7 +156,7 @@ class _SnoozePageState extends State<SnoozePage> {
 
     // Hier wird die Bestätigung angezeigt
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Snooze wurde erfolgreich aufgehoben.'),
         duration: Duration(
             seconds:
@@ -196,7 +196,7 @@ class _SnoozePageState extends State<SnoozePage> {
 
       // Zeigen Sie eine Bestätigungsnachricht an
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Snooze wurde erfolgreich gespeichert.'),
           duration: Duration(seconds: 2),
         ),
@@ -204,7 +204,7 @@ class _SnoozePageState extends State<SnoozePage> {
     } else {
       // Zeigen Sie eine Fehlermeldung an, wenn Start- oder Endzeit fehlen
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Bitte wählen Sie sowohl Start- als auch Endzeit aus.'),
           duration: Duration(seconds: 2),
         ),
@@ -239,7 +239,7 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 // Klickbare Snooze-Zeiten
                 for (int i = 0; i < _snoozeTimeItems.length; i += 2)
                   Row(
@@ -355,7 +355,7 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                 ),
                 // Spacer(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -380,7 +380,7 @@ class _SnoozePageState extends State<SnoozePage> {
                         ))
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -431,9 +431,9 @@ class _SnoozePageState extends State<SnoozePage> {
                         minHeight: 40,
                       ),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         'gewählte Zeit bestätigen',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
@@ -441,8 +441,8 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 80,
+                const SizedBox(
+                  height: 40,
                 ),
                 // "Annullieren"-Button
                 Container(
@@ -475,9 +475,9 @@ class _SnoozePageState extends State<SnoozePage> {
                           minHeight: 40,
                         ),
                         alignment: Alignment.center,
-                        child: Text(
+                        child: const Text(
                           'Snooze annullieren',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
@@ -486,16 +486,17 @@ class _SnoozePageState extends State<SnoozePage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10), // Platz zwischen Text und Button
+                const SizedBox(height: 10), // Platz zwischen Text und Button
               ],
             ),
             Positioned(
-              top: 0,
-              right: 0,
+              top: 10,
+              right: 10,
               child: IconButton(
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 onPressed: () {
-                  Navigator.pushNamed(context, homeRoute);
+                  // Navigator.pushNamed(context, homeRoute);
+                  Navigator.pop(context);
                 },
               ),
             ),

@@ -613,7 +613,7 @@ und Pausen zwischen Sätzen festlegt.*/
   Widget buildMainView(BuildContext context) {
     return Align(
       alignment: Alignment.topCenter, // Oben in der Mitte des Bildschirms
-      child: Column(
+      child: ListView(
         children: <Widget>[
           Visibility(
             visible: _isExerciseTask,
@@ -622,7 +622,7 @@ und Pausen zwischen Sätzen festlegt.*/
               style: Theme.of(context)
                   .textTheme
                   .caption
-                  ?.copyWith(fontSize: 36, color: Colors.brown),
+                  ?.copyWith(fontSize: 24, color: Colors.brown),
               textAlign: TextAlign.center,
             ),
           ),
