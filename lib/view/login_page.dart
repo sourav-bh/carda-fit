@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
 //**Diese Funktion wird aufgerufen, wenn der Benutzer auf den Anmelde-Button klickt.
 // Sie liest den eingegebenen Benutzernamen und das Passwort aus den Controllern aus und versucht dann,
 // den Benutzer über die ApiManager().loginUser()-Methode anzumelden.
-//Wenn die Anmeldung erfolgreich ist, wird ein UserInfo-Objekt zurückgegeben, das Informationen zum angemeldeten Benutzer enthält. 
+//Wenn die Anmeldung erfolgreich ist, wird ein UserInfo-Objekt zurückgegeben, das Informationen zum angemeldeten Benutzer enthält.
 //Wenn ein Fehler bei der Verbindung mit dem Server auftritt, wird eine Fehlermeldung ausgegeben. */
   void _loginAction() async {
     String userName = _userNameText.value.text;
@@ -81,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
       SharedPref.instance.saveIntValue(SharedPref.keyUserDbId, userDbId);
       AppCache.instance.userDbId = userDbId;
 
-      SharedPref.instance.saveStringValue(SharedPref.keyUserServerId, userRes.id!);
+      SharedPref.instance
+          .saveStringValue(SharedPref.keyUserServerId, userRes.id!);
       AppCache.instance.userServerId = userRes.id!;
 
       CommonUtil.createUserTargets(userRes);
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           value: Platform.isIOS
               ? SystemUiOverlayStyle.light
               : const SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.light),
+                  statusBarIconBrightness: Brightness.light),
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -138,8 +139,12 @@ class _LoginPageState extends State<LoginPage> {
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.only(top: 100, bottom: 10),
-                        child: Text('Anmeldung',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontSize: 30),
+                        child: Text(
+                          'Anmeldung',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(color: Colors.black, fontSize: 30),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -150,37 +155,51 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-                              decoration: CommonUtil.getRectangleBoxDecoration(Colors.white, 25),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 30),
+                              decoration: CommonUtil.getRectangleBoxDecoration(
+                                  Colors.white, 25),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: Text('Geben Sie Ihren Nutzernamen und Ihr Passwort ein, um sich anzumelden',
-                                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 16),
+                                    child: Text(
+                                      'Geben Sie Ihren Nutzernamen und Ihr Passwort ein, um sich anzumelden',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(fontSize: 16),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
-                                  const SizedBox(height: 30,),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
                                   TextFormField(
                                     controller: _userNameText,
                                     keyboardType: TextInputType.text,
                                     cursorColor: Colors.orange,
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1, color: Colors.white12),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1, color: Colors.white12),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
                                       labelText: 'Nutzername',
-                                      labelStyle: Theme.of(context).textTheme.bodyLarge,
+                                      labelStyle:
+                                          Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     validator: (value) {
                                       if (value?.isEmpty ?? false) {
@@ -196,86 +215,121 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     },
                                   ),
-                                  const SizedBox(height: 20,),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
                                   TextField(
                                     controller: _passwordText,
                                     obscureText: _obscureText,
                                     cursorColor: Colors.orange,
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1, color: Colors.white12),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(width: 1, color: Colors.white12),
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderSide: const BorderSide(
+                                            width: 1, color: Colors.white12),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                       ),
                                       fillColor: Colors.grey.shade300,
                                       filled: true,
                                       labelText: 'Passwort',
-                                      labelStyle: Theme.of(context).textTheme.bodyLarge,
+                                      labelStyle:
+                                          Theme.of(context).textTheme.bodyLarge,
                                       suffixIcon: IconButton(
-                                          icon: Icon(_iconVisible, color: Colors.grey[400], size: 20),
+                                          icon: Icon(_iconVisible,
+                                              color: Colors.grey[400],
+                                              size: 20),
                                           onPressed: () {
                                             _toggleObscureText();
                                           }),
                                     ),
                                   ),
+                                  const SizedBox(height: 20),
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: const Text(
+                                      "Passwort vergessen?",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
-                        child: TextButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) =>
-                                Colors.transparent,
-                              ),
-                              overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                              child: TextButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) =>
+                                          Colors.transparent,
+                                    ),
+                                    overlayColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                  ),
+                                  onPressed: () {
+                                    _loginAction();
+                                  },
+                                  child: Ink(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.orangeAccent,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                          minHeight:
+                                              50), // min sizes for Material buttons
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Weiter".toUpperCase(),
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  )),
                             ),
-                            onPressed: () {
-                              _loginAction();
-                            },
-                            child: Ink(
-                              decoration: const BoxDecoration(
-                                color: Colors.orangeAccent,
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Sie haben noch kein Konto?',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(fontSize: 15),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, registerRoute);
+                                    },
+                                    child: Text('Hier registrieren',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
+                                                color: Colors.black87,
+                                                fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
                               ),
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                    minHeight:
-                                    50), // min sizes for Material buttons
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "Weiter".toUpperCase(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                              ),
-                            )),
-                      ),
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Sie haben noch kein Konto?',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),),
-                            const SizedBox(width: 5,),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, registerRoute);
-                              },
-                              child: Text('Hier registrieren',
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black87, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
