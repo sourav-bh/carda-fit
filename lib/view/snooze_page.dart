@@ -406,7 +406,7 @@ class _SnoozePageState extends State<SnoozePage> {
                   ),
                   onPressed: () {
                     _calculateAndSaveCustomSnoozeTime();
-                    Navigator.pushNamed(context, homeRoute);
+                    Navigator.pop(context, homeRoute);
                     widget.onUpdateState?.call();
                   },
                   child: Ink(

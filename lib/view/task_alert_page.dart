@@ -691,6 +691,7 @@ und Pausen zwischen Sätzen festlegt.*/
                 _taskType == TaskType.steps.index ||
                 _taskType == TaskType.waterWithBreak.index ||
                 _taskType == TaskType.walkWithExercise.index),
+                child: Center(
             child: SizedBox(
               width: 120,
               height: 120,
@@ -720,7 +721,7 @@ und Pausen zwischen Sätzen festlegt.*/
                   )
                 ],
               ),
-            ),
+            ),),
           ),
           const SizedBox(height: 20),
           Padding(
