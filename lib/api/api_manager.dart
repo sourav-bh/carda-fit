@@ -7,6 +7,27 @@ import 'package:http/http.dart' as http;
 class ApiManager {
   ApiManager();
 
+      Future<bool> sendFeedback(String userId, String feedbackText) async {
+    try {
+      var reqBody = <String, dynamic>{
+        'userId': userId,
+        'feedback': feedbackText,
+      };
+
+      var response = await ApiClient.instance.postRequest('/feedback', reqBody);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      // Handle errors here
+      print('Error sending feedback: $error');
+      return false;
+    }
+  }
+
   Future<UserInfo?> loginUser(String userName, String password) async {
     var reqBody = <String, dynamic> {
       'userName': userName,
@@ -174,3 +195,5 @@ Future<String> fetchDataForKeyword(String keyword) async {
       return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
     }
   }
+
+

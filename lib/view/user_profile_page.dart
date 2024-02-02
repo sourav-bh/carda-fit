@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 import '../api/api_manager.dart';
+
 /* Diese Klasse repräsentiert die Benutzerprofilseite in der App.*/
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -54,7 +55,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
 // Eine Methode, die die Benutzerinformationen aus einer Datenbank lädt und den _userInfo-State aktualisiert.
   _loadUserInfo() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
 
     if (userInfo != null) {
       setState(() {
@@ -62,9 +64,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _avatarImage = userInfo.avatarImage;
       });
     }
-      if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-        await ApiManager().updateAvatarInfo(_avatarImage!, _avatarImage!);
-      }
+    if (_avatarImage != null && _avatarImage!.isNotEmpty) {
+      await ApiManager().updateAvatarInfo(_avatarImage!, _avatarImage!);
+    }
   }
 
 /* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
@@ -79,23 +81,29 @@ class _UserProfilePageState extends State<UserProfilePage> {
     await SharedPref.instance.saveIntValue(
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
+
 // Eine Methode, die aufgerufen wird, wenn der Benutzer ein neues Avatarbild auswählt, und den aktualisierten Avatar-String speichert.
-  void onAvatarSelected(String? avatar) async{
+  void onAvatarSelected(String? avatar) async {
     setState(() {
       _avatarImage = avatar;
     });
 
-    await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    await SharedPref.instance
+        .saveStringValue(SharedPref.keyAvatarImage, avatar!);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       userInfo.avatarImage = avatar;
-      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userDbId);
+      await DatabaseHelper.instance
+          .updateUser(userInfo, AppCache.instance.userDbId);
     }
 
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
+      await ApiManager()
+          .updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
     }
   }
+
 /* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
    *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
@@ -135,7 +143,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
 // Wenn der EditProfile Button betätigt wird, wird diese Funktion ausgeführt und der Nutzer zur EditProfile Seite geleitet.
   _editProfileAction() async {
-    Navigator.pushNamed(context, editProfileRoute, arguments: true).whenComplete(() {
+    Navigator.pushNamed(context, editProfileRoute, arguments: true)
+        .whenComplete(() {
       _loadUserInfo();
     });
   }
@@ -324,7 +333,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             icon: Icons.notifications,
                             label: 'Alarme:',
                             value: CommonUtil.convertPreferredAlertNames(
-                                _userInfo?.preferredAlerts ?? "Nicht ausgewählt"),
+                                _userInfo?.preferredAlerts ??
+                                    "Nicht ausgewählt"),
                           ),
                         ],
                       ),
@@ -361,6 +371,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 10),
+                    IconButton(
+                      icon: Icon(Icons.feedback),
+                      onPressed: () {
+                        _showFeedbackDialog(context);
+                      },
+                    ),
+                    SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 30),
@@ -406,6 +424,48 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
+  void _sendFeedback(String feedbackText) async {
+  try {
+    // Load user information
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+
+    if (userInfo == null) {
+      print('Error: User information not available.');
+      return;
+    }
+
+    // Extract user ID
+    String? userId = userInfo.id; // replace 'userId' with the actual property name
+
+    // Perform the API call to send feedback
+    bool success = await ApiManager().sendFeedback(userId!, feedbackText);
+
+    // Optionally, you can show a success message to the user
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Feedback submitted successfully!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Handle API error or show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to submit feedback. Please try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  } catch (error) {
+    // Handle other errors
+    print('Error: $error');
+  }
+}
+
+
+
   // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
       {required BuildContext context,
@@ -433,28 +493,85 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   // Diese Funktion wird aufgerufen, wenn der Benutzer sich abmelden möchte.
- _logoutActionField(BuildContext context) {
+  _logoutActionField(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Abmeldung bestätigen'),
+          content: Text('Möchten Sie sich wirklich abmelden?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Schließt den Dialog
+              },
+              child: Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Führt die Abmeldung durch und navigiert zur Login-Seite
+                SharedPref.instance.clearCache();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, loginRoute, (r) => false);
+              },
+              child: Text('Abmelden'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFeedbackDialog(BuildContext context) {
+  String feedbackText = '';
+  String userId = _userInfo?.id ?? ""; // Add this line to get the userId
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Abmeldung bestätigen'),
-        content: Text('Möchten Sie sich wirklich abmelden?'),
+        title: Text('Feedback'),
+        content: TextField(
+          maxLines: 3,
+          onChanged: (text) {
+            feedbackText = text;
+          },
+          decoration: InputDecoration(
+            hintText: 'Enter your feedback...',
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Schließt den Dialog
+              Navigator.pop(context); // Close the dialog
             },
-            child: Text('Abbrechen'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              // Führt die Abmeldung durch und navigiert zur Login-Seite
-              SharedPref.instance.clearCache();
-              Navigator.pushNamedAndRemoveUntil(
-                  context, loginRoute, (r) => false);
+              // Call the API method to send feedback
+              bool success = await ApiManager().sendFeedback(userId, feedbackText);
+
+              if (success) {
+                Navigator.pop(context); // Close the dialog
+                // Optionally, show a success message to the user
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Feedback submitted successfully!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                // Handle API error or show an error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to submit feedback. Please try again.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             },
-            child: Text('Abmelden'),
+            child: Text('Submit'),
           ),
         ],
       );
@@ -568,5 +685,4 @@ class _UserProfilePageState extends State<UserProfilePage> {
           });
         });
   }
-  
 }
