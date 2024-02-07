@@ -95,6 +95,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   int _stepIndex = 0;
   String _nextButtonText = "Weiter";
 
+  get highlightColor => null;
+
   @override
   void initState() {
     super.initState();
@@ -171,13 +173,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       conditionValue += condition;
       conditionValue += ', ';
     }
-    if (conditionValue.startsWith(",")) conditionValue = conditionValue.substring(1).trim();
+    if (conditionValue.startsWith(","))
+      conditionValue = conditionValue.substring(1).trim();
 
     for (String othCondition in _otherMedConditions) {
       conditionValue += othCondition;
       conditionValue += ', ';
     }
-    if (conditionValue.endsWith(",")) conditionValue = conditionValue.substring(0, conditionValue.length-1).trim();
+    if (conditionValue.endsWith(","))
+      conditionValue =
+          conditionValue.substring(0, conditionValue.length - 1).trim();
 
     var userInfo = UserInfo(
       userName: userName,
@@ -224,7 +229,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         AppCache.instance.userServerId = userServerId;
         CommonUtil.createUserTargets(userInfo);
       } else {
-        const snackBar = SnackBar(content: Text('Registrierung fehlgeschlagen'));
+        const snackBar =
+            SnackBar(content: Text('Registrierung fehlgeschlagen'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
@@ -232,7 +238,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
 //** */
-  void _addToOtherMedConditions() async{
+  void _addToOtherMedConditions() async {
     setState(() {
       String text = _otherMedConditionText.text.trim();
       if (text.isNotEmpty) {
@@ -242,7 +248,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
     // await _fetchDataFromAPI();
   }
-
 
   Future<void> _fetchDataFromAPI() async {
     for (String keyword in _otherMedConditions) {
@@ -759,12 +764,76 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Lauf-Tempo',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontSize: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Lauf-Tempo',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.info),
+                        color: highlightColor,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text(
+                                    'Schritte nach Gehgeschwindigkeit'),
+                                content: RichText(
+                                  text: const TextSpan(children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          "Für einen Menschen definiert die durchschnittliche Gehgeschwindigkeit die Anzahl der Schritte wie folgt:\n\n",
+                                      style: TextStyle(color: Colors.black87),
+                                    ),
+                                    TextSpan(
+                                      text: "Schnell: 100-119 Schritte/min\n"
+                                          "Normal: 80-99 Schritte/min\n"
+                                          "Langsam: 60-79 Schritte/min\n\n\n",
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          "Diese Informationen beruhen auf einer wissenschaftlichen Untersuchung von:\n\n",
+                                      style: TextStyle(color: Colors.black87),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          "Tudor-Locke C, Han H, Aguiar EJ, et alHow fast is fast enough? Walking cadence (steps/min) as a practical estimate of intensity in adults: a narrative reviewBritish Journal of Sports Medicine 2018;52:776-788.",
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ]),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, true);
+                                    },
+                                    child: const Text(
+                                      'Schließen',
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -1108,7 +1177,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.add),
                             onPressed: _addToOtherMedConditions,
-                                    
                           ),
                         ),
                       ),
