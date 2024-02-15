@@ -372,11 +372,76 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    IconButton(
-                      icon: Icon(Icons.feedback),
-                      onPressed: () {
-                        _showFeedbackDialog(context);
-                      },
+                    Container(
+                      padding: const EdgeInsets.only(
+                          left: 50, right: 10, top: 10, bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 8,
+                            child: TextButton(
+                              onPressed: () {
+                                _showFeedbackDialog(context);
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) =>
+                                      Colors.transparent,
+                                ),
+                                overlayColor: MaterialStateProperty.all(
+                                    Colors.transparent),
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  color: Colors.orangeAccent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Container(
+                                  constraints:
+                                      const BoxConstraints(minHeight: 40),
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.feedback, color: Colors.white),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        'Feedback geben',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: InkWell(
+                              onTap: () {
+                                _showInfoDialog(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 1, vertical: 10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.info,
+                                        color: Colors.orangeAccent),
+                                    const SizedBox(width: 10),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                     SizedBox(height: 10),
                     Container(
@@ -425,46 +490,45 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _sendFeedback(String feedbackText) async {
-  try {
-    // Load user information
-    UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    try {
+      // Load user information
+      UserInfo? userInfo =
+          await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
 
-    if (userInfo == null) {
-      print('Error: User information not available.');
-      return;
+      if (userInfo == null) {
+        print('Error: User information not available.');
+        return;
+      }
+
+      // Extract user ID
+      String? userId =
+          userInfo.id; // replace 'userId' with the actual property name
+
+      // Perform the API call to send feedback
+      bool success = await ApiManager().sendFeedback(userId!, feedbackText);
+
+      // Optionally, you can show a success message to the user
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Feedback submitted successfully!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        // Handle API error or show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit feedback. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (error) {
+      // Handle other errors
+      print('Error: $error');
     }
-
-    // Extract user ID
-    String? userId = userInfo.id; // replace 'userId' with the actual property name
-
-    // Perform the API call to send feedback
-    bool success = await ApiManager().sendFeedback(userId!, feedbackText);
-
-    // Optionally, you can show a success message to the user
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Feedback submitted successfully!'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } else {
-      // Handle API error or show an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to submit feedback. Please try again.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  } catch (error) {
-    // Handle other errors
-    print('Error: $error');
   }
-}
-
-
 
   // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
@@ -522,63 +586,85 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
+  void _showInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Info'),
+          content: Text(
+              'Durch Klicken des "Feedback geben" Buttons können Sie Feedback einreichen.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Schließt den Dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showFeedbackDialog(BuildContext context) {
-  String feedbackText = '';
-  String userId = _userInfo?.id ?? ""; // Add this line to get the userId
+    String feedbackText = '';
+    String userId = _userInfo?.id ?? ""; // Add this line to get the userId
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Feedback'),
-        content: TextField(
-          maxLines: 3,
-          onChanged: (text) {
-            feedbackText = text;
-          },
-          decoration: InputDecoration(
-            hintText: 'Enter your feedback...',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Feedback'),
+          content: TextField(
+            maxLines: 3,
+            onChanged: (text) {
+              feedbackText = text;
             },
-            child: Text('Cancel'),
+            decoration: InputDecoration(
+              hintText: 'Enter your feedback...',
+            ),
           ),
-          TextButton(
-            onPressed: () async {
-              // Call the API method to send feedback
-              bool success = await ApiManager().sendFeedback(userId, feedbackText);
-
-              if (success) {
+          actions: [
+            TextButton(
+              onPressed: () {
                 Navigator.pop(context); // Close the dialog
-                // Optionally, show a success message to the user
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Feedback submitted successfully!'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              } else {
-                // Handle API error or show an error message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Failed to submit feedback. Please try again.'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
-            child: Text('Submit'),
-          ),
-        ],
-      );
-    },
-  );
-}
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Call the API method to send feedback
+                bool success =
+                    await ApiManager().sendFeedback(userId, feedbackText);
 
+                if (success) {
+                  Navigator.pop(context); // Close the dialog
+                  // Optionally, show a success message to the user
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Feedback submitted successfully!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                } else {
+                  // Handle API error or show an error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Failed to submit feedback. Please try again.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showSnoozeTimeSelected(BuildContext context) {
     showDialog(
