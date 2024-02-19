@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class ApiManager {
   ApiManager();
 
-      Future<bool> sendFeedback(String userId, String feedbackText) async {
+  Future<bool> sendFeedback(String userId, String feedbackText) async {
     try {
       var reqBody = <String, dynamic>{
         'userId': userId,
@@ -29,10 +29,7 @@ class ApiManager {
   }
 
   Future<UserInfo?> loginUser(String userName, String password) async {
-    var reqBody = <String, dynamic> {
-      'userName': userName,
-      'password': password
-    };
+    var reqBody = <String, dynamic>{'userName': userName, 'password': password};
     var response = await ApiClient.instance.postRequest('/login', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -49,14 +46,16 @@ class ApiManager {
     if (response.statusCode == 200) {
       var jsonRes = json.decode(response.body);
       var userJson = jsonRes["_embedded"];
-      return List<UserInfo>.from(userJson["user"].map((x) => UserInfo.fromJson(x)));
+      return List<UserInfo>.from(
+          userJson["user"].map((x) => UserInfo.fromJson(x)));
     } else {
       return [];
     }
   }
 
   Future<List<UserInfo>> getAllUsersByTeam(String teamName) async {
-    var response = await ApiClient.instance.getRequest('/users?teamName=$teamName');
+    var response =
+        await ApiClient.instance.getRequest('/users?teamName=$teamName');
     if (response.statusCode == 200) {
       var jsonRes = json.decode(response.body);
       var userJson = jsonRes["records"];
@@ -67,7 +66,8 @@ class ApiManager {
   }
 
   Future<bool> checkIfUserNameAvailable(String userName) async {
-    var response = await ApiClient.instance.getRequest('/check-userName?userName=$userName');
+    var response = await ApiClient.instance
+        .getRequest('/check-userName?userName=$userName');
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -76,7 +76,8 @@ class ApiManager {
   }
 
   Future<bool> checkIfTeamIsActive(String teamName) async {
-    var response = await ApiClient.instance.getRequest('/team/check?teamName=$teamName');
+    var response =
+        await ApiClient.instance.getRequest('/team/check?teamName=$teamName');
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -109,7 +110,6 @@ class ApiManager {
       } else {
         return null;
       }
-
     } else {
       return null;
     }
@@ -117,7 +117,8 @@ class ApiManager {
 
   Future<bool> updateUser(UserInfo userModel) async {
     var reqBody = userModel.toUpdateJson();
-    var response = await ApiClient.instance.patchRequest('/user/${userModel.id}', reqBody);
+    var response =
+        await ApiClient.instance.patchRequest('/user/${userModel.id}', reqBody);
 
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
@@ -127,11 +128,12 @@ class ApiManager {
   }
 
   Future<bool> updateDeviceToken(String userId, String fcmToken) async {
-    var reqBody = <String, dynamic> {
+    var reqBody = <String, dynamic>{
       'deviceToken': fcmToken,
     };
 
-    var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+    var response =
+        await ApiClient.instance.patchRequest('/user/$userId', reqBody);
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else {
@@ -140,11 +142,12 @@ class ApiManager {
   }
 
   Future<bool> updateTeamName(String userId, String teamName) async {
-    var reqBody = <String, dynamic> {
+    var reqBody = <String, dynamic>{
       'teamName': teamName,
     };
 
-    var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+    var response =
+        await ApiClient.instance.patchRequest('/user/$userId', reqBody);
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else {
@@ -153,11 +156,12 @@ class ApiManager {
   }
 
   Future<bool> updateAvatarInfo(String userId, String avatarImage) async {
-    var reqBody = <String, dynamic> {
+    var reqBody = <String, dynamic>{
       'avatarImage': avatarImage,
     };
 
-    var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+    var response =
+        await ApiClient.instance.patchRequest('/user/$userId', reqBody);
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else {
@@ -166,11 +170,12 @@ class ApiManager {
   }
 
   Future<bool> updateUserScore(String userId, int score) async {
-    var reqBody = <String, dynamic> {
+    var reqBody = <String, dynamic>{
       'score': score,
     };
 
-    var response = await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+    var response =
+        await ApiClient.instance.patchRequest('/user/$userId', reqBody);
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else {
@@ -180,20 +185,18 @@ class ApiManager {
 }
 
 Future<String> fetchDataForKeyword(String keyword) async {
-    var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
-    var url = Uri.parse(Uri.encodeFull(apiEndPoint));
-    final http.Response response = await http.get(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      // Hier kannst du Fehlerbehandlung hinzufügen, wenn die API-Anfrage fehlschlägt
-      return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
-    }
+  var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
+  var url = Uri.parse(Uri.encodeFull(apiEndPoint));
+  final http.Response response = await http.get(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+  if (response.statusCode == 200) {
+    return response.body;
+  } else {
+    // Hier kannst du Fehlerbehandlung hinzufügen, wenn die API-Anfrage fehlschlägt
+    return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
   }
-
-
+}

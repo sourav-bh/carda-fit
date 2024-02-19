@@ -629,6 +629,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close the dialog
+                debugPrint(feedbackText);
               },
               child: Text('Cancel'),
             ),
