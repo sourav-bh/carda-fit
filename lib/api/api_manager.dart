@@ -8,22 +8,17 @@ class ApiManager {
   ApiManager();
 
   Future<bool> sendFeedback(String userId, String feedbackText) async {
-    try {
-      var reqBody = <String, dynamic>{
-        'userId': userId,
-        'feedback': feedbackText,
-      };
+    var reqBody = <String, dynamic>{
+      'userId': userId,
+      'feedbackText': feedbackText,
+    };
 
-      var response = await ApiClient.instance.postRequest('/feedback', reqBody);
+    print(reqBody);
+    var response = await ApiClient.instance.postRequest('/feedback', reqBody);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      // Handle errors here
-      print('Error sending feedback: $error');
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
       return false;
     }
   }

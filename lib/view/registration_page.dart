@@ -1209,7 +1209,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                       style: ElevatedButton.styleFrom(
                                         shape: const CircleBorder(),
                                         padding: const EdgeInsets.all(8),
-                                        primary: Colors.white,
+                                        backgroundColor: Colors.white,
                                         elevation: 0,
                                       ),
                                       child: const Icon(Icons.close, size: 16),
@@ -1346,7 +1346,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Nutzername',
+                'Konto',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),
@@ -1355,7 +1355,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Persönlich',
+                'Leiblich',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),
@@ -1373,7 +1373,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Präferenz',
+                'Vorzug',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),

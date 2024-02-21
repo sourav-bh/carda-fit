@@ -1003,7 +1003,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       style: ElevatedButton.styleFrom(
                                         shape: const CircleBorder(),
                                         padding: const EdgeInsets.all(8),
-                                        primary: Colors.white,
+                                        backgroundColor: Colors.white,
                                         elevation: 0,
                                       ),
                                       child: const Icon(Icons.close, size: 16),

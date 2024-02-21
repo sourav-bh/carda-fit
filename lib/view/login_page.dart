@@ -8,6 +8,7 @@ import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -252,20 +253,24 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: const Text(
-                                      "Passwort vergessen?",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
+                                  Visibility(
+                                    visible: false,
+                                    child: GestureDetector(
+                                      onTap: () {},
+                                      child: const Text(
+                                        "Passwort vergessen?",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          decoration: TextDecoration.underline,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 20),
                             Container(
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                               child: TextButton(
@@ -302,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
                                   )),
                             ),
                             Center(
-                              child: Row(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(

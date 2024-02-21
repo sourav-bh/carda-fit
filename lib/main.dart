@@ -300,7 +300,7 @@ Future<void> _requestPermissions() async {
             AndroidFlutterLocalNotificationsPlugin>();
 
     final bool? grantedNotificationPermission =
-        await androidImplementation?.requestPermission();
+        await androidImplementation?.requestNotificationsPermission();
   }
 }
 

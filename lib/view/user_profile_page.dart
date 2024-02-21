@@ -9,6 +9,7 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_picker_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -236,7 +237,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               style: ElevatedButton.styleFrom(
                                 shape: const CircleBorder(),
                                 padding: const EdgeInsets.all(8),
-                                primary: Colors.white,
+                                backgroundColor: Colors.white,
                                 elevation: 0,
                               ),
                               child: const Icon(Icons.edit, size: 20),
@@ -371,113 +372,90 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.only(
-                          left: 50, right: 10, top: 10, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 8,
-                            child: TextButton(
-                              onPressed: () {
-                                _showFeedbackDialog(context);
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _showFeedbackDialog();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
                                   (Set<MaterialState> states) =>
-                                      Colors.transparent,
-                                ),
-                                overlayColor: MaterialStateProperty.all(
-                                    Colors.transparent),
-                              ),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: Colors.orangeAccent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Container(
-                                  constraints:
-                                      const BoxConstraints(minHeight: 40),
-                                  alignment: Alignment.center,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.feedback, color: Colors.white),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        'Feedback geben',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
+                              Colors.transparent,
+                            ),
+                            overlayColor: MaterialStateProperty.all(
+                                Colors.transparent),
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: Colors.orangeAccent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              constraints:
+                              const BoxConstraints(minHeight: 40),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.feedback, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Feedback',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: InkWell(
-                              onTap: () {
-                                _showInfoDialog(context);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 1, vertical: 10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.info,
-                                        color: Colors.orangeAccent),
-                                    const SizedBox(width: 10),
-                                  ],
-                                ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _logoutActionField(context);
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) =>
+                              Colors.transparent,
+                            ),
+                            overlayColor: MaterialStateProperty.all(
+                                Colors.transparent),
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: Colors.orangeAccent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 40),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.logout, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Abmeldung',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 30),
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) => Colors.transparent,
-                          ),
-                          overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
-                        ),
-                        onPressed: () {
-                          _logoutActionField(context);
-                        },
-                        child: Ink(
-                          decoration: const BoxDecoration(
-                            color: Colors.orangeAccent,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Container(
-                            constraints: const BoxConstraints(
-                                minHeight:
-                                    40), // Mindestgrößen für Material Buttons.
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Abmeldung".toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
-                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -487,47 +465,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       ),
     );
-  }
-
-  void _sendFeedback(String feedbackText) async {
-    try {
-      // Load user information
-      UserInfo? userInfo =
-          await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-
-      if (userInfo == null) {
-        print('Error: User information not available.');
-        return;
-      }
-
-      // Extract user ID
-      String? userId =
-          userInfo.id; // replace 'userId' with the actual property name
-
-      // Perform the API call to send feedback
-      bool success = await ApiManager().sendFeedback(userId!, feedbackText);
-
-      // Optionally, you can show a success message to the user
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Feedback submitted successfully!'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
-        // Handle API error or show an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to submit feedback. Please try again.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (error) {
-      // Handle other errors
-      print('Error: $error');
-    }
   }
 
   // Hilfsmethode zum Erstellen jeder Zeile im Profil.
@@ -562,14 +499,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Abmeldung bestätigen'),
-          content: Text('Möchten Sie sich wirklich abmelden?'),
+          title: const Text('Abmeldung bestätigen'),
+          content: const Text('Möchten Sie sich wirklich abmelden?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Schließt den Dialog
               },
-              child: Text('Abbrechen'),
+              child: const Text('Abbrechen'),
             ),
             TextButton(
               onPressed: () async {
@@ -578,7 +515,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Navigator.pushNamedAndRemoveUntil(
                     context, loginRoute, (r) => false);
               },
-              child: Text('Abmelden'),
+              child: const Text('Abmelden'),
             ),
           ],
         );
@@ -591,15 +528,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Info'),
-          content: Text(
+          title: const Text('Info'),
+          content: const Text(
               'Durch Klicken des "Feedback geben" Buttons können Sie Feedback einreichen.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Schließt den Dialog
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -607,21 +544,42 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  void _showFeedbackDialog(BuildContext context) {
+  void _showFeedbackDialog() {
     String feedbackText = '';
-    String userId = _userInfo?.id ?? ""; // Add this line to get the userId
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Feedback'),
+          title: Row(
+            children: [
+              const Text('Feedback'),
+              const SizedBox(width: 10,),
+              InkWell(
+                onTap: () {
+                  _showInfoDialog(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 1, vertical: 10),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info,
+                          color: Colors.orangeAccent),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           content: TextField(
             maxLines: 3,
             onChanged: (text) {
               feedbackText = text;
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter your feedback...',
             ),
           ),
@@ -631,19 +589,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Navigator.pop(context); // Close the dialog
                 debugPrint(feedbackText);
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
+                // UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+                String userId = AppCache.instance.userServerId; // Add this line to get the userId
+                print(userId);
                 // Call the API method to send feedback
                 bool success =
                     await ApiManager().sendFeedback(userId, feedbackText);
 
-                if (success) {
+                if (success && mounted) {
                   Navigator.pop(context); // Close the dialog
                   // Optionally, show a success message to the user
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Feedback submitted successfully!'),
                       duration: Duration(seconds: 2),
                     ),
@@ -651,7 +612,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 } else {
                   // Handle API error or show an error message
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content:
                           Text('Failed to submit feedback. Please try again.'),
                       duration: Duration(seconds: 2),
@@ -659,7 +620,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   );
                 }
               },
-              child: Text('Submit'),
+              child: const Text('Submit'),
             ),
           ],
         );
