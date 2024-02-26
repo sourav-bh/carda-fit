@@ -93,12 +93,12 @@ class CommonUtil {
   }
 
   static String getCurrentTimeAsDbFormat() {
-    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
+    var df = DateFormat("yyyy-MM-dd HH:mm:SS");
     return df.format(DateTime.now());
   }
 
   static String convertDbTimeStampToTimeOnlyStr(String dbTime) {
-    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
+    var df = DateFormat("yyyy-MM-dd HH:mm:SS");
     var dt = df.parse(dbTime);
     return DateFormat('HH:mm').format(dt);
   }

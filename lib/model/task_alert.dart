@@ -98,7 +98,6 @@ class AlertHistory {
   );
 
   Map<String, dynamic> toMap() => {
-    "id": dbId,
     "title": title,
     "description": description,
     "taskType": taskType.index,
