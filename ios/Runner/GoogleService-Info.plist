@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>213686276476-d8eerjrpdrg1h34j3v2vrsdcehie0soq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.213686276476-d8eerjrpdrg1h34j3v2vrsdcehie0soq</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCTf2IkQ10u-nQb8XcBKeLUAuT5ybGgkV0</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>de.uni.siegen.bgf.cardafit</string>
+	<string>de.uni-siegen.bgf.cardafit</string>
 	<key>PROJECT_ID</key>
 	<string>cardafit</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:213686276476:ios:17152669eebe03ce1c54f9</string>
+	<string>1:213686276476:ios:2f698ba9eb51729b1c54f9</string>
 </dict>
 </plist>
