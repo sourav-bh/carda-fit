@@ -580,7 +580,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               feedbackText = text;
             },
             decoration: const InputDecoration(
-              hintText: 'Enter your feedback...',
+              hintText: 'Geben Sie Ihr Feedback ein...',
             ),
           ),
           actions: [
@@ -589,7 +589,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Navigator.pop(context); // Close the dialog
                 debugPrint(feedbackText);
               },
-              child: const Text('Cancel'),
+              child: const Text('Abbrechen'),
             ),
             TextButton(
               onPressed: () async {
@@ -605,7 +605,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   // Optionally, show a success message to the user
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Feedback submitted successfully!'),
+                      content: Text('Feedback erfolgreich eingereicht!'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -614,13 +614,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:
-                          Text('Failed to submit feedback. Please try again.'),
+                          Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
                       duration: Duration(seconds: 2),
                     ),
                   );
                 }
               },
-              child: const Text('Submit'),
+              child: const Text('Einreichen'),
             ),
           ],
         );

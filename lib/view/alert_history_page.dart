@@ -1,12 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../app.dart';
 import 'package:app/model/task_alert.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/view/task_alert_page.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import '../app.dart';
 
 //**Diese Klasse stellt die Alarmverlaufseite dar. Sie wird verwendet, um den Alarmverlauf anzuzeigen, der aus verschiedenen Alarmen besteht, die der Benutzer erhalten hat. */
 class AlertHistoryPage extends StatefulWidget {
@@ -16,26 +15,42 @@ class AlertHistoryPage extends StatefulWidget {
   _AlertHistoryPageState createState() => _AlertHistoryPageState();
 }
 
-//Dies ist der zugehörige State für die AlertHistoryPage. Der State enthält die Logik für das Anzeigen des Alarmverlaufs.
-class _AlertHistoryPageState extends State<AlertHistoryPage> {
-
+class _AlertHistoryPageState extends State<AlertHistoryPage> with WidgetsBindingObserver {
   final List<AlertHistory> _historyItems = List.empty(growable: true);
 
+//Dies ist der zugehörige State für die AlertHistoryPage. Der State enthält die Logik für das Anzeigen des Alarmverlaufs.
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(this);
     _loadData();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Die App ist jetzt im Vordergrund
+      _loadData();  // Daten erneut laden
+    }
+  }
+  
 //**Diese Funktion wird aufgerufen, um die Daten für die Alarmverlaufseite zu laden.
 //Sie ruft die Liste der Alarmverlaufselemente aus der lokalen Datenbank ab und aktualisiert den Zustand der Seite, um die Daten darzustellen. */
   _loadData() async {
     List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryList();
-    setState(() {
-      _historyItems.clear();
-      _historyItems.addAll(historyItems);
-    });
+    if(mounted) {
+      setState(() {
+        _historyItems.clear();
+        _historyItems.addAll(historyItems);
+      });
+    }
   }
 
 //**Diese Funktion gibt ein Icon zurück, das auf den Status eines Alarmverlaufselements hinweist.
