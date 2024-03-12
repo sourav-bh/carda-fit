@@ -186,7 +186,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
         .batchUpdateAlertHistoryItemAsMissed(alertType);
   } else {
     debugPrint('Marking previous history items as missed alerts');
-   
+
     // Nutzer hat Snooze (Schlummern) aktiviert, daher Alarm nicht zeigen.
     debugPrint('User is snoozed, not showing the alert');
     return;
@@ -300,7 +300,7 @@ Future<void> _requestPermissions() async {
             AndroidFlutterLocalNotificationsPlugin>();
 
     final bool? grantedNotificationPermission =
-        await androidImplementation?.requestNotificationsPermission();
+        await androidImplementation?.requestPermission();
   }
 }
 
@@ -330,10 +330,12 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
 
   if (!isUserSnoozedNow) {
     // Markiert alle vorherigen Verlaufselemente als verpasste Alarme für denselben Aufgabentypen.
-    await DatabaseHelper.instance.batchUpdateAlertHistoryItemAsMissed(alertType);
+    await DatabaseHelper.instance
+        .batchUpdateAlertHistoryItemAsMissed(alertType);
   }
 
-  int alertHistoryId = await DatabaseHelper.instance.addAlertHistory(alertHistory);
+  int alertHistoryId =
+      await DatabaseHelper.instance.addAlertHistory(alertHistory);
   debugPrint(
       "-------> Alert history item saved in DB from background listener: $alertHistoryId");
 
