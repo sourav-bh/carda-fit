@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../app.dart';
 import 'package:app/model/task_alert.dart';
 import 'package:app/service/database_helper.dart';
@@ -17,6 +18,7 @@ class AlertHistoryPage extends StatefulWidget {
 
 class _AlertHistoryPageState extends State<AlertHistoryPage> with WidgetsBindingObserver {
   final List<AlertHistory> _historyItems = List.empty(growable: true);
+  String _lastLoadDate = "";
 
 //Dies ist der zugehörige State für die AlertHistoryPage. Der State enthält die Logik für das Anzeigen des Alarmverlaufs.
   @override
@@ -36,20 +38,25 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> with WidgetsBinding
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      // Die App ist jetzt im Vordergrund
-      _loadData();  // Daten erneut laden
+      _loadData(); // Daten erneut laden, wenn die App fortgesetzt wird
     }
   }
   
 //**Diese Funktion wird aufgerufen, um die Daten für die Alarmverlaufseite zu laden.
 //Sie ruft die Liste der Alarmverlaufselemente aus der lokalen Datenbank ab und aktualisiert den Zustand der Seite, um die Daten darzustellen. */
   _loadData() async {
-    List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryList();
-    if(mounted) {
-      setState(() {
-        _historyItems.clear();
-        _historyItems.addAll(historyItems);
-      });
+    // Überprüfung, ob heute ein neuer Tag ist
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    if (_lastLoadDate != today) {
+      List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryList();
+      if (mounted) {
+        setState(() {
+          _historyItems.clear();
+          _historyItems.addAll(historyItems);
+          // Aktualisieren des letzten Ladetags
+          _lastLoadDate = today;
+        });
+      }
     }
   }
 
