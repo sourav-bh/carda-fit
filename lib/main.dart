@@ -223,6 +223,24 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   await flutterLocalNotificationsPlugin.show(
       alertType, title, desc, notificationDetails,
       payload: alertHistoryId.toString());
+
+  // Benachrichtigung anklicken: Navigation zur entsprechenden Seite
+  _handleNotificationClickInBackground(alertType, alertHistoryId);
+}
+
+void _handleNotificationClickInBackground(
+    int taskType, int alertHistoryId) async {
+  // Hier wird die entsprechende Seite basierend auf dem taskType geöffnet
+  if (CardaFitApp.navigatorKey.currentContext != null &&
+      CardaFitApp.navigatorKey.currentContext!.mounted) {
+    TaskAlertPageData alertPageData = TaskAlertPageData(
+        viewMode: 0, taskType: taskType, taskHistoryId: alertHistoryId);
+
+    debugPrint("-------> opening task alert page from background listener");
+    await Navigator.pushNamed(
+        CardaFitApp.navigatorKey.currentContext!, taskAlertRoute,
+        arguments: alertPageData);
+  }
 }
 
 //**Diese Funktion überprüft, ob der Benutzer in der App angemeldet ist.
