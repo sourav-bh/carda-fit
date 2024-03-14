@@ -42,7 +42,7 @@ void main() async {
 
   _checkIfItsANewDay();
   _setupFireBase();
-  initLocalNotificationPlugin();
+  await initLocalNotificationPlugin();
 
   // final NotificationAppLaunchDetails? notificationAppLaunchDetails = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   // String? payload = notificationAppLaunchDetails?.notificationResponse?.payload;
@@ -272,7 +272,7 @@ _checkIfItsANewDay() async {
 //**Diese Funktion initialisiert das lokale Benachrichtigungsplugin (flutterLocalNotificationsPlugin).
 //Sie fordert auch Berechtigungen für Benachrichtigungen auf verschiedenen Plattformen (Android/iOS) an
 // und konfiguriert die Initialisierungseinstellungen für die Benachrichtigungen. */
-void initLocalNotificationPlugin() async {
+Future<void> initLocalNotificationPlugin() async {
   _requestPermissions();
 
   const AndroidInitializationSettings initSettingsAndroid =
@@ -283,14 +283,13 @@ void initLocalNotificationPlugin() async {
     requestSoundPermission: true,
     requestBadgePermission: true,
     requestAlertPermission: true,
-    onDidReceiveLocalNotification: _onDidReceiveLocalNotificationInIos,
   );
 
-  const InitializationSettings initSettings = InitializationSettings(
+  final InitializationSettings initSettings = InitializationSettings(
       android: initSettingsAndroid, iOS: initSettingsIOS, macOS: null);
 
   await flutterLocalNotificationsPlugin.initialize(initSettings,
-      onDidReceiveNotificationResponse: _onDidReceiveLocalNotification);
+      onDidReceiveNotificationResponse: _onDidReceiveNotificationResponse);
 }
 
 //**Diese Funktion fordert Benachrichtigungsberechtigungen für Android und iOS an, falls erforderlich. */
@@ -386,6 +385,28 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
         alertType, title, body, notificationDetails,
         payload: alertHistoryId.toString());
   }
+}
+
+void _onDidReceiveNotificationResponse(NotificationResponse response) async {
+  if (response.payload != null) {
+    // Handle notification payload
+    int taskHistoryId = int.tryParse(response.payload!) ?? 0;
+    // Navigate to the specific task alert page
+    _navigateToTaskPage(taskHistoryId);
+  }
+}
+
+void _navigateToTaskPage(int taskHistoryId) async {
+  // Ensure Navigator is ready and context is mounted
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (CardaFitApp.navigatorKey.currentState?.context != null) {
+      Navigator.pushNamed(
+          CardaFitApp.navigatorKey.currentState!.context, taskAlertRoute,
+          arguments: TaskAlertPageData(
+              viewMode: 0, taskType: TaskType.exercise.index, // Beispielwert
+              taskHistoryId: taskHistoryId));
+    }
+  });
 }
 
 //**Dieser Handler wird aufgerufen, wenn eine lokale Benachrichtigung auf iOS empfangen wird,  */
