@@ -223,24 +223,6 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   await flutterLocalNotificationsPlugin.show(
       alertType, title, desc, notificationDetails,
       payload: alertHistoryId.toString());
-
-  // Benachrichtigung anklicken: Navigation zur entsprechenden Seite
-  _handleNotificationClickInBackground(alertType, alertHistoryId);
-}
-
-void _handleNotificationClickInBackground(
-    int taskType, int alertHistoryId) async {
-  // Hier wird die entsprechende Seite basierend auf dem taskType geöffnet
-  if (CardaFitApp.navigatorKey.currentContext != null &&
-      CardaFitApp.navigatorKey.currentContext!.mounted) {
-    TaskAlertPageData alertPageData = TaskAlertPageData(
-        viewMode: 0, taskType: taskType, taskHistoryId: alertHistoryId);
-
-    debugPrint("-------> opening task alert page from background listener");
-    await Navigator.pushNamed(
-        CardaFitApp.navigatorKey.currentContext!, taskAlertRoute,
-        arguments: alertPageData);
-  }
 }
 
 //**Diese Funktion überprüft, ob der Benutzer in der App angemeldet ist.
@@ -397,14 +379,21 @@ void _onDidReceiveNotificationResponse(NotificationResponse response) async {
 }
 
 void _navigateToTaskPage(int taskHistoryId) async {
+  print('Navigating to task page with history ID: $taskHistoryId');
   // Ensure Navigator is ready and context is mounted
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (CardaFitApp.navigatorKey.currentState?.context != null) {
-      Navigator.pushNamed(
-          CardaFitApp.navigatorKey.currentState!.context, taskAlertRoute,
-          arguments: TaskAlertPageData(
-              viewMode: 0, taskType: TaskType.exercise.index, // Beispielwert
-              taskHistoryId: taskHistoryId));
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    AlertHistory? alertHistory =
+        await DatabaseHelper.instance.getAlertHistory(taskHistoryId);
+    if (alertHistory != null) {
+      int taskType = alertHistory.taskType.index;
+      if (CardaFitApp.navigatorKey.currentState?.context != null) {
+        Navigator.pushNamed(
+            CardaFitApp.navigatorKey.currentState!.context, taskAlertRoute,
+            arguments: TaskAlertPageData(
+                viewMode: 0, taskType: taskType, taskHistoryId: taskHistoryId));
+      }
+    } else {
+      print('Alert history not found for ID: $taskHistoryId');
     }
   });
 }
