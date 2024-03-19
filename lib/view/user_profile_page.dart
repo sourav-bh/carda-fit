@@ -405,7 +405,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   Icon(Icons.feedback, color: Colors.white),
                                   SizedBox(width: 10),
                                   Text(
-                                    'Feedback',
+                                    'Rückmeldung',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,

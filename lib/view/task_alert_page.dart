@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:app/api/api_manager.dart';
@@ -130,42 +131,8 @@ und Pausen zwischen Sätzen festlegt.*/
 
     if (_taskType == TaskType.exercise.index ||
         _taskType == TaskType.teamExercise.index) {
-      List<Exercise> exerciseList = AppCache.instance.exercises;
-      if (exerciseList.isEmpty) {
-        await _loadExerciseDataFromAsset();
-        exerciseList = AppCache.instance.exercises;
-      }
 
-      if (_taskType == TaskType.exercise.index) {
-        exerciseList.shuffle();
-      } else {
-        // do nothing, for team exercise we are always choosing the first one
-      }
-      Exercise exerciseNow = exerciseList.first;
-
-      // start the steps countdown timer
-      _loadWebsiteMetaData(exerciseNow.url ?? "");
-
-      setState(() {
-        _isExerciseTask = true;
-        _exercise = exerciseNow;
-        _title = exerciseNow.name ?? "";
-      });
-
-      if ((exerciseNow.steps?.length ?? 0) > 1) {
-        _stepNo =
-            '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
-        _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
-        _currentStep = 1;
-        _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
-      } else {
-        _totalExerciseSec = exerciseNow.duration ?? 10;
-      }
-
-      setState(() {
-        _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
-      });
-      _passedExerciseSec = 0;
+      _selectExerciseToStart();
     } else if (_taskType == TaskType.water.index) {
       setState(() {
         _title = 'Trinke jetzt ein Glas Wasser!';
@@ -179,7 +146,7 @@ und Pausen zwischen Sätzen festlegt.*/
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
 
-        _startBreakAndWalkTimer();
+        _startBreakOrWalkTimer();
       });
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
@@ -187,7 +154,7 @@ und Pausen zwischen Sätzen festlegt.*/
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
 
-        _startBreakAndWalkTimer();
+        _startBreakOrWalkTimer();
       });
     } else if (_taskType == TaskType.waterWithBreak.index) {
       setState(() {
@@ -196,7 +163,7 @@ und Pausen zwischen Sätzen festlegt.*/
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
 
-        _startBreakAndWalkTimer();
+        _startBreakOrWalkTimer();
       });
     } else if (_taskType == TaskType.walkWithExercise.index) {
       setState(() {
@@ -205,7 +172,14 @@ und Pausen zwischen Sätzen festlegt.*/
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_break_time.gif';
 
-        _startBreakAndWalkTimer();
+        final randomValGenerator = Random();
+        // to create less chance (25%) of getting walking task
+        final bool chanceOfWalkingTask = randomValGenerator.nextInt(4) == 0 ? true : false;
+        if (chanceOfWalkingTask) {
+          _startBreakOrWalkTimer();
+        } else {
+          _selectExerciseToStart();
+        }
       });
     }
   }
@@ -434,6 +408,45 @@ und Pausen zwischen Sätzen festlegt.*/
     }
   }
 
+  void _selectExerciseToStart() async {
+    List<Exercise> exerciseList = AppCache.instance.exercises;
+    if (exerciseList.isEmpty) {
+      await _loadExerciseDataFromAsset();
+      exerciseList = AppCache.instance.exercises;
+    }
+
+    if (_taskType == TaskType.exercise.index) {
+      exerciseList.shuffle();
+    } else {
+      // do nothing, for team exercise we are always choosing the first one
+    }
+    Exercise exerciseNow = exerciseList.first;
+
+    // start the steps countdown timer
+    _loadWebsiteMetaData(exerciseNow.url ?? "");
+
+    setState(() {
+      _isExerciseTask = true;
+      _exercise = exerciseNow;
+      _title = exerciseNow.name ?? "";
+    });
+
+    if ((exerciseNow.steps?.length ?? 0) > 1) {
+      _stepNo =
+      '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
+      _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
+      _currentStep = 1;
+      _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
+    } else {
+      _totalExerciseSec = exerciseNow.duration ?? 10;
+    }
+
+    setState(() {
+      _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
+    });
+    _passedExerciseSec = 0;
+  }
+
 /**Diese Methode startet einen Timer für die Anzeige der Fortschrittsdauer einer Übung.
  * Der Timer wird jede Sekunde aktualisiert.
  */
@@ -460,7 +473,7 @@ und Pausen zwischen Sätzen festlegt.*/
 /**Diese Methode startet einen Timer für Aufgabentypen wie Pausen und Schritte.
  * Der Timer wird jede Sekunde aktualisiert.
  */
-  void _startBreakAndWalkTimer() {
+  void _startBreakOrWalkTimer() {
     setState(() {
       _isBreakAndWalkTimerStarted = true;
     });
