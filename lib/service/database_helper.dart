@@ -590,6 +590,21 @@ class DatabaseHelper {
     return await db.rawDelete('DELETE FROM $TABLE_ALERT_HISTORY');
   }
 
+  Future<List<AlertHistory>> getTodayAlertHistoryList(String today) async {
+  Database db = await instance.database;
+  // Extrahieren des Datums aus taskCreatedAt und Filtern basierend auf 'today'
+  var alertHistory = await db.query(
+    TABLE_ALERT_HISTORY,
+    where: "strftime('%Y-%m-%d', taskCreatedAt) = ?", // ÄNDERUNG: Filterung nach Datum
+    whereArgs: [today],
+    orderBy: 'taskCreatedAt DESC',
+  );
+  List<AlertHistory> todayHistoryList = alertHistory.isNotEmpty
+      ? alertHistory.map((e) => AlertHistory.fromMap(e)).toList()
+      : [];
+  return todayHistoryList;
+}
+
   /// user_task
   Future<List<UserTask>> getUserTasks() async {
     Database db = await instance.database;
