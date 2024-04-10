@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:app/app.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
@@ -433,7 +434,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 onTap: () {
-                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: item.taskType.index);
+                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: TaskType.walkWithExercise.index);
                                   print("-------> opening task alert page from on home page item click");
                                   Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
                                 },

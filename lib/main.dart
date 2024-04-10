@@ -156,6 +156,7 @@ Future<void> foregroundHandler(RemoteMessage message) async {
 //**Dies ist der Handler für eingehende FCM-Benachrichtigungen, wenn die App im Hintergrund läuft.
 //Der Handler überprüft ähnlich wie der foregroundHandler, ob der Benutzer Benachrichtigungen snoozed hat und erstellt einen Eintrag in der lokalen Datenbank.
 //Falls die Benachrichtigung nicht gesnoozed wurde, zeigt der Handler eine lokale Benachrichtigung an. */
+@pragma('vm:entry-point')
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(
       'Remote notification message data whilst in the background: ${message.data}');

@@ -7,7 +7,8 @@ class AppConstant {
   static const productionBuild = false;
   // static const baseURL = "http://10.0.2.2:8075"; // local
   static const baseURL = "https://kontikat.de/cardafit"; // live
-  // bgf-internal, unisiegen-thesis, dokuworks-company1, pmd-company2, maipham-mai
+  // bgf-internal, unisiegen-thesis, maipham-mai
+  // dokuworks-company1, pmd-company2, firma-company3
   static const teamNameForCustomBuild = 'bgf';
 
   static const waterTaskValue = 1;

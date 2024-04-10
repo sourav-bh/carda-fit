@@ -131,7 +131,6 @@ und Pausen zwischen Sätzen festlegt.*/
 
     if (_taskType == TaskType.exercise.index ||
         _taskType == TaskType.teamExercise.index) {
-
       _selectExerciseToStart();
     } else if (_taskType == TaskType.water.index) {
       setState(() {
@@ -145,42 +144,38 @@ und Pausen zwischen Sätzen festlegt.*/
         _title = 'Bleibe nun zwei Minuten in Bewegung!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_walking_steps.gif';
-
-        _startBreakOrWalkTimer();
       });
+      _startBreakOrWalkTimer();
     } else if (_taskType == TaskType.breaks.index) {
       setState(() {
         _title = 'Lege nun eine zweiminütige Pause ein!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
-
-        _startBreakOrWalkTimer();
       });
+      _startBreakOrWalkTimer();
     } else if (_taskType == TaskType.waterWithBreak.index) {
       setState(() {
         _title =
             'Machen Sie eine kurze Pause und trinken Sie auch ein Glas Wasser!';
         _subTitle = 'Arbeiten Sie wie ein Mensch, nicht wie ein Roboter!';
         _staticImage = 'assets/animations/anim_break_time.gif';
-
-        _startBreakOrWalkTimer();
       });
+      _startBreakOrWalkTimer();
     } else if (_taskType == TaskType.walkWithExercise.index) {
       setState(() {
         _title =
             'Gehen Sie eine Weile spazieren und strecken Sie Ihre Hände ein wenig!';
         _subTitle = 'Je mehr Schritte du machst, desto gesünder wirst du';
         _staticImage = 'assets/animations/anim_break_time.gif';
-
-        final randomValGenerator = Random();
-        // to create less chance (25%) of getting walking task
-        final bool chanceOfWalkingTask = randomValGenerator.nextInt(4) == 0 ? true : false;
-        if (chanceOfWalkingTask) {
-          _startBreakOrWalkTimer();
-        } else {
-          _selectExerciseToStart();
-        }
       });
+      final randomValGenerator = Random();
+      // to create less chance (25%) of getting walking task
+      final bool chanceOfWalkingTask = randomValGenerator.nextInt(4) == 0 ? true : false;
+      if (chanceOfWalkingTask) {
+        _startBreakOrWalkTimer();
+      } else {
+        _selectExerciseToStart();
+      }
     }
   }
 
@@ -415,13 +410,12 @@ und Pausen zwischen Sätzen festlegt.*/
       exerciseList = AppCache.instance.exercises;
     }
 
-    if (_taskType == TaskType.exercise.index) {
+    if (_taskType == TaskType.exercise.index || _taskType == TaskType.walkWithExercise.index) {
       exerciseList.shuffle();
     } else {
       // do nothing, for team exercise we are always choosing the first one
     }
     Exercise exerciseNow = exerciseList.first;
-
     // start the steps countdown timer
     _loadWebsiteMetaData(exerciseNow.url ?? "");
 
@@ -429,22 +423,19 @@ und Pausen zwischen Sätzen festlegt.*/
       _isExerciseTask = true;
       _exercise = exerciseNow;
       _title = exerciseNow.name ?? "";
-    });
 
-    if ((exerciseNow.steps?.length ?? 0) > 1) {
-      _stepNo =
-      '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
-      _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
-      _currentStep = 1;
-      _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
-    } else {
-      _totalExerciseSec = exerciseNow.duration ?? 10;
-    }
+      if ((exerciseNow.steps?.length ?? 0) > 1) {
+        _stepNo = '${_exercise?.steps?.elementAt(1).serialNo} von ${(_exercise?.steps?.length ?? 0) - 2}';
+        _subTitle = exerciseNow.steps?.elementAt(1).name ?? "";
+        _currentStep = 1;
+        _totalExerciseSec = exerciseNow.steps?.elementAt(1).duration ?? 5;
+      } else {
+        _totalExerciseSec = exerciseNow.duration ?? 10;
+      }
 
-    setState(() {
       _textToSpeak = '$_subTitle für ${exerciseNow.steps?.elementAt(1).duration ?? 5} Sekunden';
+      _passedExerciseSec = 0;
     });
-    _passedExerciseSec = 0;
   }
 
 /**Diese Methode startet einen Timer für die Anzeige der Fortschrittsdauer einer Übung.
@@ -476,10 +467,9 @@ und Pausen zwischen Sätzen festlegt.*/
   void _startBreakOrWalkTimer() {
     setState(() {
       _isBreakAndWalkTimerStarted = true;
+      _targetTotalTimeInSec = 120;
+      _timePassedInSec = 0;
     });
-
-    _targetTotalTimeInSec = 120;
-    _timePassedInSec = 0;
 
     _breakAndWaterTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted && _timePassedInSec <= _targetTotalTimeInSec) {
@@ -703,7 +693,7 @@ und Pausen zwischen Sätzen festlegt.*/
             visible: (_taskType == TaskType.breaks.index ||
                 _taskType == TaskType.steps.index ||
                 _taskType == TaskType.waterWithBreak.index ||
-                _taskType == TaskType.walkWithExercise.index),
+                (_taskType == TaskType.walkWithExercise.index && _isBreakAndWalkTimerStarted)),
                 child: Center(
             child: SizedBox(
               width: 120,
@@ -822,7 +812,7 @@ und Pausen zwischen Sätzen festlegt.*/
             ),
           ),
           Visibility(
-            visible: _isBreakAndWalkTimerStarted && _showHideCloseButton != 1.0,
+            visible: !_isExerciseTask && _isBreakAndWalkTimerStarted && _showHideCloseButton != 1.0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
               child: TextButton(
