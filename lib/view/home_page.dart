@@ -434,7 +434,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 onTap: () {
-                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: TaskType.walkWithExercise.index);
+                                  TaskAlertPageData alertPageData = TaskAlertPageData(viewMode: 1, taskType: item.taskType.index);
                                   print("-------> opening task alert page from on home page item click");
                                   Navigator.pushNamed(context, taskAlertRoute, arguments: alertPageData);
                                 },
