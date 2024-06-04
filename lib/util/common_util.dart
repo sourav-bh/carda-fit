@@ -93,7 +93,12 @@ class CommonUtil {
   }
 
   static String getCurrentTimeAsDbFormat() {
-    var df = DateFormat("yyyy-MM-dd HH:mm:SS");
+    var df = DateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    return df.format(DateTime.now());
+  }
+
+  static String getCurrentDayAsDbFormat() {
+    var df = DateFormat("yyyy-MM-dd");
     return df.format(DateTime.now());
   }
 

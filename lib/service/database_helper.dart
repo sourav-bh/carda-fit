@@ -525,26 +525,29 @@ class DatabaseHelper {
   }
 
   /// alert_history
-  
   Future<List<AlertHistory>> getAlertHistoryListOfDate(String today) async {
-  Database db = await instance.database;
+    Database db = await instance.database;
 
-  // Da taskCreatedAt im Format "YYYY-MM-DD HH:MM:SS" gespeichert wird, verwenden wir die SQL-Funktion DATE()
-  // um nur das Datumsteil des Strings für den Vergleich zu extrahieren.
-  List<Map<String, dynamic>> result = await db.query(
-    TABLE_ALERT_HISTORY,
-    where: 'DATE(taskCreatedAt) = ?', // Datumsteil des taskCreatedAt mit today vergleichen
-    whereArgs: [today],
-    orderBy: 'taskCreatedAt DESC', // Ergebnisse nach Erstellungsdatum absteigend sortieren.
-  );
+    // Da taskCreatedAt im Format "YYYY-MM-DD HH:MM:SS" gespeichert wird, verwenden wir die SQL-Funktion DATE()
+    // um nur das Datumsteil des Strings für den Vergleich zu extrahieren.
+    List<Map<String, dynamic>> result = await db.query(
+      TABLE_ALERT_HISTORY,
+      where: 'DATE(taskCreatedAt) = ?', // Datumsteil des taskCreatedAt mit today vergleichen
+      whereArgs: [today],
+      orderBy: 'taskCreatedAt DESC', // Ergebnisse nach Erstellungsdatum absteigend sortieren
+    );
 
-  // Konvertiert die rohen Map-Ergebnisse in AlertHistory-Objekte.
-  List<AlertHistory> historyList = result.isNotEmpty
-      ? result.map((e) => AlertHistory.fromMap(e)).toList()
-      : [];
-  
-  return historyList;
-}
+    // var result = await db.rawQuery("SELECT * FROM $TABLE_ALERT_HISTORY where taskCreatedAt >= $today and taskCreatedAt <= $today ORDER BY taskCreatedAt DESC");
+
+    // sumJan= db.rawQuery('SELECT SUM(AMOUNT) FROM EXPENSES WHERE DATE(DATETIME) >= ? AND DATE(DATETIME) <= ?', [2021-01-01, 2021-01-31] ).then(Sqflite.firstIntValue);
+
+    // Konvertiert die rohen Map-Ergebnisse in AlertHistory-Objekte.
+    List<AlertHistory> historyList = result.isNotEmpty
+        ? result.map((e) => AlertHistory.fromMap(e)).toList()
+        : [];
+
+    return historyList;
+  }
 
 
   Future<List<AlertHistory>> getAlertHistoryList() async {

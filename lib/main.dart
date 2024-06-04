@@ -110,7 +110,6 @@ Future<void> foregroundHandler(RemoteMessage message) async {
   int alertType = int.parse(message.data["text"]);
 
   AlertHistory alertHistory = AlertHistory(
-      dbId: 0,
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
@@ -173,7 +172,6 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   int alertType = int.parse(message.data["text"]);
 
   AlertHistory alertHistory = AlertHistory(
-      dbId: 0,
       title: title,
       description: desc,
       taskType: TaskType.values[alertType],
@@ -248,7 +246,7 @@ _checkIfItsANewDay() async {
         SharedPref.keyUserCompletedTargets, completedTarget.toRawJson());
 
     // TODO: clear all previous alert history items as it's a new day
-    await DatabaseHelper.instance.clearAlertHistoryTable();
+    // await DatabaseHelper.instance.clearAlertHistoryTable();
   }
 }
 
@@ -320,7 +318,6 @@ _onDidReceiveLocalNotificationInIos(id, title, body, payload) async {
   int alertType = int.parse(payload);
 
   AlertHistory alertHistory = AlertHistory(
-      dbId: 0,
       title: title,
       description: body,
       taskType: TaskType.values[alertType],

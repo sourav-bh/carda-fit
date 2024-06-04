@@ -66,7 +66,7 @@ enum TaskStatus { completed, pending, missed, snoozed, upcoming }
 
 class AlertHistory {
   AlertHistory({
-    required this.dbId,
+    this.dbId,
     required this.title,
     required this.description,
     required this.taskType,
@@ -75,7 +75,7 @@ class AlertHistory {
     required this.completedAt,
   });
 
-  int dbId;
+  final int? dbId;
   String title;
   String description;
   TaskType taskType;

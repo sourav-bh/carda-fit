@@ -18,7 +18,6 @@ class AlertHistoryPage extends StatefulWidget {
 
 class _AlertHistoryPageState extends State<AlertHistoryPage> with WidgetsBindingObserver {
   final List<AlertHistory> _historyItems = List.empty(growable: true);
-  String _lastLoadDate = "";
 
 //Dies ist der zugehörige State für die AlertHistoryPage. Der State enthält die Logik für das Anzeigen des Alarmverlaufs.
   @override
@@ -45,17 +44,13 @@ class _AlertHistoryPageState extends State<AlertHistoryPage> with WidgetsBinding
 //**Diese Funktion wird aufgerufen, um die Daten für die Alarmverlaufseite zu laden.
 //Sie ruft die Liste der Alarmverlaufselemente aus der lokalen Datenbank ab und aktualisiert den Zustand der Seite, um die Daten darzustellen. */
   _loadData() async {
-    String today = CommonUtil.getCurrentTimeAsDbFormat();
-    if (_lastLoadDate != today) {
-      List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryList();
-      if (mounted) {
-        setState(() {
-          _historyItems.clear();
-          _historyItems.addAll(historyItems);
-          // Aktualisieren des letzten Ladetags
-          _lastLoadDate = today;
-        });
-      }
+    String today = CommonUtil.getCurrentDayAsDbFormat();
+    List<AlertHistory> historyItems = await DatabaseHelper.instance.getAlertHistoryListOfDate(today);
+    if (mounted) {
+      setState(() {
+        _historyItems.clear();
+        _historyItems.addAll(historyItems);
+      });
     }
   }
 
