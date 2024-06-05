@@ -12,6 +12,10 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="youtube" />
         </intent>
+
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
     </queries>
 
    <application
@@ -45,7 +49,8 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-       <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+       <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+           android:exported="true">
            <intent-filter>
                <action android:name="android.intent.action.BOOT_COMPLETED"/>
                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>

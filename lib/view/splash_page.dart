@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -18,6 +19,7 @@ import '../model/user_info.dart';
 import '../service/database_helper.dart';
 import '../util/common_util.dart';
 
+// Die Splah Page stellt den Ladebildschirm der App dar.
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
 
@@ -32,25 +34,27 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
-    _quoteIndex = Random().nextInt(DataLoader.quotes.length);
-    AppCache.instance.quoteIndex = _quoteIndex;
-
-    // Check if data is already saved in the database
+    //**In der initState-Methode wird überprüft, ob Daten bereits in der Datenbank gespeichert sind (checkDataSaved).
+    // Falls ja, wird nach einer Verzögerung zur nächsten Seite navigiert.
+    //Wenn keine Daten vorhanden sind, werden Übungsdaten und Lernmaterialien aus einer Excel-Datei geladen und
+    // in die Datenbank eingefügt. Dann wird auch zur nächsten Seite navigiert. */
     checkDataSaved().then((isDataSaved) {
       if (isDataSaved) {
-        // Data is already saved, go to the next page
+        // Daten sind bereits gespeichert, gehe weiter zur nächsten Seite.
         Timer(const Duration(seconds: 3), () {
+          _loadDataFromDatabase();
           _goToNextPage();
         });
       } else {
-        // Data is not saved, load and save data from Excel file
-        // _loadExerciseDataFromAsset();
-        // _loadLearningMaterialFromAsset();
-        // Move to the next page after a delay
+        // Daten sind nicht gespeichert, lade und speicher die Daten aus der Excel-Datei.
+        _loadExerciseDataFromAsset();
+        _quoteIndex = Random().nextInt(DataLoader.quotes.length);
+        AppCache.instance.quoteIndex = _quoteIndex;
+
+        // Gehe weiter zur nächsten Seite nach kurzer Verzögerung.
         Timer(const Duration(seconds: 3), () {
           _goToNextPage();
         });
-        // Is it possible to leave the timer in didChangeDependencies? 
       }
     });
   }
@@ -60,15 +64,29 @@ class _SplashPageState extends State<SplashPage> {
     super.didChangeDependencies();
   }
 
+//**Diese asynchrone Methode überprüft, ob Daten bereits in der Datenbank gespeichert sind, indem sie die Datenbank nach Übungen und Lerninhalten abfragt.
+//*  Sie gibt einen booleschen Wert zurück, der angibt, ob Daten gespeichert sind oder nicht. */
   Future<bool> checkDataSaved() async {
     // bool check if data is saved
     final dbHelper = DatabaseHelper.instance;
-    final exercises = await dbHelper.getExercises();
-    final learningContents = await dbHelper.getLearningContents();
 
-    return exercises.isNotEmpty && learningContents.isNotEmpty;
+    // final exercises = await dbHelper.getExercises();
+    final learningContents = await dbHelper.getLearningContents();
+    AppCache.instance.learningContents = learningContents;
+
+    return/*exercises.isNotEmpty && */  learningContents.isNotEmpty;
   }
 
+  Future<void> _loadDataFromDatabase() async {
+    final dbHelper = DatabaseHelper.instance;
+
+    // Daten aus der Datenbank abrufen
+    final learningContents = await dbHelper.getLearningContents();
+    AppCache.instance.learningContents = learningContents;
+  }
+
+//**Eine Methode zum Laden von Übungsdaten aus einer Excel-Datei im Assets-Ordner der App.
+//Die Daten werden zeilenweise aus der Excel-Datei gelesen, analysiert und in eine lokale Datenbank eingefügt. */
   Future<void> _loadExerciseDataFromAsset() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
@@ -127,10 +145,20 @@ class _SplashPageState extends State<SplashPage> {
             exercise.name = exerciseName;
             exercise.duration = duration;
             exercise.url = url;
+
+            // exercise.stepsJson = json.encode(steps);
             exercise.steps = [];
             exercise.steps?.addAll(steps);
 
-            await dbHelper.addExercise(exercise);
+            // await dbHelper.addExercise(exercise);
+
+            // List<Exercise> exercises = await dbHelper.getExercises();
+            // // Deserialize the stepsJson field back into a list of ExerciseStep
+            // exercises.forEach((exercise) {
+            //   List<dynamic> stepsJson = json.decode(exercise.stepsJson!);
+            //   exercise.steps =
+            //       stepsJson.map((step) => ExerciseStep.fromMap(step)).toList();
+            // });
 
             exerciseName = "";
             duration = 0;
@@ -143,13 +171,14 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
+//** Ähnlich wie _loadExerciseDataFromAsset() lädt diese Funktion Lernmaterialien aus einer Excel-Datei und fügt sie in eine lokale Datenbank ein.
+// Sie liest Daten aus der Excel-Datei zeilenweise und erstellt LearningContent-Objekte. */
   Future<void> _loadLearningMaterialFromAsset() async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
 
-    AppCache.instance.contents.clear();
-
+    AppCache.instance.learningContents.clear();
     final dbHelper = DatabaseHelper.instance;
 
     for (var table in excel.tables.keys) {
@@ -172,6 +201,9 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
+//**Diese Methode ist für das Navigieren zur nächsten Seite der App verantwortlich.
+//Sie überprüft anhand von Shared Preferences, ob ein Benutzer existiert,
+//und je nach Ergebnis navigiert sie entweder zur Startseite oder zur Anmeldeseite. */
   _goToNextPage() async {
     bool isUserExist =
         await SharedPref.instance.hasValue(SharedPref.keyUserName);

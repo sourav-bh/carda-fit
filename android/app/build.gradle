@@ -29,7 +29,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -38,9 +38,9 @@ android {
     }
 
     defaultConfig {
-        applicationId "uni.siegen.bgf.cardafit"
-        minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
+        applicationId "de.uni.siegen.bgf.cardafit"
+        minSdkVersion 23
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

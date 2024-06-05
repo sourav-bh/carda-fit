@@ -1,15 +1,15 @@
 import 'dart:convert';
 
 class ExerciseStep {
-  ExerciseStep({
-    this.id,
-    this.serialNo,
-    this.name,
-    this.details,
-    this.media,
-    this.duration,
-    this.createdAt,
-  });
+  ExerciseStep(
+      {this.id,
+      this.serialNo,
+      this.name,
+      this.details,
+      this.media,
+      this.duration,
+      this.createdAt,
+      this.stepsJson});
 
   int? id;
   String? serialNo;
@@ -18,6 +18,7 @@ class ExerciseStep {
   String? media;
   int? duration;
   double? createdAt;
+  String? stepsJson;
 
   factory ExerciseStep.fromRawJson(String str) =>
       ExerciseStep.fromMap(json.decode(str));
@@ -32,6 +33,7 @@ class ExerciseStep {
         duration: json["duration"] ?? 0,
         serialNo: json["serial_no"],
         createdAt: json["created_at"],
+        stepsJson: json["stepsJson"],
       );
 
   Map<String, dynamic> toMap() => {
@@ -42,5 +44,6 @@ class ExerciseStep {
         "duration": duration,
         "serial_no": serialNo,
         "created_at": createdAt,
+        "stepsJson": stepsJson,
       };
 }

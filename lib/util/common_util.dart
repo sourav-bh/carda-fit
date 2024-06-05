@@ -93,12 +93,17 @@ class CommonUtil {
   }
 
   static String getCurrentTimeAsDbFormat() {
-    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
+    var df = DateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    return df.format(DateTime.now());
+  }
+
+  static String getCurrentDayAsDbFormat() {
+    var df = DateFormat("yyyy-MM-dd");
     return df.format(DateTime.now());
   }
 
   static String convertDbTimeStampToTimeOnlyStr(String dbTime) {
-    var df = DateFormat("YYYY-MM-DD HH:mm:SS");
+    var df = DateFormat("yyyy-MM-dd HH:mm:SS");
     var dt = df.parse(dbTime);
     return DateFormat('HH:mm').format(dt);
   }
@@ -221,17 +226,51 @@ class CommonUtil {
   static String getTaskAlertName(TaskType? type) {
     switch(type) {
       case TaskType.waterWithBreak:
-        return "Water & Break";
+        return "Wasser & Pause";
       case TaskType.exercise:
-        return "Exercise";
+        return "Übung";
       case TaskType.walkWithExercise:
-        return "Walk & Exercise";
+        return "Schritt & Übung";
       case TaskType.steps:
-        return "Walk";
+        return "Schritt";
       case TaskType.water:
-        return "Water";
+        return "Wasser";
       case TaskType.breaks:
-        return "Break";
+        return "Pause";
+      default:
+        return "";
+    }
+  }
+
+  static String convertPreferredAlertNames(String preferredAlerts) {
+    if (preferredAlerts == 'Nicht ausgewählt') return preferredAlerts;
+
+    List<String> alerts = preferredAlerts.split(", ");
+    String result = "";
+    for (var alert in alerts) {
+      print(alert);
+      String convertedName = getPreferredAlertNameFromENtoDE(alert.trim());
+      print(convertedName);
+      result += convertedName;
+      result += ', ';
+    }
+    return result.isNotEmpty ? result.substring(0, result.length - 2) : "";
+  }
+
+  static String getPreferredAlertNameFromENtoDE(String preferredAlert) {
+    switch(preferredAlert) {
+      case 'waterWithBreak':
+        return 'Wasser & Pause';
+      case 'exercise':
+        return "Übung";
+      case 'walkWithExercise':
+        return "Schritt & Übung ";
+      case 'steps':
+        return "Schritt";
+      case 'water':
+        return "Wasser";
+      case 'breaks':
+        return "Pause";
       default:
         return "";
     }

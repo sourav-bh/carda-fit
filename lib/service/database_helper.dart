@@ -35,6 +35,8 @@ const TABLE_USER_TASK = 'user_tasks';
 const TABLE_SCORER = 'public_scorer';
 const TABLE_TASK_ALERT = 'task_alert';
 
+//**Dies ist die Hauptklasse, die für die Verwaltung der SQLite-Datenbank verantwortlich ist.
+//Sie enthält Methoden zum Erstellen und Aktualisieren von Tabellen und zur Durchführung von Datenbankoperationen. */
 class DatabaseHelper {
   // Singleton Pattern
   DatabaseHelper._privateConstructor();
@@ -43,34 +45,44 @@ class DatabaseHelper {
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
 
+//**Diese Methode initialisiert die Datenbank, öffnet sie und gibt eine Instanz der Datenbank zurück.
+// Sie wird verwendet, um sicherzustellen, dass die Datenbank vor der Verwendung einsatzbereit ist. */
   Future<Database> _initDatabase() async {
     String? documentsDirectory = await _getLocalDirectoryPath();
     String path = join(documentsDirectory ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
+//**Diese Methode ermittelt den Pfad zum lokalen Verzeichnis, in dem die SQLite-Datenbankdatei gespeichert wird.
+// Sie berücksichtigt dabei die Plattform (Android oder iOS). */
   Future<String?> _getLocalDirectoryPath() async {
     String? externalStorageDirPath;
     if (Platform.isAndroid) {
       try {
-        externalStorageDirPath = (await getApplicationDocumentsDirectory()).path;
+        externalStorageDirPath =
+            (await getApplicationDocumentsDirectory()).path;
       } catch (e) {
         final directory = await getExternalStorageDirectory();
         externalStorageDirPath = directory?.path;
       }
     } else if (Platform.isIOS) {
-      externalStorageDirPath = (await getApplicationDocumentsDirectory()).absolute.path;
+      externalStorageDirPath =
+          (await getApplicationDocumentsDirectory()).absolute.path;
     }
     return externalStorageDirPath;
   }
 
+//**Diese Methode wird aufgerufen, wenn die Datenbank erstellt wird.
+//Sie enthält SQL-Anweisungen zum Erstellen der Tabellen in der Datenbank. */
   Future _onCreate(Database db, int version) async {
     await db.execute("CREATE TABLE $TABLE_USER("
+        //**Diese Tabelle speichert Benutzerinformationen wie Benutzernamen, Avatarbild, Geschlecht, und viele mehr.
+        //Sie wird verwendet, um die Profile der Benutzer zu verwalten. */
         "id INTEGER PRIMARY KEY,"
         "userName TEXT,"
         "avatarImage VARCHAR,"
@@ -92,6 +104,8 @@ class DatabaseHelper {
         "isMergedAlertSet INTEGER,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_TASK("
+        //**Diese Tabelle speichert Aufgabeninformationen wie Namen, Schwierigkeitsgrad, Beschreibung, Häufigkeit, Dauer und Punktzahl.
+        //Sie wird verwendet, um Aufgaben und Übungen zu verwalten, die Benutzer in der App absolvieren können. */
         "id INTEGER PRIMARY KEY,"
         "name VARCHAR,"
         "difficulty_level INTEGER,"
@@ -101,6 +115,8 @@ class DatabaseHelper {
         "score DOUBLE,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
+        //**Diese Tabelle speichert Informationen über die Historie von Alarmen, einschließlich Titel, Beschreibung, Typ des Alarms, Status des Alarms, Zeitpunkt der Alarmerstellung und Zeitpunkt der Abschluss des Alarms.
+        //Sie wird verwendet, um den Verlauf von Benachrichtigungen und Alarmen anzuzeigen, die der Benutzer erhalten hat. */
         "id INTEGER PRIMARY KEY,"
         "title VARCHAR,"
         "description VARCHAR,"
@@ -109,17 +125,21 @@ class DatabaseHelper {
         "taskCreatedAt VARCHAR,"
         "completedAt VARCHAR)");
     await db.execute("CREATE TABLE $TABLE_EXERCISES("
+        //**Diese Tabelle speichert Übungen, einschließlich Informationen wie Bedingungen, Name der Übung, Schritte zur Durchführung, Beschreibung, URL zum Übungsvideo, Dauer und Schwierigkeitsgrad.
+        //Sie wird verwendet, um Übungen in der App zu verwalten. */
         "id INTEGER PRIMARY KEY,"
         "condition VARCHAR,"
         "name VARCHAR,"
         "exercise_name VARCHAR,"
-        "steps VARCHAR,"
+        "stepsJson VARCHAR,"
         "description VARCHAR,"
         "url VARCHAR,"
         "duration INTEGER,"
         "difficulty_level INTEGER,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_EXERCISE_STEPS("
+        //**Diese Tabelle speichert Schritte oder Anweisungen für Übungen. Jeder Schritt hat eine Seriennummer, einen Namen, Details, Medien (z. B. Bilder oder Videos) und eine Dauer.
+        //Sie wird verwendet, um detaillierte Anweisungen für Übungen bereitzustellen. */
         "id INTEGER PRIMARY KEY,"
         "serial_no VARCHAR,"
         "name VARCHAR,"
@@ -128,6 +148,8 @@ class DatabaseHelper {
         "duration INTEGER,"
         "created_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_USER_TASK("
+        //**Diese Tabelle speichert verschiedene erreichte Werte des Nutzers von absolvierten Übungen. Sie enthält Informationen über den Benutzer,
+        //die Aufgabe, begonnene Aufgaben, abgeschlossene Aufgaben.*/
         "user_id INTEGER PRIMARY KEY,"
         "task_id INTEGER,"
         "total_due_count INTEGER,"
@@ -135,10 +157,14 @@ class DatabaseHelper {
         "created_at TIMESTAMP,"
         "last_updated_at TIMESTAMP)");
     await db.execute("CREATE TABLE $TABLE_USER_EXERCISES("
+        //**Diese Tabelle verfolgt, welche Übungen ein Benutzer absolviert hat.
+        //Sie enthält Informationen über den Benutzer, die Übung und ob die Übung abgeschlossen wurde. */
         "user_id INTEGER PRIMARY KEY,"
         "exercise_id INTEGER,"
         "done INTEGER)");
     await db.execute("CREATE TABLE $TABLE_LEARNING("
+        //**Diese Tabelle speichert Informationen über Lerninhalte wie Titel, Beschreibung, Art des Inhalts, Schwierigkeitsgrad und den URI (Uniform Resource Identifier) des Lerninhalts.
+        //Sie wird verwendet, um Lerninhalte in der App zu verwalten. */
         "id INTEGER PRIMARY KEY,"
         "title VARCHAR,"
         "description VARCHAR,"
@@ -149,6 +175,9 @@ class DatabaseHelper {
         "condition VARCHAR,"
         "done INTEGER)");
     await db.execute("CREATE TABLE $TABLE_USER_LEARNING_CONTENTS("
+        //**Diese Tabelle verfolgt, welche Lerninhalte ein Benutzer angesehen hat.
+        //Sie enthält Informationen über den Benutzer, den Lerninhalt, ob er als Favorit markiert wurde,
+        // die Anzahl der Aufrufe und den Zeitpunkt des letzten Aufrufs. */
         "user_id INTEGER PRIMARY KEY,"
         "content_id INTEGER,"
         "favourite INTEGER,"
@@ -157,32 +186,42 @@ class DatabaseHelper {
         "done INTEGER)");
   }
 
+//**Diese Methode wird aufgerufen, wenn die Datenbank auf eine neue Version aktualisiert wird.
+// Sie enthält SQL-Anweisungen zum Aktualisieren der Tabellenstruktur, wenn sich das Datenbankschema zwischen den Versionen geändert hat. */
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    await db.execute('ALTER TABLE $TABLE_USER '
-        'DROP COLUMN fullName, '
-        'RENAME COLUMN avatar TO userName,'
-        'RENAME COLUMN avatar_image TO avatarImage,'
-        'RENAME COLUMN designation TO jobPosition,'
-        'RENAME COLUMN job_type TO jobType,'
-        'RENAME COLUMN condition TO medicalConditions,'
-        'ADD teamName VARCHAR,'
-        'ADD score INTEGER,'
-        'ADD workingDays VARCHAR,'
-        'ADD workStartTime VARCHAR,'
-        'ADD workEndTime VARCHAR,'
-        'ADD diseases VARCHAR,'
-        'ADD preferredAlerts VARCHAR,'
-        'ADD isMergedAlertSet INTEGER;');
-    await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
-        "id INTEGER PRIMARY KEY,"
-        "title VARCHAR,"
-        "description VARCHAR,"
-        "taskType INTEGER,"
-        "taskStatus INTEGER,"
-        "taskCreatedAt VARCHAR,"
-        "completedAt VARCHAR)");
+    // await db.execute('ALTER TABLE $TABLE_USER '
+    //     'DROP COLUMN fullName, '
+    //     'RENAME COLUMN avatar TO userName,'
+    //     'RENAME COLUMN avatar_image TO avatarImage,'
+    //     'RENAME COLUMN designation TO jobPosition,'
+    //     'RENAME COLUMN job_type TO jobType,'
+    //     'RENAME COLUMN condition TO medicalConditions,'
+    //     'ADD teamName VARCHAR,'
+    //     'ADD score INTEGER,'
+    //     'ADD workingDays VARCHAR,'
+    //     'ADD workStartTime VARCHAR,'
+    //     'ADD workEndTime VARCHAR,'
+    //     'ADD walkingSpeed VARCHAR,'
+    //     'ADD diseases VARCHAR,'
+    //     'ADD preferredAlerts VARCHAR,'
+    //     'ADD isMergedAlertSet INTEGER;');
+    // await db.execute("CREATE TABLE $TABLE_ALERT_HISTORY("
+    //     "id INTEGER PRIMARY KEY,"
+    //     "title VARCHAR,"
+    //     "description VARCHAR,"
+    //     "taskType INTEGER,"
+    //     "taskStatus INTEGER,"
+    //     "taskCreatedAt VARCHAR,"
+    //     "completedAt VARCHAR)");
+    // await db.execute('ALTER TABLE $TABLE_EXERCISES '
+    //     'RENAME COLUMN steps TO stepsJson;');
   }
 
+  ///user
+
+//** Diese Methode ruft alle Benutzerinformationen aus der Datenbank ab und gibt sie als Liste von UserInfo-Objekten zurück.
+// Sie verwendet die query-Methode, um alle Datensätze aus der TABLE_USER-Tabelle abzurufen, und ordnet sie nach dem Feld full_name.
+// Die abgerufenen Daten werden in UserInfo-Objekte umgewandelt und in einer Liste gespeichert. */
   Future<List<UserInfo>> getAllUserInfo() async {
     Database db = await instance.database;
     var userInfo = await db.query(TABLE_USER, orderBy: 'full_name');
@@ -192,6 +231,10 @@ class DatabaseHelper {
     return userInfoList;
   }
 
+//**Diese Methode ruft die Benutzerinformationen für einen bestimmten Benutzer anhand seiner id aus der Datenbank ab
+// und gibt ein einzelnes UserInfo-Objekt zurück. Sie verwendet die query-Methode mit einer where-Klausel,
+// um nach einem bestimmten Benutzer mit der angegebenen id zu suchen. Wenn ein entsprechender Datensatz gefunden wird,
+// wird er in ein UserInfo-Objekt umgewandelt und zurückgegeben. Andernfalls wird null zurückgegeben. */
   Future<UserInfo?> getUserInfo(int id) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> users =
@@ -204,19 +247,29 @@ class DatabaseHelper {
     }
   }
 
+//**Diese Methode fügt einen neuen Benutzer zur Datenbank hinzu. Sie akzeptiert ein UserInfo-Objekt als Eingabe
+//und fügt die entsprechenden Daten in die TABLE_USER-Tabelle ein. Der Rückgabewert ist die id des neu hinzugefügten Benutzers. */
   Future<int> addUser(UserInfo item) async {
     Database db = await instance.database;
     return await db.insert(TABLE_USER, item.toDbMap());
   }
 
+//**Diese Methode entfernt einen Benutzer aus der Datenbank anhand seiner id. Sie verwendet die delete-Methode,
+//um den Benutzerdatensatz aus der TABLE_USER-Tabelle zu löschen. Der Rückgabewert gibt an,
+//wie viele Datensätze gelöscht wurden, normalerweise 1, wenn der Benutzer erfolgreich gelöscht wurde. */
   Future<int> removeUser(int id) async {
     Database db = await instance.database;
     return await db.delete(TABLE_USER, where: 'id = ?', whereArgs: [id]);
   }
 
+//**Diese Methode aktualisiert die Informationen eines Benutzers in der Datenbank.
+//Sie akzeptiert ein UserInfo-Objekt und die id des zu aktualisierenden Benutzers.
+//Sie verwendet die update-Methode, um die Daten in der TABLE_USER-Tabelle entsprechend zu aktualisieren.
+//Der Rückgabewert gibt an, wie viele Datensätze aktualisiert wurden, normalerweise 1, wenn die Aktualisierung erfolgreich war. */
   Future<int> updateUser(UserInfo item, int id) async {
     Database db = await instance.database;
-    return await db.update(TABLE_USER, item.toDbMap(), where: 'id = ?', whereArgs: [id]);
+    return await db
+        .update(TABLE_USER, item.toDbMap(), where: 'id = ?', whereArgs: [id]);
   }
 
   /// user_allergies
@@ -275,6 +328,7 @@ class DatabaseHelper {
   }
 
   /// learning contents
+
   Future<List<LearningContent>> getLearningContents() async {
     Database db = await instance.database;
     var learnings = await db.query(TABLE_LEARNING, orderBy: 'title');
@@ -449,8 +503,8 @@ class DatabaseHelper {
   Future<List<Task>> getTasks() async {
     Database db = await instance.database;
     var tasks = await db.query(TABLE_TASK, orderBy: 'user_id');
-    List<Task> taskList = tasks.isNotEmpty ? tasks.map((e) => Task.fromMap(e))
-        .toList() : [];
+    List<Task> taskList =
+        tasks.isNotEmpty ? tasks.map((e) => Task.fromMap(e)).toList() : [];
     return taskList;
   }
 
@@ -471,10 +525,38 @@ class DatabaseHelper {
   }
 
   /// alert_history
+  Future<List<AlertHistory>> getAlertHistoryListOfDate(String today) async {
+    Database db = await instance.database;
+
+    // Da taskCreatedAt im Format "YYYY-MM-DD HH:MM:SS" gespeichert wird, verwenden wir die SQL-Funktion DATE()
+    // um nur das Datumsteil des Strings für den Vergleich zu extrahieren.
+    List<Map<String, dynamic>> result = await db.query(
+      TABLE_ALERT_HISTORY,
+      where: 'DATE(taskCreatedAt) = ?', // Datumsteil des taskCreatedAt mit today vergleichen
+      whereArgs: [today],
+      orderBy: 'taskCreatedAt DESC', // Ergebnisse nach Erstellungsdatum absteigend sortieren
+    );
+
+    // var result = await db.rawQuery("SELECT * FROM $TABLE_ALERT_HISTORY where taskCreatedAt >= $today and taskCreatedAt <= $today ORDER BY taskCreatedAt DESC");
+
+    // sumJan= db.rawQuery('SELECT SUM(AMOUNT) FROM EXPENSES WHERE DATE(DATETIME) >= ? AND DATE(DATETIME) <= ?', [2021-01-01, 2021-01-31] ).then(Sqflite.firstIntValue);
+
+    // Konvertiert die rohen Map-Ergebnisse in AlertHistory-Objekte.
+    List<AlertHistory> historyList = result.isNotEmpty
+        ? result.map((e) => AlertHistory.fromMap(e)).toList()
+        : [];
+
+    return historyList;
+  }
+
+
   Future<List<AlertHistory>> getAlertHistoryList() async {
     Database db = await instance.database;
-    var alertHistory = await db.query(TABLE_ALERT_HISTORY, orderBy: 'taskCreatedAt DESC');
-    List<AlertHistory> historyList = alertHistory.isNotEmpty ? alertHistory.map((e) => AlertHistory.fromMap(e)).toList() : [];
+    var alertHistory =
+        await db.query(TABLE_ALERT_HISTORY, orderBy: 'taskCreatedAt DESC');
+    List<AlertHistory> historyList = alertHistory.isNotEmpty
+        ? alertHistory.map((e) => AlertHistory.fromMap(e)).toList()
+        : [];
     return historyList;
   }
 
@@ -486,7 +568,7 @@ class DatabaseHelper {
   Future<AlertHistory?> getAlertHistory(int id) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> historyItems =
-    await db.query(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
+        await db.query(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
 
     if (historyItems.isNotEmpty) {
       print(historyItems.first["id"]);
@@ -498,7 +580,8 @@ class DatabaseHelper {
 
   Future<int> removeAlertHistory(int id) async {
     Database db = await instance.database;
-    return await db.delete(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
+    return await db
+        .delete(TABLE_ALERT_HISTORY, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> updateAlertHistory(int id) async {
@@ -518,8 +601,11 @@ class DatabaseHelper {
     };
 
     Database db = await instance.database;
-    return db.update(TABLE_ALERT_HISTORY, updatedStatusValue,
-      where: 'taskType = ? and taskStatus = ?', whereArgs: [alertType, TaskStatus.pending.index],
+    return db.update(
+      TABLE_ALERT_HISTORY,
+      updatedStatusValue,
+      where: 'taskType = ? and taskStatus = ?',
+      whereArgs: [alertType, TaskStatus.pending.index],
     );
   }
 
@@ -527,6 +613,8 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.rawDelete('DELETE FROM $TABLE_ALERT_HISTORY');
   }
+
+  
 
   /// user_task
   Future<List<UserTask>> getUserTasks() async {

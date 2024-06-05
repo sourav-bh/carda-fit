@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+//**Dies ist die Klasse, die die Leaderbord Seite darstellt. */
 class LeaderBoardPage extends StatefulWidget {
   const LeaderBoardPage({Key? key}) : super(key: key);
 
@@ -19,6 +20,9 @@ class LeaderBoardPage extends StatefulWidget {
   _LeaderBoardPageState createState() => _LeaderBoardPageState();
 }
 
+
+//**Dies ist der zugehörige State für die LeaderBoardPage.
+//Hier werden die Logik und die Zustände für die LeaderboardPage verwaltet. */
 class _LeaderBoardPageState extends State<LeaderBoardPage> {
   final List<UserInfo> _teamMembersList = List.empty(growable: true);
   String? _currentUserName;
@@ -32,6 +36,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     _loadAllUsers();
   }
 
+// Diese Funktion lädt den Benutzernamen des aktuellen Benutzers aus den SharedPreferences und aktualisiert den Wert von _currentUserName.
   _loadUserName() async {
     var userName = await SharedPref.instance.getValue(SharedPref.keyUserName);
     if (userName != null && userName is String) {
@@ -41,6 +46,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     }
   }
 
+//**Diese Funktion ruft alle Benutzer (Teammitglieder) von einem Server ab und speichert sie in der Liste _teamMembersList.
+// Sie sortiert auch die Benutzer nach ihrer Punktzahl in absteigender Reihenfolge. */
   void _loadAllUsers() async {
     setState(() {
       _teamMembersList.clear();
@@ -68,6 +75,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     });
   }
 
+//**Diese Funktion gibt die UserInfo des aktuellen Benutzers zurück, falls ein Benutzer angemeldet ist.
+//  Andernfalls wird ein leeres UserInfo-Objekt zurückgegeben. */
   UserInfo _getCurrentUserInfo() {
     if (_currentUserName != null &&
         _currentUserName!.isNotEmpty &&

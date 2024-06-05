@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+// Ein Enum zur Darstellung der verschiedenen Ansichtszustände der Registrierungsseite, wie "Mandatory Info", "Optional Bio Info" usw.
 enum RegisterPageViewState {
   mandatoryInfo,
   optionalOneBioInfo,
@@ -24,6 +25,8 @@ enum RegisterPageViewState {
   allInfoToSubmit,
 }
 
+//**Diese Klasse stellt die Hauptseite der Registrierung dar.
+//Sie enthält verschiedene Formularelemente und Schritte für die Registrierung. */
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -31,6 +34,8 @@ class RegistrationPage extends StatefulWidget {
   _RegistrationPageState createState() => _RegistrationPageState();
 }
 
+//**Dies ist der zugehörige State für die RegistrationPage.
+//Hier werden die Logik und die Zustände für die Registrierung verwaltet. */
 class _RegistrationPageState extends State<RegistrationPage> {
   final _mandatoryFormKey = GlobalKey<FormState>();
   final _alertTypeFormKey = GlobalKey<FormState>();
@@ -44,9 +49,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _weightText = TextEditingController();
   final TextEditingController _heightText = TextEditingController();
   final TextEditingController _designationText = TextEditingController();
+  final TextEditingController _otherMedConditionText = TextEditingController();
 
   Gender? _genderValue;
-  WalkingSpeed? _walkingSpeedValue;
+  WalkingSpeed? _walkingSpeedValue = WalkingSpeed.medium;
   JobType? _jobTypeValue;
   String? _avatarImage;
 
@@ -72,6 +78,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     'Augen',
   ];
   List<String> _selectedConditions = [];
+  List<String> _otherMedConditions = [];
+  List<String> apiResults = [];
 
   List<MultiSelectItem<TaskType?>> _items = [];
   final List<TaskType?> _alertTypes = [
@@ -86,6 +94,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   int _stepIndex = 0;
   String _nextButtonText = "Weiter";
+
+  get highlightColor => null;
 
   @override
   void initState() {
@@ -107,6 +117,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
   }
 
+//**Diese Funktion wird aufgerufen, wenn auf den "Weiter"-Button geklickt wird. Sie steuert den Fortschritt des Registrierungsprozesses,
+// indem sie je nach aktuellem Zustand des Registrierungsformulars zur nächsten Ansicht wechselt oder die Registrierung abschließt. */
   void _nextAction() async {
     if (_viewState == RegisterPageViewState.mandatoryInfo) {
       if (_mandatoryFormKey.currentState!.validate()) {
@@ -139,11 +151,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//** Diese Funktion überprüft die Verfügbarkeit eines Benutzernamens, indem sie eine Anfrage an den Server sendet,
+// um sicherzustellen, dass der Benutzername eindeutig ist. */
   Future<bool> _checkUserNameAvailability() async {
     String userName = _userNameText.value.text;
     return await ApiManager().checkIfUserNameAvailable(userName);
   }
 
+//** Diese Funktion wird aufgerufen, wenn der Benutzer auf den "Registrieren"-Button klickt.
+// Sie sammelt die eingegebenen Informationen und sendet sie an den Server, um den Registrierungsprozess abzuschließen. */
   void _submitAction() async {
     String userName = _userNameText.value.text;
     String password = _passwordText.value.text;
@@ -157,6 +173,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       conditionValue += condition;
       conditionValue += ', ';
     }
+    if (conditionValue.startsWith(","))
+      conditionValue = conditionValue.substring(1).trim();
+
+    for (String othCondition in _otherMedConditions) {
+      conditionValue += othCondition;
+      conditionValue += ', ';
+    }
+    if (conditionValue.endsWith(","))
+      conditionValue =
+          conditionValue.substring(0, conditionValue.length - 1).trim();
 
     var userInfo = UserInfo(
       userName: userName,
@@ -167,6 +193,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _genderValue != null ? _genderValue.toString().split('.').last : "",
       weight: weight,
       height: height,
+      walkingSpeed: _walkingSpeedValue.toString().split('.').last,
       teamName: AppConstant.teamNameForCustomBuild,
       score: 0,
       jobPosition: designation,
@@ -202,13 +229,39 @@ class _RegistrationPageState extends State<RegistrationPage> {
         AppCache.instance.userServerId = userServerId;
         CommonUtil.createUserTargets(userInfo);
       } else {
-        const snackBar = SnackBar(content: Text('Registrierung fehlschlagen'));
+        const snackBar =
+            SnackBar(content: Text('Registrierung fehlgeschlagen'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
       Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
     }
   }
 
+//** */
+  void _addToOtherMedConditions() async {
+    setState(() {
+      String text = _otherMedConditionText.text.trim();
+      if (text.isNotEmpty) {
+        _otherMedConditions.add(text);
+        _otherMedConditionText.clear();
+      }
+    });
+    // await _fetchDataFromAPI();
+  }
+
+  Future<void> _fetchDataFromAPI() async {
+    for (String keyword in _otherMedConditions) {
+      // Verwende die neue Methode, um Daten von der API abzurufen
+      String result = await fetchDataForKeyword(keyword);
+      setState(() {
+        apiResults.add(result);
+        print(result);
+      });
+    }
+  }
+
+//**Diese Funktion ändert den Anzeigemodus des Passwortfelds zwischen verdecktem Text und sichtbarem Text.
+// Sie wird aufgerufen, wenn der Benutzer auf das "Sichtbarkeits"-Symbol im Passwortfeld klickt. */
   void _toggleObscureText() {
     setState(() {
       _obscureText = !_obscureText;
@@ -220,6 +273,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+//**Genau wie _toggleObscureText() ändert diese Funktion den Anzeigemodus des Bestätigungspasswortfelds
+// zwischen verdecktem Text und sichtbarem Text. Der einzige Unterschied ist, dass diese Methode, dann aufgerufen wird,
+// wenn das klicken auf das Sichtbarkeits-Symbol erfolgt ist. Erst dann wird das Passwort aufgedeckt. */
   void _toggleConfirmObscureText() {
     setState(() {
       _confirmObscureText = !_confirmObscureText;
@@ -231,6 +287,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+// Diese Funktion zeigt einen Zeitwahl-Dialog an, wenn der Benutzer auf das Startzeit-Feld klickt, und aktualisiert die ausgewählte Startzeit.
   Future<void> _selectStartTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -239,13 +296,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -262,6 +319,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//Diese Funktion zeigt einen Zeitwahl-Dialog an, wenn der Benutzer auf das Endzeit-Feld klickt, und aktualisiert die ausgewählte Endzeit.
   Future<void> _selectEndTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -270,13 +328,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColor.primaryLight, // header background color
-              onPrimary: Colors.black, // header text color
-              onSurface: Colors.black, // body text color
+              primary: AppColor.primaryLight, // header Hintergrundfarbe
+              onPrimary: Colors.black, // header Textfarbe
+              onSurface: Colors.black, // body Textfarbe
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColor.orange, // button text color
+                foregroundColor: AppColor.orange, // Button Textfarbe
               ),
             ),
           ),
@@ -293,6 +351,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+//**  Diese Funktion aktualisiert den aktuellen Registrierungszustand
+//(wie "Mandatory Info" oder "Optional Bio Info") und den Anzeigeindex des Fortschrittsbalkens. */
   void _updateViewState(RegisterPageViewState viewState, int viewIndex) {
     setState(() {
       _viewState = viewState;
@@ -300,6 +360,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer ein Avatar-Bild auswählt.
+// Sie aktualisiert das ausgewählte Avatar-Bild im Registrierungsformular. */
   void onAvatarSelected(String? avatar) {
     setState(() {
       _avatarImage = avatar;
@@ -700,35 +762,101 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     },
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(vertical: 10),
-                //   child: Text(
-                //     'Lauf-Tempo',
-                //     style: Theme.of(context)
-                //         .textTheme
-                //         .bodyLarge
-                //         ?.copyWith(fontSize: 16),
-                //   ),
-                // ),
-                // SizedBox(
-                //   width: MediaQuery.of(context).size.width,
-                //   child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
-                //     groupValue: _walkingSpeedValue,
-                //     padding: const EdgeInsets.symmetric(
-                //         vertical: 10, horizontal: 10),
-                //     children: const {
-                //       WalkingSpeed.fast: Text('schnell'),
-                //       WalkingSpeed.medium: Text('medium'),
-                //       WalkingSpeed.slow: Text('langsam'),
-                //     },
-                //     onValueChanged: (groupValue) {
-                //       setState(() {
-                //         _walkingSpeedValue = groupValue;
-                //       });
-                //     },
-                //   ),
-                // ),
-                const SizedBox(height: 15,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Lauf-Tempo',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.info),
+                        color: highlightColor,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text(
+                                    'Schritte nach Gehgeschwindigkeit'),
+                                content: RichText(
+                                  text: const TextSpan(children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          "Für einen Menschen definiert die durchschnittliche Gehgeschwindigkeit die Anzahl der Schritte wie folgt:\n\n",
+                                      style: TextStyle(color: Colors.black87),
+                                    ),
+                                    TextSpan(
+                                      text: "Schnell: 100-119 Schritte/min\n"
+                                          "Normal: 80-99 Schritte/min\n"
+                                          "Langsam: 60-79 Schritte/min\n\n\n",
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          "Diese Informationen beruhen auf einer wissenschaftlichen Untersuchung von:\n\n",
+                                      style: TextStyle(color: Colors.black87),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          "Tudor-Locke C, Han H, Aguiar EJ, et alHow fast is fast enough? Walking cadence (steps/min) as a practical estimate of intensity in adults: a narrative reviewBritish Journal of Sports Medicine 2018;52:776-788.",
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ]),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, true);
+                                    },
+                                    child: const Text(
+                                      'Schließen',
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: CupertinoSlidingSegmentedControl<WalkingSpeed>(
+                    groupValue: _walkingSpeedValue,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    children: const {
+                      WalkingSpeed.fast: Text('Schnell'),
+                      WalkingSpeed.medium: Text('Mittel'),
+                      WalkingSpeed.slow: Text('Langsam'),
+                    },
+                    onValueChanged: (groupValue) {
+                      setState(() {
+                        _walkingSpeedValue = groupValue;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
                 TextField(
                   controller: _weightText,
                   keyboardType: TextInputType.number,
@@ -1027,6 +1155,82 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(
                   height: 20,
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Text(
+                    'weitere Beeinträchtigungen',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontSize: 16),
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        controller: _otherMedConditionText,
+                        onSubmitted: (value) => _addToOtherMedConditions(),
+                        decoration: InputDecoration(
+                          hintText: 'Geben Sie die Beeinträchtigung ein',
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: _addToOtherMedConditions,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50, // Höhe des Scrollbereichs anpassen
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _otherMedConditions.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.orange),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: -20,
+                                    right: -26,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _otherMedConditions.removeAt(index);
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        padding: const EdgeInsets.all(8),
+                                        backgroundColor: Colors.white,
+                                        elevation: 0,
+                                      ),
+                                      child: const Icon(Icons.close, size: 16),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(_otherMedConditions[index]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
                 SizedBox(
                   child: Form(
                     key: _alertTypeFormKey,
@@ -1142,7 +1346,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Nutzername',
+                'Konto',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),
@@ -1151,7 +1355,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Persönlich',
+                'Leiblich',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),
@@ -1169,7 +1373,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Step(
               title: const Text(''),
               label: const Text(
-                'Präferenz',
+                'Vorzug',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               content: const SizedBox(),

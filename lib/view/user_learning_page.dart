@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import '../util/app_constant.dart';
 
+// Diese Klasse repräsentiert eine Seite in der App, auf der Benutzer sich Rezepte anzeigen lassen können.
 class UserLearningPage extends StatefulWidget {
   const UserLearningPage({Key? key}) : super(key: key);
 
@@ -20,6 +21,8 @@ class UserLearningPage extends StatefulWidget {
   _UserLearningPageState createState() => _UserLearningPageState();
 }
 
+//**Diese Klasse erweitert SearchDelegate und dient für die Suche nach Rezepten.
+//Sie enthält eine Liste von LearningMaterialInfo-Objekten(Rezepten), auf denen die Suche durchgeführt wird. */
 class CustomSearchDelegate extends SearchDelegate {
   List<LearningMaterialInfo> searchTerms = [];
 
@@ -28,6 +31,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Erstellt die Aktionen in der AppBar während der Suche. Hier wird eine Schaltfläche zum Löschen des Suchbegriffs hinzugefügt.
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
@@ -40,6 +44,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Schaltfläche zum Zurückkehren zur vorherigen Seite während der Suche.
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
@@ -50,6 +55,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Hier werden die Ergebnisse generiert basierend auf der Suchanfrage. Die Ergebnisse werden als Liste zurückgegeben.
   Widget buildResults(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -77,6 +83,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  //Generiert Suchvorschläge, während der Benutzer den Suchbegriff eingibt. Zeigt eine Liste von Suchvorschlägen an.
   Widget buildSuggestions(BuildContext context) {
     print(">>>>>>>>>>$query");
     if (query.isEmpty) return Container();
@@ -101,7 +108,8 @@ class CustomSearchDelegate extends SearchDelegate {
         var result = learningMaterialResults[index];
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, detailsWebRoute, arguments: result.originalContent);
+            Navigator.pushNamed(context, detailsWebRoute,
+                arguments: result.originalContent);
           },
           child: ListTile(
             title: Text(result.title),
@@ -112,12 +120,13 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
+//In diesem State werden verschiedene Daten und Logik für die Seite zur Anzeige von Lernmaterialien(Rezepte) verwaltet. */
 class _UserLearningPageState extends State<UserLearningPage> {
   // show all the data
   final List<LearningMaterialInfo> _learningMaterials =
       List.empty(growable: true);
   int? _selectedTab = 1;
-  bool _showFilteredList = false;
+  bool _showNoFilteredItemMsg = false;
   String? _userCondition;
 
   bool _isLoading = false;
@@ -129,29 +138,30 @@ class _UserLearningPageState extends State<UserLearningPage> {
     _loadData();
   }
 
+//Hier werden die erforderlichen Daten basierend auf dem Gesundheitszustand des Benutzers geladen.
   _loadData() async {
     setState(() => _isLoading = true);
 
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    if (userInfo != null &&
-        !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
+    if (userInfo != null && !CommonUtil.isNullOrEmpty(userInfo.medicalConditions)) {
       setState(() {
-        _showFilteredList = true;
         _userCondition = userInfo.medicalConditions;
       });
     }
 
-    _loadContentsFromAsset(true, _userCondition);
-
+    await _loadContentsFromAsset(true, _userCondition);
     if (_learningMaterials.isEmpty) {
       setState(() {
-        _showFilteredList = false;
+        _showNoFilteredItemMsg = true;
       });
       _loadContentsFromAsset(false, null);
     }
   }
 
+//**Diese Methode liest Daten aus einer Excel-Tabelle und erstellt LearningContent-Objekte.
+//Sie filtert die Lernmaterialien basierend auf dem Gesundheitszustand des Benutzers
+// oder zeigt alle an, wenn keine Filterung erforderlich ist. */
   _loadContentsFromAsset(bool isFiltered, String? filerCondition) async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
@@ -176,14 +186,13 @@ class _UserLearningPageState extends State<UserLearningPage> {
 
           bool addContent = false;
           if (isFiltered) {
-            if (content.condition != null &&
-                filerCondition != null &&
-                filerCondition.contains(content.condition ?? "")) {
+            print("+++++++++++++++++filter condition: $filerCondition");
+            if (content.condition != null && filerCondition != null && filerCondition.contains(content.condition ?? "")) {
               addContent = true;
             } else if (filerCondition == null) {
               addContent = true;
             } else {
-              // skip this learning content, since it is not useful for the user condition specified
+              // Überspringe den Lerninhalt, da er nicht relevant ist für die Nutzerbedingungen.
             }
           } else {
             addContent = true;
@@ -250,18 +259,16 @@ class _UserLearningPageState extends State<UserLearningPage> {
                 ),
               ),
             ),
-            Visibility(
-              visible: _showFilteredList,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                child: Text(
-                  'Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: AppColor.darkBlue, fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: Text(_showNoFilteredItemMsg ?
+                'Es wurde leider kein Lernmaterial zu den von Ihnen genannten Krankheiten gefunden. Sie sehen jetzt alle Inhalte' :
+                'Sie sehen die Inhalte, die Ihrem Gesundheitszustand entsprechen: ${_userCondition ?? ""}',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColor.darkBlue, fontSize: 20),
+                textAlign: TextAlign.center,
               ),
             ),
             _isLoading ?
@@ -276,7 +283,8 @@ class _UserLearningPageState extends State<UserLearningPage> {
                   return GestureDetector(
                     child: UserLearningItemView(itemData: material),
                     onTap: () {
-                      Navigator.pushNamed(context, detailsWebRoute, arguments: material.originalContent);
+                      Navigator.pushNamed(context, detailsWebRoute,
+                          arguments: material.originalContent);
                       // CommonUtil.openUrl(material.videoUrl);
                       // Navigator.pushNamed(context, learningDetailsRoute, arguments: material.description);
                     },

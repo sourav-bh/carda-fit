@@ -2,17 +2,25 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
+// Speichert den Benutzernamen.
   static const keyUserName = "key_user_name";
+//Speichert die Datenbank-ID des Benutzers.
   static const keyUserDbId = "key_user_db_id";
+//Speichert die Server-ID des Benutzers.
   static const keyUserServerId = "key_user_server_id";
+//Speichert das Firebase Cloud Messaging-Token des Geräts.
   static const keyDeviceToken = "key_fcm_token";
+//Speichert Informationen über das Avatarbild des Benutzers 
   static const keyAvatarImage = "key_avatar_image";
-
+//Speichert Informationen über den letzten Tag, an dem die App geöffnet wurde.
   static const keyLastAppOpenDay = "key_last_app_open_day";
+//Speichert Benutzerziele.  
   static const keyUserTargets = "key_user_targets";
+//Speichert Informationen über abgeschlossene Benutzerziele.
   static const keyUserCompletedTargets = "key_user_completed_targets";
-
+//Speichert die Dauer der Snooze-Funktion in Minuten.
   static const keySnoozeDuration = "key_snooze_duration"; // in minutes
+//Speichert den Zeitpunkt des letzten Snooze-Vorgangs.
   static const keySnoozedAt = "key_snoozed_at";
 
   SharedPref._privateConstructor();

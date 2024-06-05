@@ -24,6 +24,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+//**Diese Klasse stellt die LandingPage der App dar. 
+//Sie enthält eine Navigationsleiste (BottomNavigationBar) und einen PageView, um zwischen verschiedenen Ansichten zu wechseln. */
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
 
@@ -31,6 +33,9 @@ class LandingPage extends StatefulWidget {
   _LandingPageState createState() => _LandingPageState();
 }
 
+//**Dies ist der zugehörige State für die LandingPage. 
+//Hier wird die Logik für das Navigieren zwischen den Tabs und das Laden von Daten aus Excel-Dateien behandelt.
+//Wichtige Teile dieses States sind: */
 class _LandingPageState extends State<LandingPage> {
   late PageController _pageController;
   int _currentIndex = 0;
@@ -45,6 +50,7 @@ class _LandingPageState extends State<LandingPage> {
     _contentPages.add(const LeaderBoardPage());
     _contentPages.add(const UserProfilePage());
 
+//Ein PageController, der die Seitenansicht für die verschiedenen Tabs steuert.
     _pageController = PageController(initialPage: 0);
     _pageController.addListener(_handleTabSelection);
 
@@ -116,6 +122,7 @@ class _LandingPageState extends State<LandingPage> {
     setState(() {});
   }
 
+//**Diese Funktion wird aufgerufen, wenn der Benutzer auf eine Benachrichtigung klickt, um eine Aktion auszulösen. */
   Future<void> _handleOnNotificationClick() async {
     final NotificationAppLaunchDetails? notificationAppLaunchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
 
@@ -136,6 +143,8 @@ class _LandingPageState extends State<LandingPage> {
     }
   }
 
+//**Diese Funktion wird aufgerufen, um von der Startseite zu einer anderen Seite zu wechseln.
+// Sie aktualisiert den ausgewählten Tab und scrollt zur entsprechenden Seite. */
   void _switchFromHomeToAnotherTab(int tab) {
     _currentIndex = tab;
     _pageController.jumpToPage(tab);
@@ -143,6 +152,9 @@ class _LandingPageState extends State<LandingPage> {
     FocusScope.of(context).unfocus();
   }
 
+//**Diese Funktion lädt Übungsdaten aus einer Excel-Datei im Asset-Ordner und speichert sie in der App. 
+//Sie erstellt eine Liste von Übungen, wobei die Übungen nach medizinischen Bedingungen gefiltert werden.
+//Die Übungen werden in AppCache.instance.exercises gespeichert. */
   _loadExerciseDataFromAsset() async {
     UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     var userCondition = "";
@@ -208,7 +220,7 @@ class _LandingPageState extends State<LandingPage> {
             } else if (userCondition.isEmpty) {
               addContent = true;
             } else {
-              // skip this learning content, since it is not useful for the user condition specified
+              // Überspringe den Lerninhalt, da er für die angegebene Nutzerbedingung nicht nützlich ist.
             }
 
             if (addContent) exercises.add(exercise);
@@ -224,12 +236,14 @@ class _LandingPageState extends State<LandingPage> {
     }
   }
 
+//**Diese Funktion lädt Lernmaterialien aus einer Excel-Datei im Asset-Ordner und speichert sie in der App.
+//Sie erstellt eine Liste von Lerninhalten und speichert sie in AppCache.instance.contents. */
   _loadLearningMaterialFromAsset() async {
     ByteData data = await rootBundle.load("assets/data/material_database.xlsx");
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
 
-    AppCache.instance.contents.clear();
+    AppCache.instance.learningContents.clear();
     List<LearningContent> learningContents = [];
     for (var table in excel.tables.keys) {
       Sheet? sheet = excel.tables[table];
@@ -245,7 +259,7 @@ class _LandingPageState extends State<LandingPage> {
           content.contentUri = linkCell?.value.toString();
           learningContents.add(content);
 
-          AppCache.instance.contents.add(content);
+          AppCache.instance.learningContents.add(content);
           DatabaseHelper.instance.addLearningContent(content);
         }
 

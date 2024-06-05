@@ -6,15 +6,18 @@ import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
+import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_picker_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 import '../api/api_manager.dart';
-/* */
+
+/* Diese Klasse repräsentiert die Benutzerprofilseite in der App.*/
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
 
@@ -22,6 +25,7 @@ class UserProfilePage extends StatefulWidget {
   State<UserProfilePage> createState() => _UserProfilePageState();
 }
 
+// In diesem State werden verschiedene Daten und Logik für die Benutzerprofilseite verwaltet.
 class _UserProfilePageState extends State<UserProfilePage> {
   UserInfo? _userInfo;
   String? selectedValue;
@@ -50,17 +54,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
   }
 
+// Eine Methode, die die Benutzerinformationen aus einer Datenbank lädt und den _userInfo-State aktualisiert.
   _loadUserInfo() async {
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-    String? userAvatar = await SharedPref.instance.getValue(SharedPref.keyAvatarImage);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
         _avatarImage = userAvatar;
       });
     }
+    if (_avatarImage != null && _avatarImage!.isNotEmpty) {
+      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
+    }
   }
 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+   *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
       _selectedSnoozeTimeVal = snoozeTime;
@@ -72,16 +82,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
         SharedPref.keySnoozedAt, DateTime.now().millisecondsSinceEpoch);
   }
 
+// Eine Methode, die aufgerufen wird, wenn der Benutzer ein neues Avatarbild auswählt, und den aktualisierten Avatar-String speichert.
   void onAvatarSelected(String? avatar) async {
     setState(() {
       _avatarImage = avatar;
     });
 
-    await SharedPref.instance.saveStringValue(SharedPref.keyAvatarImage, avatar!);
-    UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    await SharedPref.instance
+        .saveStringValue(SharedPref.keyAvatarImage, avatar!);
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       userInfo.avatarImage = avatar;
-      await DatabaseHelper.instance.updateUser(userInfo, AppCache.instance.userDbId);
+      await DatabaseHelper.instance
+          .updateUser(userInfo, AppCache.instance.userDbId);
     }
 
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
@@ -89,6 +103,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+   *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
+   *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
+   * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
         await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
@@ -111,6 +129,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+// Wenn der LogOut Button betätigt wird, wird diese Funktion ausgelöst und der Nutzer zu LogIn Seite geleitet.
   _logoutAction() async {
     SharedPref.instance.clearCache();
     Navigator.pushNamed(context, loginRoute);
@@ -121,12 +140,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+// Wenn der EditProfile Button betätigt wird, wird diese Funktion ausgeführt und der Nutzer zur EditProfile Seite geleitet.
   _editProfileAction() async {
-    Navigator.pushNamed(context, editProfileRoute, arguments: true);
+    Navigator.pushNamed(context, editProfileRoute, arguments: true)
+        .whenComplete(() {
+      _loadUserInfo();
+    });
   }
 
   Color transparentOrange = Colors.orange.withOpacity(0);
 
+// Hier wird mittels Größe und Gewicht der BMI berechnet und zurückgegeben.
   String _getCalculatedBmiValue(int? weight, int? height) {
     if ((weight != null && weight > 0) && (height != null && height > 0)) {
       return ((weight) / pow(((height) / 100), 2)).toStringAsFixed(1);
@@ -196,7 +220,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                           Positioned(
                             top: -5,
-                            right: -10,
+                            right: -15,
                             child: ElevatedButton(
                               onPressed: () async {
                                 await showDialog(
@@ -208,13 +232,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   },
                                 );
                               },
-                              child: Icon(Icons.edit, size: 20),
                               style: ElevatedButton.styleFrom(
-                                shape: CircleBorder(),
-                                padding: EdgeInsets.all(8),
-                                primary: Colors.white,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(8),
+                                backgroundColor: Colors.white,
                                 elevation: 0,
                               ),
+                              child: const Icon(Icons.edit, size: 20),
                             ),
                           ),
                         ],
@@ -269,7 +293,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             label: 'BMI:',
                             value:
                                 '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
-                                '(Größe: ${_userInfo?.weight} kg, Gewicht: ${_userInfo?.height} cm)',
+                                '(Größe: ${_userInfo?.height} cm, Gewicht: ${_userInfo?.weight} kg)',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -307,8 +331,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             context: context,
                             icon: Icons.notifications,
                             label: 'Alarme:',
-                            value: _userInfo?.preferredAlerts ??
-                                "Nicht ausgewählt",
+                            value: CommonUtil.convertPreferredAlertNames(
+                                _userInfo?.preferredAlerts ??
+                                    "Nicht ausgewählt"),
                           ),
                         ],
                       ),
@@ -345,40 +370,90 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 30),
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) => Colors.transparent,
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _showFeedbackDialog();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) =>
+                              Colors.transparent,
+                            ),
+                            overlayColor: MaterialStateProperty.all(
+                                Colors.transparent),
                           ),
-                          overlayColor:
-                              MaterialStateProperty.all(Colors.transparent),
-                        ),
-                        onPressed: () {
-                          _logoutAction();
-                        },
-                        child: Ink(
-                          decoration: const BoxDecoration(
-                            color: Colors.orangeAccent,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Container(
-                            constraints: const BoxConstraints(
-                                minHeight:
-                                    40), // min sizes for Material buttons
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Abmeldung".toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: Colors.orangeAccent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              constraints:
+                              const BoxConstraints(minHeight: 40),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.feedback, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Rückmeldung',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                        TextButton(
+                          onPressed: () {
+                            _logoutActionField(context);
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) =>
+                              Colors.transparent,
+                            ),
+                            overlayColor: MaterialStateProperty.all(
+                                Colors.transparent),
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: Colors.orangeAccent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 40),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.logout, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Abmeldung',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -390,7 +465,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Helper method to build each row in the profile
+  // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
       {required BuildContext context,
       required IconData icon,
@@ -413,6 +488,141 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
         )
       ],
+    );
+  }
+
+  // Diese Funktion wird aufgerufen, wenn der Benutzer sich abmelden möchte.
+  _logoutActionField(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Abmeldung bestätigen'),
+          content: const Text('Möchten Sie sich wirklich abmelden?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Schließt den Dialog
+              },
+              child: const Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Führt die Abmeldung durch und navigiert zur Login-Seite
+                SharedPref.instance.clearCache();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, loginRoute, (r) => false);
+              },
+              child: const Text('Abmelden'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Info'),
+          content: const Text(
+              'Durch Klicken des "Feedback geben" Buttons können Sie Feedback einreichen.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Schließt den Dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFeedbackDialog() {
+    String feedbackText = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              const Text('Feedback'),
+              const SizedBox(width: 10,),
+              InkWell(
+                onTap: () {
+                  _showInfoDialog(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 1, vertical: 10),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info,
+                          color: Colors.orangeAccent),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: TextField(
+            maxLines: 3,
+            onChanged: (text) {
+              feedbackText = text;
+            },
+            decoration: const InputDecoration(
+              hintText: 'Geben Sie Ihr Feedback ein...',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                debugPrint(feedbackText);
+              },
+              child: const Text('Abbrechen'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // UserInfo? userInfo = await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+                String userId = AppCache.instance.userServerId; // Add this line to get the userId
+                print(userId);
+                // Call the API method to send feedback
+                bool success =
+                    await ApiManager().sendFeedback(userId, feedbackText);
+
+                if (success && mounted) {
+                  Navigator.pop(context); // Close the dialog
+                  // Optionally, show a success message to the user
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Feedback erfolgreich eingereicht!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                } else {
+                  // Handle API error or show an error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Einreichen'),
+            ),
+          ],
+        );
+      },
     );
   }
 

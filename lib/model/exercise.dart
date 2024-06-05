@@ -11,7 +11,10 @@ class Exercise {
       this.difficultyLevel,
       this.steps,
       this.createdAt,
-      this.condition});
+      this.condition,
+      this.stepsJson
+      });
+     
 
   int? id;
   String? name;
@@ -22,6 +25,7 @@ class Exercise {
   List<ExerciseStep>? steps = [];
   double? createdAt;
   String? condition;
+  String? stepsJson;
 
   factory Exercise.fromRawJson(String str) =>
       Exercise.fromMap(json.decode(str));
@@ -35,10 +39,13 @@ class Exercise {
       url: json["url"],
       duration: json["duration"],
       difficultyLevel: json["difficulty_level"],
-      steps: List<ExerciseStep>.from(
-          json["steps"].map((x) => ExerciseStep.fromMap(x))),
+      stepsJson: json["steps_json"],
+      steps: (json["steps_json"] as List<dynamic>)
+      .map((stepJson) => ExerciseStep.fromMap(stepJson as Map<String, dynamic>))
+      .toList(),
       createdAt: json["created_at"],
-      condition: json["condition"]);
+      condition: json["condition"],
+     );
 
   Map<String, dynamic> toMap() => {
         "id": id,
@@ -47,9 +54,9 @@ class Exercise {
         "url": url,
         "duration": duration,
         "difficulty_level": difficultyLevel,
-        "steps": steps != null
-            ? List<dynamic>.from(steps!.map((x) => x.toMap()))
-            : null,
+        "steps_json": json.encode(steps != null
+        ? List<dynamic>.from(steps!.map((x) => x.toMap()))
+        : []),
         "created_at": createdAt,
         "condition": condition,
       };

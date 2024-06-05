@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>213686276476-kk3gmf1vlivnfn495e6cntmujks0hoq0.apps.googleusercontent.com</string>
+	<string>213686276476-d8eerjrpdrg1h34j3v2vrsdcehie0soq.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.213686276476-kk3gmf1vlivnfn495e6cntmujks0hoq0</string>
+	<string>com.googleusercontent.apps.213686276476-d8eerjrpdrg1h34j3v2vrsdcehie0soq</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCTf2IkQ10u-nQb8XcBKeLUAuT5ybGgkV0</string>
 	<key>GCM_SENDER_ID</key>
@@ -19,16 +19,16 @@
 	<key>STORAGE_BUCKET</key>
 	<string>cardafit.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:213686276476:ios:9b0cea964b623b111c54f9</string>
+	<string>1:213686276476:ios:2f698ba9eb51729b1c54f9</string>
 </dict>
 </plist>
