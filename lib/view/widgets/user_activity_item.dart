@@ -34,11 +34,7 @@ class UserActivityItemView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(5),
             color: shadeColor,
-            child: Icon(
-              icon,
-              size: 35,
-              color: highlightColor,
-            ),
+            child: Icon(icon, size: 35, color: highlightColor,),
           ),
           const SizedBox(
             width: 10,

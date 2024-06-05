@@ -58,11 +58,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   _loadUserInfo() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
-
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
-        _avatarImage = userInfo.avatarImage;
+        _avatarImage = userAvatar;
       });
     }
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
