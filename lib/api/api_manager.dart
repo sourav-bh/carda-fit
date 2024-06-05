@@ -165,33 +165,33 @@ class ApiManager {
   }
 
   Future<bool> updateUserScore(String userId, int score) async {
-    var reqBody = <String, dynamic>{
-      'score': score,
-    };
+      var reqBody = <String, dynamic>{
+        'score': score,
+      };
 
-    var response =
-        await ApiClient.instance.patchRequest('/user/$userId', reqBody);
-    if (response.statusCode == 200 || response.statusCode == 204) {
-      return true;
-    } else {
-      return false;
+      var response =
+          await ApiClient.instance.patchRequest('/user/$userId', reqBody);
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
-}
 
-Future<String> fetchDataForKeyword(String keyword) async {
-  var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
-  var url = Uri.parse(Uri.encodeFull(apiEndPoint));
-  final http.Response response = await http.get(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-  );
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    // Hier kannst du Fehlerbehandlung hinzufügen, wenn die API-Anfrage fehlschlägt
-    return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
+  Future<String> fetchDataForKeyword(String keyword) async {
+    var apiEndPoint = 'https://api.datamuse.com/words?ml=$keyword&v=de';
+    var url = Uri.parse(Uri.encodeFull(apiEndPoint));
+    final http.Response response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      // Hier kannst du Fehlerbehandlung hinzufügen, wenn die API-Anfrage fehlschlägt
+      return 'Fehler beim Abrufen von Daten für Keyword: $keyword';
+    }
   }
-}

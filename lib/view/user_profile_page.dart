@@ -66,7 +66,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       });
     }
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-      await ApiManager().updateAvatarInfo(_avatarImage!, _avatarImage!);
+      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
     }
   }
 
@@ -100,8 +100,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
-      await ApiManager()
-          .updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
+      await ApiManager().updateAvatarInfo(AppCache.instance.userServerId, _avatarImage!);
     }
   }
 
