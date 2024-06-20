@@ -252,7 +252,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           'Nutzername: ',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyText1
+                              .bodyLarge
                               ?.copyWith(fontSize: 18),
                         ),
                         Text(
