@@ -61,7 +61,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
-        _avatarImage = userAvatar;
+        _avatarImage = _userInfo?.avatarImage;
       });
     }
     if (_avatarImage != null && _avatarImage!.isNotEmpty) {
