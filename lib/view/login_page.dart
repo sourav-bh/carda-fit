@@ -4,6 +4,7 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
+import 'package:app/service/local_auth_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
@@ -27,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _obscureText = true;
   IconData _iconVisible = Icons.visibility_off;
+  bool authenticated =false;
 
 //**Diese Funktion wird aufgerufen, wenn der Benutzer auf das Sichtbarkeits-Symbol im Passwortfeld klickt.
 // Sie ändert den Sichtbarkeitsstatus des Passwortfelds und aktualisiert das Symbol entsprechend. */
@@ -253,17 +255,19 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  Visibility(
-                                    visible: false,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: const Text(
-                                        "Passwort vergessen?",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
-                                        ),
+                                  GestureDetector(
+                                    onTap: () async{
+                                      final authenticate = await LocalAuth.authenticate();
+                                      setState(() {
+                                        authenticated = authenticate;
+                                      });
+                                    },
+                                    child: const Text(
+                                      "Passwort vergessen?",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ),
