@@ -9,7 +9,6 @@ import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -28,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _obscureText = true;
   IconData _iconVisible = Icons.visibility_off;
-  bool authenticated =false;
 
 //**Diese Funktion wird aufgerufen, wenn der Benutzer auf das Sichtbarkeits-Symbol im Passwortfeld klickt.
 // Sie ändert den Sichtbarkeitsstatus des Passwortfelds und aktualisiert das Symbol entsprechend. */
@@ -98,6 +96,19 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
+
+  //Passwort über lokale Authentifizierung vergessen
+
+  void handleForgotPassword() async {
+    final authenticated = await LocalAuth.authenticate();
+    if (authenticated) {
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+    } else {
+      const snackBar = SnackBar(content: Text('Lokale Authentifizierung fehlgeschlagen'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -256,11 +267,8 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   const SizedBox(height: 20),
                                   GestureDetector(
-                                    onTap: () async{
-                                      final authenticate = await LocalAuth.authenticate();
-                                      setState(() {
-                                        authenticated = authenticate;
-                                      });
+                                    onTap: () {
+                                      handleForgotPassword();
                                     },
                                     child: const Text(
                                       "Passwort vergessen?",
@@ -279,12 +287,12 @@ class _LoginPageState extends State<LoginPage> {
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                               child: TextButton(
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty
+                                    backgroundColor: WidgetStateProperty
                                         .resolveWith<Color>(
-                                      (Set<MaterialState> states) =>
+                                      (Set<WidgetState> states) =>
                                           Colors.transparent,
                                     ),
-                                    overlayColor: MaterialStateProperty.all(
+                                    overlayColor: WidgetStateProperty.all(
                                         Colors.transparent),
                                   ),
                                   onPressed: () {
