@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class AvatarPickerDialog extends StatelessWidget {
   final StringCallback selectionCallback;
 
-  const AvatarPickerDialog({Key? key, required this.selectionCallback}) : super(key: key);
+  const AvatarPickerDialog({Key? key, required this.selectionCallback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
