@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:fluttermoji/fluttermoji.dart';
+
 class UserInfo {
   UserInfo(
       {this.id,
@@ -30,6 +32,23 @@ class UserInfo {
   String? userName;
   String? password;
   String? avatarImage;
+
+  String? _avatar;
+
+  String? get flutterMojiImage {
+    if (_avatar != null) return _avatar;
+    if (avatarImage == null) return null;
+    Map<String?, dynamic>? imageSelectedOptions;
+    try {
+      imageSelectedOptions = jsonDecode(avatarImage!);
+    } catch (e) {
+      imageSelectedOptions = null;
+    }
+    if (imageSelectedOptions == null) return avatarImage;
+    _avatar = FlutterMojiStatic.getFluttermojiFromOptions(imageSelectedOptions);
+    return _avatar;
+  }
+
   String? deviceToken;
   String? walkingSpeed;
 
@@ -53,6 +72,7 @@ class UserInfo {
       preferredAlerts; // comma separated string containing alert type enum values
   bool?
       isMergedAlertSet; // indicate if the user wants to merge the alert types, like water + break and exercise + steps
+
 
   factory UserInfo.fromRawJson(String str) =>
       UserInfo.fromJson(json.decode(str));
@@ -168,9 +188,9 @@ class UserInfo {
       };
 }
 
-enum WalkingSpeed {
-  fast,
-  medium,
+enum WalkingSpeed { 
+  fast, 
+  medium, 
   slow }
 
 enum Gender {

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:app/api/api_manager.dart';
 import 'package:app/model/task_alert.dart';
+import 'package:app/model/trophy.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/util/app_style.dart';
@@ -21,10 +22,8 @@ class CommonUtil {
   static getEmptyIfNull(String? value) {
     return value ?? '';
   }
-  
-  static showSnoozedIfActive(bool? value) {
-    
-  }
+
+  static showSnoozedIfActive(bool? value) {}
 
   static MaterialColor createMaterialColor(Color color) {
     List strengths = <double>[.05];
@@ -86,7 +85,8 @@ class CommonUtil {
     return '$minutesString:$secondsString';
   }
 
-  static String convert12HourTimeTo24HourFormat(BuildContext context, TimeOfDay pickedTime) {
+  static String convert12HourTimeTo24HourFormat(
+      BuildContext context, TimeOfDay pickedTime) {
     var date = DateTime.now().applied(pickedTime);
     var df = DateFormat("HH:mm");
     return df.format(date);
@@ -140,7 +140,8 @@ class CommonUtil {
   }
 
   static String getRandomString(int length) {
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     Random _rnd = Random();
     return String.fromCharCodes(Iterable.generate(
         length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
@@ -182,17 +183,52 @@ class CommonUtil {
         exercises: exercises,
         waterGlasses: waterGlasses,
         breaks: breaks);
-    SharedPref.instance.saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
+    SharedPref.instance
+        .saveJsonValue(SharedPref.keyUserTargets, dailyTarget.toRawJson());
   }
 
   static UserLevel getUserLevelByScore(int score) {
     if (score < 1000) {
       return UserLevel(levelType: UserLevelType.starter, level: score ~/ 350);
     } else if (score < 2500) {
-      return UserLevel(levelType: UserLevelType.advanced, level: (score-1000) ~/ 500);
+      return UserLevel(
+          levelType: UserLevelType.advanced, level: (score - 1000) ~/ 500);
     } else {
-      return UserLevel(levelType: UserLevelType.pro, level: min((score-2500) ~/ 1000, 2));
+      return UserLevel(
+          levelType: UserLevelType.pro, level: min((score - 2500) ~/ 1000, 2));
     }
+  }
+
+  static List<Trophy> getUserTrophyByScore(int score) {
+    List<Trophy> trophies = [];
+    if (score > 350) {
+      trophies.add(Trophy.trophies[0]);
+    }
+    if (score > 700) {
+      trophies.add(Trophy.trophies[1]);
+    }
+    if (score > 1000) {
+      trophies.add(Trophy.trophies[2]);
+    }
+    if (score > 1500) {
+      trophies.add(Trophy.trophies[3]);
+    }
+    if (score > 2000) {
+      trophies.add(Trophy.trophies[4]);
+    }
+    if (score > 2500) {
+      trophies.add(Trophy.trophies[5]);
+    }
+    if (score > 3500) {
+      trophies.add(Trophy.trophies[6]);
+    }
+    if (score > 4500) {
+      trophies.add(Trophy.trophies[7]);
+    }
+    if (score > 5000) {
+      trophies.add(Trophy.trophies[8]);
+    }
+    return trophies;
   }
 
   static const List<String> weekdayNames = [
@@ -205,7 +241,7 @@ class CommonUtil {
 
   static String getWeekDaySelectionStr(List<bool> selections) {
     String result = "";
-    for (int i=0 ; i<selections.length ; i++) {
+    for (int i = 0; i < selections.length; i++) {
       if (selections[i] == true) {
         result += weekdayNames[i];
         result += ', ';
@@ -224,7 +260,7 @@ class CommonUtil {
   }
 
   static String getTaskAlertName(TaskType? type) {
-    switch(type) {
+    switch (type) {
       case TaskType.waterWithBreak:
         return "Wasser & Pause";
       case TaskType.exercise:
@@ -258,7 +294,7 @@ class CommonUtil {
   }
 
   static String getPreferredAlertNameFromENtoDE(String preferredAlert) {
-    switch(preferredAlert) {
+    switch (preferredAlert) {
       case 'waterWithBreak':
         return 'Wasser & Pause';
       case 'exercise':
@@ -306,13 +342,16 @@ class DrawCircle extends CustomPainter {
   const DrawCircle(this.colorGradiant1, this.colorGradiant2, this.radius);
 
   @override
-  void paint(Canvas canvas, Size size)
-  {
+  void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = LinearGradient(colors: [colorGradiant1, colorGradiant2,])
-          .createShader(Rect.fromCircle(center: const Offset(0.0, 0.0), radius: radius));
+      ..shader = LinearGradient(colors: [
+        colorGradiant1,
+        colorGradiant2,
+      ]).createShader(
+          Rect.fromCircle(center: const Offset(0.0, 0.0), radius: radius));
     canvas.drawCircle(const Offset(0.0, 0.0), radius, paint);
   }
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;

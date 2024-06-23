@@ -8,9 +8,11 @@ import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/services/moji_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // Diese Klasse repräsentiert die Anmeldeseite der App.
 class LoginPage extends StatefulWidget {
@@ -66,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
   void _loginAction() async {
     String userName = _userNameText.value.text;
     String password = _passwordText.value.text;
-
+    await EasyLoading.show();
     UserInfo? userRes;
     try {
       userRes = await ApiManager().loginUser(userName, password);
@@ -76,6 +78,8 @@ class _LoginPageState extends State<LoginPage> {
 
     if (userRes != null) {
       int userDbId = await DatabaseHelper.instance.addUser(userRes);
+      int userActivityId = await DatabaseHelper.instance.initUserActivity(userDbId);
+      MojiService.iniMojiFreeItem();
       SharedPref.instance.saveStringValue(SharedPref.keyUserName, userName);
       AppCache.instance.userName = userName;
 
@@ -89,9 +93,11 @@ class _LoginPageState extends State<LoginPage> {
       CommonUtil.createUserTargets(userRes);
 
       if (mounted) {
+        await EasyLoading.dismiss();
         Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
       }
     } else if (mounted) {
+      await EasyLoading.dismiss();
       const snackBar = SnackBar(content: Text('Login fehlgeschlagen'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
@@ -169,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                                       'Geben Sie Ihren Nutzernamen und Ihr Passwort ein, um sich anzumelden',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyMedium
+                                          .bodyLarge
                                           ?.copyWith(fontSize: 16),
                                       textAlign: TextAlign.center,
                                     ),

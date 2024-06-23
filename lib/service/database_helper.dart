@@ -4,8 +4,10 @@ import 'package:app/model/allergy.dart';
 import 'package:app/model/condition.dart';
 import 'package:app/model/exercise.dart';
 import 'package:app/model/learning.dart';
+import 'package:app/model/moji_unlocked.dart';
 import 'package:app/model/scorer.dart';
 import 'package:app/model/task_alert.dart';
+import 'package:app/model/user_activity.dart';
 import 'package:app/model/user_allergy.dart';
 import 'package:app/model/user_condition.dart';
 import 'package:app/model/user_exercise.dart';
@@ -34,15 +36,19 @@ const TABLE_USER_CONDITION = 'user_condition';
 const TABLE_USER_TASK = 'user_tasks';
 const TABLE_SCORER = 'public_scorer';
 const TABLE_TASK_ALERT = 'task_alert';
+const TABLE_USER_ACTIVITY = 'user_activity';
+const TABLE_MOJI_UNLOCK = 'moji_unlock';
 
 //**Dies ist die Hauptklasse, die für die Verwaltung der SQLite-Datenbank verantwortlich ist.
 //Sie enthält Methoden zum Erstellen und Aktualisieren von Tabellen und zur Durchführung von Datenbankoperationen. */
 class DatabaseHelper {
   // Singleton Pattern
   DatabaseHelper._privateConstructor();
+
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   static Database? _database;
+
   Future<Database> get database async => _database ??= await _initDatabase();
 
 //**Diese Methode initialisiert die Datenbank, öffnet sie und gibt eine Instanz der Datenbank zurück.
@@ -52,7 +58,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory ?? "", 'carda_fit.db');
     return await openDatabase(
       path,
-      version: 8,
+      version: 9,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -184,6 +190,10 @@ class DatabaseHelper {
         "view_count INTEGER,"
         "last_viewed_at TIMESTAMP,"
         "done INTEGER)");
+    var batch = db.batch();
+    _createTableUerActivity(batch);
+    _createTableMojiUnlock(batch);
+    await batch.commit();
   }
 
 //**Diese Methode wird aufgerufen, wenn die Datenbank auf eine neue Version aktualisiert wird.
@@ -215,6 +225,100 @@ class DatabaseHelper {
     //     "completedAt VARCHAR)");
     // await db.execute('ALTER TABLE $TABLE_EXERCISES '
     //     'RENAME COLUMN steps TO stepsJson;');
+
+    if (oldVersion == 8) {
+      var batch = db.batch();
+      _createTableUerActivity(batch);
+      _createTableMojiUnlock(batch);
+      await batch.commit();
+    }
+  }
+
+  void _createTableUerActivity(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS $TABLE_USER_ACTIVITY');
+    batch.execute('''CREATE TABLE $TABLE_USER_ACTIVITY (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    loginCount INTEGER,
+    lastTrophyId INTEGER,
+    lastLogin TIMESTAMP,
+    userId INTEGER
+)''');
+  }
+
+  void _createTableMojiUnlock(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS $TABLE_MOJI_UNLOCK');
+    batch.execute('''CREATE TABLE $TABLE_MOJI_UNLOCK (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    flutterMojiKey TEXT,
+    unlockIds TEXT
+)''');
+  }
+
+  /// user activity
+  Future<UserActivity?> getUserActivity(int userId) async {
+    Database db = await instance.database;
+    var userActivities = await db
+        .query(TABLE_USER_ACTIVITY, where: 'userId = ?', whereArgs: [userId]);
+    var userActivity = userActivities.firstOrNull;
+    if (userActivity == null) return null;
+    UserActivity userAc = UserActivity.fromMap(userActivity);
+    return userAc;
+  }
+
+  Future<int> initUserActivity(int userId) async {
+    var exist = await getUserActivity(userId);
+    if (exist != null) return 99;
+    var userActivity = UserActivity(
+      userId: userId,
+      lastLogin: DateTime.now().millisecondsSinceEpoch,
+      lastTrophyId: null,
+      loginCount: 1,
+    );
+    return await addUserActivity(userActivity);
+  }
+
+  Future<int> addUserActivity(UserActivity item) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_USER_ACTIVITY, item.toDBMap());
+  }
+
+  Future<int> updateUserActivity(UserActivity item, int userId) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_USER_ACTIVITY, item.toDBMap(),
+        where: 'userId = ?', whereArgs: [userId]);
+  }
+
+  // moji
+  Future<List<MojiUnlockModel>> getAllMojiUnlocked() async {
+    Database db = await instance.database;
+    var mojis = await db.query(TABLE_MOJI_UNLOCK);
+    List<MojiUnlockModel> mojiList = mojis.isNotEmpty
+        ? mojis.map((e) => MojiUnlockModel.fromMap(e)).toList()
+        : [];
+    return mojiList;
+  }
+
+  Future<MojiUnlockModel?> findByMojiKey(String mojiKey) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> mojis = await db.query(TABLE_MOJI_UNLOCK,
+        where: 'flutterMojiKey = ?', whereArgs: [mojiKey]);
+    if (mojis.isNotEmpty) {
+      print(mojis.first["id"]);
+      return MojiUnlockModel.fromMap(mojis.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<int> addMojiUnlocked(MojiUnlockModel mojiUnlock) async {
+    Database db = await instance.database;
+    return await db.insert(TABLE_MOJI_UNLOCK, mojiUnlock.toDBMap());
+  }
+
+  Future<int> updateMojiUnlocked(MojiUnlockModel mojiUnlock, id) async {
+    Database db = await instance.database;
+    return await db.update(TABLE_MOJI_UNLOCK, mojiUnlock.toDBMap(),
+        where: 'id = ?', whereArgs: [id]);
   }
 
   ///user
@@ -549,7 +653,6 @@ class DatabaseHelper {
     return historyList;
   }
 
-
   Future<List<AlertHistory>> getAlertHistoryList() async {
     Database db = await instance.database;
     var alertHistory =
@@ -613,8 +716,6 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.rawDelete('DELETE FROM $TABLE_ALERT_HISTORY');
   }
-
-  
 
   /// user_task
   Future<List<UserTask>> getUserTasks() async {

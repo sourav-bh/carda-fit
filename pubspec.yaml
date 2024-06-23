@@ -57,7 +57,9 @@ dependencies:
   file: ^7.0.0
   flutter_svg: ^2.0.7
   flutter_tts: ^4.0.2
-  fluttermoji: ^1.0.2
+  fluttermoji:
+    path: plugin/fluttermoji
+  flutter_easyloading: ^3.0.5
 
 dev_dependencies:
   flutter_test:

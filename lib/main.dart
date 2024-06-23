@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
@@ -7,6 +6,7 @@ import 'package:app/model/task_alert.dart';
 import 'package:app/model/user_daily_target.dart';
 import 'package:app/service/database_helper.dart';
 import 'package:app/util/app_constant.dart';
+import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/splash_page.dart';
@@ -16,6 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 
@@ -53,6 +54,13 @@ void main() async {
   // runApp(CardaFitApp(home: const SplashPage()));
 
   runApp(const CardaFitApp());
+
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.custom //This was missing in earlier code
+    ..backgroundColor = Colors.transparent
+    ..dismissOnTap = false
+    ..indicatorColor = CommonUtil.createMaterialColor(AppColor.lightOrange)
+    ..textColor = CommonUtil.createMaterialColor(AppColor.lightOrange);
 }
 
 //**Diese Funktion konfiguriert Firebase Cloud Messaging (FCM) in der App.

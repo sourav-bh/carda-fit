@@ -2,6 +2,8 @@ import 'package:app/util/common_util.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+import 'avatar_widget.dart';
+
 class AvatarImagePickerView extends StatefulWidget {
   final ValueChanged<String?>? onItemSelected;
 

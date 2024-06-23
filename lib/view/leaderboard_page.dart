@@ -6,8 +6,10 @@ import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
+import 'package:app/view/widgets/avatar_widget.dart';
 import 'package:app/view/widgets/leaderborad_top_item.dart';
 import 'package:app/view/widgets/user_badge_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -19,7 +21,6 @@ class LeaderBoardPage extends StatefulWidget {
   @override
   _LeaderBoardPageState createState() => _LeaderBoardPageState();
 }
-
 
 //**Dies ist der zugehörige State für die LeaderBoardPage.
 //Hier werden die Logik und die Zustände für die LeaderboardPage verwaltet. */
@@ -55,7 +56,8 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
 
     List<UserInfo> allUsers = [];
     try {
-      allUsers = await ApiManager().getAllUsersByTeam(AppConstant.teamNameForCustomBuild);
+      allUsers = await ApiManager()
+          .getAllUsersByTeam(AppConstant.teamNameForCustomBuild);
     } on Exception catch (_) {
       print('failed to connect with server');
     }
@@ -69,10 +71,12 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
         }
       }
     }
-
-    setState(() {
-      _teamMembersList.sort((a, b) => (b.score ?? 0).compareTo((a.score ?? 0)));
-    });
+    if (mounted){
+      setState(() {
+        _teamMembersList
+            .sort((a, b) => (b.score ?? 0).compareTo((a.score ?? 0)));
+      });
+    }
   }
 
 //**Diese Funktion gibt die UserInfo des aktuellen Benutzers zurück, falls ein Benutzer angemeldet ist.
@@ -95,100 +99,154 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.lightPink,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 30,),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Hallo, $_currentUserName',
-                        style: Theme.of(context).textTheme.headlineLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 5,),
-                      Text('Ihr aktueller Spielstand ist: ${_getCurrentUserInfo().score ?? 0}', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.black87)),
-                      const SizedBox(height: 15,),
-                      Text('Mach weiter mit den Aktivitäten und schalte das nächste Level frei!',
-                          style: Theme.of(context).textTheme.labelMedium
-                      ),
-                    ],
+        backgroundColor: AppColor.lightPink,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hallo, $_currentUserName',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                            'Ihr aktueller Spielstand ist: ${_getCurrentUserInfo().score ?? 0}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(color: Colors.black87)),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                            'Mach weiter mit den Aktivitäten und schalte das nächste Level frei!',
+                            style: Theme.of(context).textTheme.labelMedium),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 20,),
-                UserBadgeView(userLevel: CommonUtil.getUserLevelByScore(_getCurrentUserInfo().score ?? 0),),
-              ],
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  UserBadgeView(
+                    userLevel: CommonUtil.getUserLevelByScore(
+                        _getCurrentUserInfo().score ?? 0),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 30,),
-          _teamMembersList.isEmpty ?
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
-            child: Text('Derzeit gibt es keine anderen Teammitglieder, die angezeigt werden können!',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.blueGrey),
-              textAlign: TextAlign.center,
+            const SizedBox(
+              height: 30,
             ),
-          ) :
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text('Sehen was andere machen',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.brown)
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              itemCount: max(_teamMembersList.length, 0),
-              itemBuilder: (BuildContext context, int index) {
-                UserInfo participant = _teamMembersList[index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5),
-                  child: Card(
-                      elevation: 5,
-                      color: Colors.pink.shade100,
-                      child: Container(
-                        decoration: CommonUtil.getRectangleBoxDecoration(Colors.pink.shade100, 15),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(15),
-                                decoration: CommonUtil.getRectangleBoxDecoration(Colors.white.withAlpha(205), 5),
-                                child: Row(
-                                  children: [
-                                    // Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                                    // const SizedBox(width: 10,),
-                                    Text(participant.userName ?? "", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 20), textAlign: TextAlign.center,),
-                                    const SizedBox(width: 10,),
-                                    RandomAvatar(participant.avatarImage ?? "n/a", width: 40, height: 40)
-                                  ],
+            _teamMembersList.isEmpty
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 100),
+                        child: Text(
+                          'Derzeit gibt es keine anderen Teammitglieder, die angezeigt werden können!',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(color: Colors.blueGrey),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const Center(child: CircularProgressIndicator()),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('Sehen was andere machen',
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: Colors.brown)),
+                  ),
+            Expanded(
+              child: ListView.builder(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                itemCount: max(_teamMembersList.length, 0),
+                itemBuilder: (BuildContext context, int index) {
+                  UserInfo participant = _teamMembersList[index];
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    child: Card(
+                        elevation: 5,
+                        color: Colors.pink.shade100,
+                        child: Container(
+                          decoration: CommonUtil.getRectangleBoxDecoration(
+                              Colors.pink.shade100, 15),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(15),
+                                  decoration:
+                                      CommonUtil.getRectangleBoxDecoration(
+                                          Colors.white.withAlpha(205), 5),
+                                  child: Row(
+                                    children: [
+                                      // Text('${index + 4}.', style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 30, color: Colors.brown, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      // const SizedBox(width: 10,),
+                                      Text(
+                                        participant.userName ?? "",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 20),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      AvatarWidget(
+                                          size: 40,
+                                          image: participant.flutterMojiImage)
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 100,
-                              child: Text('${participant.score ?? 0}',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 30, color: Colors.black54, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
+                              SizedBox(
+                                width: 100,
+                                child: Text(
+                                  '${participant.score ?? 0}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                          fontSize: 30,
+                                          color: Colors.black54,
+                                          fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                  ),
-                );
-              },
-            ),
-          )
-        ],
-      )
-    );
+                            ],
+                          ),
+                        )),
+                  );
+                },
+              ),
+            )
+          ],
+        ));
   }
 }
 

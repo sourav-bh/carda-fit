@@ -74,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
     final learningContents = await dbHelper.getLearningContents();
     AppCache.instance.learningContents = learningContents;
 
-    return/*exercises.isNotEmpty && */  learningContents.isNotEmpty;
+    return /*exercises.isNotEmpty && */ learningContents.isNotEmpty;
   }
 
   Future<void> _loadDataFromDatabase() async {
@@ -208,8 +208,13 @@ class _SplashPageState extends State<SplashPage> {
     bool isUserExist =
         await SharedPref.instance.hasValue(SharedPref.keyUserName);
     var userId = await SharedPref.instance.getValue(SharedPref.keyUserDbId);
+    var userServerId =
+        await SharedPref.instance.getValue(SharedPref.keyUserServerId);
     if (userId != null && userId is int) {
       AppCache.instance.userDbId = userId;
+    }
+    if (userServerId != null) {
+      AppCache.instance.userServerId = userServerId;
     }
 
     if (isUserExist && mounted) {

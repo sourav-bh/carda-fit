@@ -13,7 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:random_avatar/random_avatar.dart';
+import 'package:fluttermoji/fluttermoji.dart';
 
 import '../api/api_manager.dart';
 
@@ -69,7 +69,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit,
    *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
@@ -103,7 +103,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
    *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
    * */
@@ -213,11 +213,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       child: Stack(
                         alignment: Alignment.topRight,
                         children: [
-                          ClipOval(
-                            child: _avatarImage != null
-                                ? RandomAvatar(_avatarImage ?? "")
-                                : const Icon(Icons.person_outlined, size: 100),
-                          ),
+                          _userInfo != null
+                              ? FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: FluttermojiCircleAvatar(
+                                    backgroundColor: Colors.grey[200],
+                                    radius: 100,
+                                    image: _userInfo?.avatarImage,
+                                  ),
+                                )
+                              : SizedBox(),
                           Positioned(
                             top: -5,
                             right: -15,
@@ -252,7 +257,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           'Nutzername: ',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyLarge
+                              .bodyMedium
                               ?.copyWith(fontSize: 18),
                         ),
                         Text(
@@ -380,12 +385,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           },
                           style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) =>
-                              Colors.transparent,
+                                WidgetStateProperty.resolveWith<Color>(
+                              (Set<WidgetState> states) => Colors.transparent,
                             ),
-                            overlayColor: MaterialStateProperty.all(
-                                Colors.transparent),
+                            overlayColor:
+                                WidgetStateProperty.all(Colors.transparent),
                           ),
                           child: Ink(
                             decoration: BoxDecoration(
@@ -394,7 +398,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10),
-                              constraints:
+                              constraints: 
                               const BoxConstraints(minHeight: 40),
                               alignment: Alignment.center,
                               child: const Row(
@@ -420,12 +424,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           },
                           style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) =>
+                            WidgetStateProperty.resolveWith<Color>(
+                                (Set<WidgetState> states) => 
                               Colors.transparent,
                             ),
-                            overlayColor: MaterialStateProperty.all(
-                                Colors.transparent),
+                            overlayColor: WidgetStateProperty.all(
+                              Colors.transparent),
                           ),
                           child: Ink(
                             decoration: BoxDecoration(
@@ -510,6 +514,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               onPressed: () async {
                 // Führt die Abmeldung durch und navigiert zur Login-Seite
                 SharedPref.instance.clearCache();
+                FlutterMojiStatic.disposeController();
                 Navigator.pushNamedAndRemoveUntil(
                     context, loginRoute, (r) => false);
               },
@@ -559,11 +564,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 1, vertical: 10),
+                    horizontal: 1, vertical: 10),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.info,
+                      Icon(Icons.info, 
                           color: Colors.orangeAccent),
                       SizedBox(width: 10),
                     ],
@@ -611,8 +616,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   // Handle API error or show an error message
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content:
-                          Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
+                      content: 
+                      Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
                       duration: Duration(seconds: 2),
                     ),
                   );

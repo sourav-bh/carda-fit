@@ -17,6 +17,7 @@ import 'package:app/view/leaderboard_page.dart';
 import 'package:app/view/task_alert_page.dart';
 import 'package:app/view/user_activity_page.dart';
 import 'package:app/view/user_learning_page.dart';
+import 'package:app/view/user_overview_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:excel/excel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -48,6 +49,7 @@ class _LandingPageState extends State<LandingPage> {
     _contentPages.add(const UserActivityPage());
     _contentPages.add(const UserLearningPage());
     _contentPages.add(const LeaderBoardPage());
+     _contentPages.add(const UserOverviewPage());
     _contentPages.add(const UserProfilePage());
 
 //Ein PageController, der die Seitenansicht für die verschiedenen Tabs steuert.
@@ -311,9 +313,13 @@ class _LandingPageState extends State<LandingPage> {
                 icon: Icon(Icons.score,
                     color: _currentIndex == 3 ? Colors.orange : Colors.grey)),
             BottomNavigationBarItem(
+                label: 'Overview',
+                icon: Icon(Icons.star,
+                    color: _currentIndex == 4 ? Colors.orange : Colors.grey)),
+            BottomNavigationBarItem(
                 label: 'Profile',
                 icon: Icon(Icons.person,
-                    color: _currentIndex == 4 ? Colors.orange : Colors.grey)),
+                    color: _currentIndex == 5 ? Colors.orange : Colors.grey)),
           ],
         ));
   }

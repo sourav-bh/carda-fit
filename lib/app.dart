@@ -16,6 +16,7 @@ import 'package:app/view/user_learning_page.dart';
 import 'package:app/view/user_profile_page.dart';
 import 'package:app/view/snooze_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 const splashRoute = '/';
 const landingRoute = '/landing';
@@ -61,6 +62,7 @@ class _CardaFitAppState extends State<CardaFitApp> {
       debugShowCheckedModeBanner: false,
       onGenerateRoute: _routes(),
       home: const SplashPage(),
+      builder: EasyLoading.init(),
     );
   }
 

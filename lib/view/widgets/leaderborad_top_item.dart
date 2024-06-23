@@ -3,6 +3,8 @@ import 'package:app/util/common_util.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 
+import 'avatar_widget.dart';
+
 class LeaderboardTopItemView extends StatelessWidget {
   final UserInfo? userInfo;
   final Color badgeColor;
@@ -37,7 +39,7 @@ class LeaderboardTopItemView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RandomAvatar(userInfo?.avatarImage ?? "n/a", width: 25, height: 25),
+                  AvatarWidget(image: userInfo?.flutterMojiImage ?? "n/a", size: 25),
                   Text('${userInfo?.score ?? 0}', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20, color: Colors.brown), textAlign: TextAlign.center,),
                 ],
               ),

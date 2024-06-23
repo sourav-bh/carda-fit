@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/api/api_manager.dart';
@@ -10,9 +11,11 @@ import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
 import 'package:app/view/widgets/avatar_picker_dialog.dart';
+import 'package:app/view/widgets/avatar_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttermoji/fluttermoji.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -364,7 +367,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
 // Sie aktualisiert das ausgewählte Avatar-Bild im Registrierungsformular. */
   void onAvatarSelected(String? avatar) {
     setState(() {
-      _avatarImage = avatar;
+      if (avatar == null) return;
+      var imageSelection = jsonDecode(avatar);
+      _avatarImage =  FlutterMojiStatic.getFluttermojiFromOptions(imageSelection);
     });
   }
 
@@ -588,8 +593,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         visible: _avatarImage != null,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 30),
-                          child: RandomAvatar(_avatarImage ?? "",
-                              height: 50, width: 50),
+                          child:
+                              AvatarWidget(image: _avatarImage ?? "", size: 50),
                         ),
                       ),
                     ],
