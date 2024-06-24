@@ -97,19 +97,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //Passwort über lokale Authentifizierung vergessen
-
-  void handleForgotPassword() async {
-    final authenticated = await LocalAuth.authenticate();
-    if (authenticated) {
-      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
-    } else {
-      const snackBar = SnackBar(content: Text('Lokale Authentifizierung fehlgeschlagen'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                                   const SizedBox(height: 20),
                                   GestureDetector(
                                     onTap: () {
-                                      handleForgotPassword();
+                                      LocalAuth.handleForgotPassword(context);
                                     },
                                     child: const Text(
                                       "Passwort vergessen?",

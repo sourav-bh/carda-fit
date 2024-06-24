@@ -1,25 +1,35 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
+import '../app.dart';
+
+//Passwort vergessen bei lokaler Authentifizierung Bildschirm
+
+
 class LocalAuth{
-  static final _auth = LocalAuthentication();
+  static Future<void> handleForgotPassword(BuildContext context) async {
+    final LocalAuthentication auth = LocalAuthentication();
+    bool authenticated = false;
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Bitte authentifizieren Sie sich, um Ihr Passwort zurückzusetzen',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+        ),
+      );
+    } on PlatformException catch (e) {
+      print(e);
+    }
 
-  static Future<bool> _canAuthenticate() async {
-    final canCheckBiometrics = await _auth.canCheckBiometrics;
-    final isDeviceSupported = await _auth.isDeviceSupported();
-    return canCheckBiometrics || isDeviceSupported;
-  }
+    if (!context.mounted) return;
 
-  static Future<bool> authenticate() async{
-  try{
-    if(!await _canAuthenticate()) return false;
-    
-    return await _auth.authenticate(localizedReason: "Please authenticate to login again",
-       );
-    } catch(e){
-    debugPrint('error $e');
-    return false;
-  }
+    if (authenticated) {
+      Navigator.pushNamedAndRemoveUntil(context, landingRoute, (r) => false);
+    } else {
+      const snackBar = SnackBar(content: Text('Lokale Authentifizierung fehlgeschlagen'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 }
 
