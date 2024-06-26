@@ -34,11 +34,11 @@ class ExerciseSummaryItemView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(itemData.name?.trim() ?? "",
-                    style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 20),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
                     maxLines: 2,
                   ),
                   Text('Zeit Dauer: ${itemData.duration ?? 0} seconds',
-                    style: Theme.of(context).textTheme.bodyText2,
+                    style: Theme.of(context).textTheme.bodyMedium,
                     maxLines: 3,
                   ),
                 ],

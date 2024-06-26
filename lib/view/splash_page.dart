@@ -255,7 +255,7 @@ class _SplashPageState extends State<SplashPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(DataLoader.quotes[_quoteIndex],
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.caption?.copyWith(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.black87,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -273,7 +273,7 @@ class _SplashPageState extends State<SplashPage> {
             '- ${DataLoader.quotesAuthor[_quoteIndex]}',
             style: Theme.of(context)
                 .textTheme
-                .caption
+                .bodySmall
                 ?.copyWith(color: Colors.black54, fontSize: 18),
             textAlign: TextAlign.center,
           ),

@@ -49,7 +49,7 @@ class UserActivityItemView extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.subtitle1,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         if (title ==
                             "Schritt") // Falls title == step, dann zeige info icon
@@ -151,7 +151,7 @@ class UserActivityItemView extends StatelessWidget {
                     ),
                     Text(
                       subTitle,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),

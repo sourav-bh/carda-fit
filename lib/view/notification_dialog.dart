@@ -35,9 +35,9 @@ class NotificationAlertDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text(_motivatingQuote ?? '', style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 22, color: AppColor.darkBlue), textAlign: TextAlign.center,),
+              Text(_motivatingQuote ?? '', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 22, color: AppColor.darkBlue), textAlign: TextAlign.center,),
               const SizedBox(height: 30,),
-              Text(_fitnessTask ?? '', style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20), textAlign: TextAlign.center,),
+              Text(_fitnessTask ?? '', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 20), textAlign: TextAlign.center,),
               const SizedBox(height: 15,),
               Align(
                 alignment: Alignment.bottomRight,
@@ -45,7 +45,7 @@ class NotificationAlertDialog extends StatelessWidget {
                   // width: 400,
                   text: "Schieben zum\nBestätigen",
                   dragableIconBackgroundColor: Colors.greenAccent,
-                  textStyle: Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 18),
+                  textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18),
                   backgroundColor: Colors.white,
                   onSubmit: (){
                     Future.delayed(const Duration(seconds: 1), () {
