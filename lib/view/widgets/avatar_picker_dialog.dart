@@ -67,8 +67,14 @@ class AvatarPickerDialog extends StatelessWidget {
                           unlockMojiCallback: (mojiKey, id) {
                             _updateMojiUnlocked(mojiKey, id);
                           },
-                          lockWidget:
-                              Icon(Icons.lock, size: 40, color: Colors.white70),
+                          lockWidget: const Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Icon(Icons.lock,
+                                  size: 20, color: Colors.black38),
+                            ),
+                          ),
                           theme: FluttermojiThemeData(
                               boxDecoration: const BoxDecoration(
                                   boxShadow: [BoxShadow()])),
@@ -150,7 +156,7 @@ class AvatarPickerDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Artikel mit 20 Punkte kaufen",
+                    "Artikel mit 20 Punkte einlösen",
                     style: TextStyle(fontSize: 20, color: AppColor.darkBlue),
                   ),
                   const SizedBox(height: 15),

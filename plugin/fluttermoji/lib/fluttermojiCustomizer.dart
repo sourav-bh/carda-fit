@@ -271,15 +271,15 @@ class _FluttermojiCustomizerState extends State<FluttermojiCustomizer>
       BoxDecoration _getLockDecoration(int index, int? selectedIndex) {
         if (index == selectedIndex) {
           return (widget.theme.selectedTileDecoration as BoxDecoration)
-              .copyWith(color: Colors.black38);
+              .copyWith(color: Colors.black.withOpacity(.1));
         }
         if (widget.theme.unselectedTileDecoration != null) {
           return (widget.theme.unselectedTileDecoration as BoxDecoration)
-              .copyWith(color: Colors.black38);
+              .copyWith(color: Colors.black.withOpacity(.1));
         }
         return BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
-          color: Colors.black38,
+          color: Colors.black.withOpacity(.1),
         );
       }
 
