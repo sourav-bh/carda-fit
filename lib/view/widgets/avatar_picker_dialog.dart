@@ -96,7 +96,7 @@ class AvatarPickerDialog extends StatelessWidget {
                                         BorderRadius.all(Radius.circular(10)),
                                     side:
                                         BorderSide(color: AppColor.darkGrey)))),
-                    child: const Text('Absagen'),
+                    child: const Text('Abbrechen'),
                   ),
                   FluttermojiSaveWidget(
                     onTap: (avatar, flutterMojiMap) async {

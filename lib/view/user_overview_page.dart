@@ -335,7 +335,7 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
                                     color: Colors.yellow.withOpacity(.3)),
                                 child: const Center(
                                   child: Text(
-                                    "Got it",
+                                    "Erhalten",
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
