@@ -231,6 +231,37 @@ class CommonUtil {
     return trophies;
   }
 
+  static int getScoreToHaveTrophy(Trophy trophy, int score) {
+    if (trophy.id == 1) {
+      return score - 350;
+    }
+    if (trophy.id == 2) {
+      return score - 700;
+    }
+    if (trophy.id == 3) {
+      return score - 1000;
+    }
+    if (trophy.id == 4) {
+      return score - 1500;
+    }
+    if (trophy.id == 5) {
+      return score - 2000;
+    }
+    if (trophy.id == 6) {
+      return score - 2500;
+    }
+    if (trophy.id == 7) {
+      return score - 3500;
+    }
+    if (trophy.id == 8) {
+      return score - 4500;
+    }
+    if (trophy.id == 9) {
+      return score - 5000;
+    }
+    return 0;
+  }
+
   static const List<String> weekdayNames = [
     'Mo',
     'Di',

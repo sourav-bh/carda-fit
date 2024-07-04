@@ -51,248 +51,253 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
 
   Widget _buildUserInfo() {
     return Selector<UserOverviewViewModel, UserInfo?>(
-        selector: (_, vm) => vm.userInfo,
-        builder: (context, user, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 60, 16, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Übersicht",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColor.darkBlue,
-                          fontSize: 28,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+      selector: (_, vm) => vm.userInfo,
+      builder: (context, user, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 60, 16, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Übersicht",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColor.darkBlue,
+                        fontSize: 28,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 10),
-                height: 70,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 10, right: 5),
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        height: 70,
-                        decoration: CommonUtil.getRectangleBoxDecoration(
-                            Colors.white70, 10),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Image(
-                                image: AssetImage("assets/images/fire.png"),
-                              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 10),
+              height: 70,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10, right: 5),
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      height: 70,
+                      decoration: CommonUtil.getRectangleBoxDecoration(
+                          Colors.white70, 10),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            flex: 1,
+                            child: Image(
+                              image: AssetImage("assets/images/fire.png"),
                             ),
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "${_overviewViewModel.loginCount}",
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "${_overviewViewModel.loginCount}",
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  const Flexible(
-                                    child: Text(
-                                      "Tagesträhne",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 5, right: 10),
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        height: 70,
-                        decoration: CommonUtil.getRectangleBoxDecoration(
-                            Colors.white70, 10),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Image(
-                                image:
-                                    AssetImage("assets/images/lightning.png"),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '${user?.score}',
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const Flexible(
-                                    child: Text(
-                                      "Punkte",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                height: 70,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 10, right: 5),
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        height: 70,
-                        decoration: CommonUtil.getRectangleBoxDecoration(
-                            Colors.white70, 10),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Image(
-                                image: AssetImage("assets/images/diamond.png"),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      '${_overviewViewModel.userLevel?.level ?? 1}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const Text(
-                                    "Level",
+                                ),
+                                const Flexible(
+                                  child: Text(
+                                    "Tagesträhne",
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 5, right: 10),
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        height: 70,
-                        decoration: CommonUtil.getRectangleBoxDecoration(
-                            Colors.white70, 10),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Image(
-                                image:
-                                    AssetImage("assets/images/gold_medal.png"),
-                              ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, right: 10),
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      height: 70,
+                      decoration: CommonUtil.getRectangleBoxDecoration(
+                          Colors.white70, 10),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            flex: 1,
+                            child: Image(
+                              image: AssetImage("assets/images/lightning.png"),
                             ),
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    (_overviewViewModel.userLevel?.levelType)?.name ?? 'none',
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: [
+                                Text(
+                                  '${user?.score}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Flexible(
+                                  child: Text(
+                                    "Punkte",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              height: 70,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 10, right: 5),
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      height: 70,
+                      decoration: CommonUtil.getRectangleBoxDecoration(
+                          Colors.white70, 10),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            flex: 1,
+                            child: Image(
+                              image: AssetImage("assets/images/diamond.png"),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    '${_overviewViewModel.userLevel?.level ?? 1}',
                                     style: const TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const Flexible(
-                                    child: Text(
-                                      "Ranking",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
+                                ),
+                                const Text(
+                                  "Level",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 50),
-              Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Trophäen",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColor.darkBlue,
-                          fontSize: 28,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.bold),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, right: 10),
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      height: 70,
+                      decoration: CommonUtil.getRectangleBoxDecoration(
+                          Colors.white70, 10),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            flex: 1,
+                            child: Image(
+                              image: AssetImage("assets/images/gold_medal.png"),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              children: [
+                                Text(
+                                  (_overviewViewModel.userLevel?.levelType)
+                                          ?.name ??
+                                      'none',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Flexible(
+                                  child: Text(
+                                    "Ranking",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Flexible(
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: Trophy.trophies.length,
-                  itemBuilder: (context, index) {
-                    final trophy = Trophy.trophies[index];
-                    final bool haveIt =
-                        _overviewViewModel.haveTrophies.contains(trophy);
-                    return Container(
+            ),
+            const SizedBox(height: 50),
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Trophäen",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColor.darkBlue,
+                        fontSize: 28,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: Trophy.trophies.length,
+                itemBuilder: (context, index) {
+                  final trophy = Trophy.trophies[index];
+                  final bool haveIt =
+                      _overviewViewModel.haveTrophies.contains(trophy);
+                  return InkWell(
+                    onTap: () {
+                      if (haveIt) return;
+                      checkScoreToHaveTrophy(trophy);
+                    },
+                    child: Container(
                       margin: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                       height: 90,
@@ -335,7 +340,7 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
                                     color: Colors.yellow.withOpacity(.3)),
                                 child: const Center(
                                   child: Text(
-                                    "Erhalten",
+                                    "Got it",
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
@@ -347,13 +352,78 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
                             )
                         ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void checkScoreToHaveTrophy(Trophy trophy) async {
+    var scoreToHave =
+        CommonUtil.getScoreToHaveTrophy(trophy, _overviewViewModel.score);
+    if (scoreToHave < 0) {
+      _showOkDialog(
+        context,
+        'Du brauchst noch ${scoreToHave.abs()} Punkte, um ${trophy.name} zu bekommen.',
+      );
+    }
+  }
+
+  _showOkDialog(
+    BuildContext context,
+    String msg, {
+    String? titleCancel,
+    String? title,
+    bool isCancel = false,
+    String? titleOK,
+    Function()? okAction,
+  }) async {
+    var actions = [
+      CupertinoDialogAction(
+        child: Text(
+          titleOK ?? 'Bestätigen',
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.blue,
+          ),
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+          if (okAction != null) {
+            okAction();
+          }
+        },
+      )
+    ];
+    if (isCancel) {
+      actions.add(
+        CupertinoDialogAction(
+          isDestructiveAction: true,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            titleCancel ?? 'Abbrechen',
+            style: const TextStyle(
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      );
+    }
+    await showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(title ?? 'Tipp'),
+        content: Text(msg),
+        actions: actions,
+      ),
+    );
   }
 }
 

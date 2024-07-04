@@ -27,6 +27,8 @@ class UserOverviewViewModel extends ChangeNotifier {
     return CommonUtil.getUserLevelByScore(userInfo?.score ?? 0);
   }
 
+  int get score => userInfo?.score ?? 0;
+
   List<Trophy> get haveTrophies {
     return CommonUtil.getUserTrophyByScore(userInfo?.score ?? 0);
   }
