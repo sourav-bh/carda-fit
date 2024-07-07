@@ -340,7 +340,7 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
                                     color: Colors.yellow.withOpacity(.3)),
                                 child: const Center(
                                   child: Text(
-                                    "Got it",
+                                    "Erhalten",
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
@@ -386,7 +386,7 @@ class _UserOverviewPageState extends State<UserOverviewPage> {
     var actions = [
       CupertinoDialogAction(
         child: Text(
-          titleOK ?? 'Bestätigen',
+          titleOK ?? 'OK',
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             color: Colors.blue,

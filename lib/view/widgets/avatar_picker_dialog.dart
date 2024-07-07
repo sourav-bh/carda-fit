@@ -33,7 +33,8 @@ class AvatarPickerDialog extends StatelessWidget {
               }
               return AlertDialog(
                 title: Text('Avatar wählen',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black87, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.black87, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center),
                 insetPadding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
@@ -156,8 +157,8 @@ class AvatarPickerDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Artikel mit 20 Punkte einlösen",
-                    style: TextStyle(fontSize: 20, color: AppColor.darkBlue),
+                    "Artikel mit 20 Punkte einlösen?",
+                    style: TextStyle(fontSize: 18, color: AppColor.darkBlue),
                   ),
                   const SizedBox(height: 15),
                   Row(
@@ -167,7 +168,7 @@ class AvatarPickerDialog extends StatelessWidget {
                         onTap: () {
                           Navigator.of(_).pop(true);
                         },
-                        child: const Text("Bestätigen"),
+                        child: const Text("OK"),
                       ),
                       const SizedBox(width: 50),
                       CustomTextButton(
@@ -189,19 +190,7 @@ class AvatarPickerDialog extends StatelessWidget {
       const int DEFAULT_MOJI_PRICE = 20;
       try {
         await EasyLoading.show();
-        var result = await ApiManager().updateUserScore(
-            AppCache.instance.userServerId, -DEFAULT_MOJI_PRICE);
-        if (result) {
-          UserInfo? userInfo = await DatabaseHelper.instance
-              .getUserInfo(AppCache.instance.userDbId);
-          if (userInfo != null) {
-            if (userInfo.score != null) {
-              userInfo.score = userInfo.score! - DEFAULT_MOJI_PRICE;
-              await DatabaseHelper.instance
-                  .updateUser(userInfo, userInfo.dbId!);
-            }
-          }
-        }
+        bool result = await _subtractScore();
         await EasyLoading.dismiss();
         if (!result) _showPurchaseFailed(ctx);
         return result;
@@ -211,6 +200,27 @@ class AvatarPickerDialog extends StatelessWidget {
       }
     }
     return result ?? false;
+  }
+
+  Future<bool> _subtractScore() async {
+    const int DEFAULT_MOJI_PRICE = 20;
+    UserInfo? userInfo =
+        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    if (userInfo == null || userInfo.score == null) return false;
+    if (userInfo.score! - DEFAULT_MOJI_PRICE < 0) return false;
+    var result = await ApiManager()
+        .updateUserScore(AppCache.instance.userServerId, -DEFAULT_MOJI_PRICE);
+    if (result) {
+      userInfo =
+          await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+      if (userInfo != null) {
+        if (userInfo.score != null) {
+          userInfo.score = userInfo.score! - DEFAULT_MOJI_PRICE;
+          await DatabaseHelper.instance.updateUser(userInfo, userInfo.dbId!);
+        }
+      }
+    }
+    return result;
   }
 
   _showPurchaseFailed(BuildContext context) async {
@@ -229,10 +239,10 @@ class AvatarPickerDialog extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      "Ein Fehler ist aufgetreten. Bitte versuche es erneut",
-                      style: TextStyle(fontSize: 20, color: AppColor.darkBlue),
+                      "Leider hast du nicht die erforderlichen Punkte, um diesen Artikel freizuschalten, aber du kannst schnell einige Punkte bekommen, indem du deine täglichen Aufgaben erledigst.",
+                      style: TextStyle(fontSize: 18, color: AppColor.darkBlue),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 20),
                     CustomTextButton(
                       onTap: () {
                         Navigator.of(_).pop();
@@ -267,11 +277,11 @@ class CustomTextButton extends StatelessWidget {
     return TextButton(
       onPressed: onTap,
       style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.all<Color>(foregroundColor!),
-          backgroundColor: WidgetStateProperty.all<Color>(backgroundColor!),
-          padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+          foregroundColor: MaterialStateProperty.all<Color>(foregroundColor!),
+          backgroundColor: MaterialStateProperty.all<Color>(backgroundColor!),
+          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
               const EdgeInsets.symmetric(horizontal: 10)),
-          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   side: BorderSide(color: AppColor.primary)))),
