@@ -9,7 +9,7 @@ class AppConstant {
   static const baseURL = "https://kontikat.de/cardafit"; // live
   // bgf-internal, unisiegen-thesis, maipham-mai
   // dokuworks-company1, pmd-company2, firma-company3
-  static const teamNameForCustomBuild = 'pmd';
+  static const teamNameForCustomBuild = 'bgf';
 
   static const waterTaskValue = 1;
   static const exerciseTaskValue = 3;
