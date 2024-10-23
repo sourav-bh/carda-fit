@@ -58,6 +58,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   _loadUserInfo() async {
     UserInfo? userInfo =
         await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    var userAvatar = userInfo?.avatarImage;
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
@@ -252,7 +253,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           'Nutzername: ',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyText1
+                              .bodyMedium
                               ?.copyWith(fontSize: 18),
                         ),
                         Text(

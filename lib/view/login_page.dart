@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                                       'Geben Sie Ihren Nutzernamen und Ihr Passwort ein, um sich anzumelden',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyText2
+                                          .bodyMedium
                                           ?.copyWith(fontSize: 16),
                                       textAlign: TextAlign.center,
                                     ),
