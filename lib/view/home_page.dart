@@ -358,7 +358,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               "${_currentUserProgress.round()} %",
-                              style: Theme.of(context).textTheme.bodyLarge,
+                              style: Theme.of(context).textTheme.bodyText1,
                             ),
                           ],
                         )
@@ -537,7 +537,7 @@ class _HomePageState extends State<HomePage> {
                                           material.title.trim(),
                                           style: Theme.of(context)
                                               .textTheme
-                                              .titleLarge
+                                              .headline6
                                               ?.copyWith(fontSize: 20),
                                           maxLines: 2,
                                         ),
@@ -545,7 +545,7 @@ class _HomePageState extends State<HomePage> {
                                           material.description.trim(),
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodyMedium,
+                                              .bodyText2,
                                           maxLines: 3,
                                         ),
                                       ],

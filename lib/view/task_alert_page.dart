@@ -633,7 +633,7 @@ und Pausen zwischen Sätzen festlegt.*/
               _stepNo ?? "",
               style: Theme.of(context)
                   .textTheme
-                  .bodySmall
+                  .caption
                   ?.copyWith(fontSize: 24, color: Colors.brown),
               textAlign: TextAlign.center,
             ),
@@ -665,7 +665,7 @@ und Pausen zwischen Sätzen festlegt.*/
                           _totalExerciseSec - _passedExerciseSec),
                       style: Theme.of(context)
                           .textTheme
-                          .bodySmall
+                          .caption
                           ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                       textAlign: TextAlign.center,
                     ),
@@ -681,7 +681,7 @@ und Pausen zwischen Sätzen festlegt.*/
               _title,
               style: Theme.of(context)
                   .textTheme
-                  .bodySmall
+                  .caption
                   ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
               textAlign: TextAlign.center,
             ),
@@ -717,7 +717,7 @@ und Pausen zwischen Sätzen festlegt.*/
                           _targetTotalTimeInSec - _timePassedInSec),
                       style: Theme.of(context)
                           .textTheme
-                          .bodySmall
+                          .caption
                           ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                       textAlign: TextAlign.center,
                     ),
@@ -732,7 +732,7 @@ und Pausen zwischen Sätzen festlegt.*/
             child: Text(
               _subTitle,
               style:
-                  Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 20),
+                  Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: 20),
               textAlign: TextAlign.center,
             ),
           ),
@@ -853,7 +853,7 @@ und Pausen zwischen Sätzen festlegt.*/
                 dragableIconBackgroundColor: Colors.greenAccent,
                 textStyle: Theme.of(context)
                     .textTheme
-                    .bodyMedium
+                    .bodyText2
                     ?.copyWith(fontSize: 18),
                 backgroundColor: Colors.white,
                 onSubmit: () {
