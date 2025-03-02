@@ -57,7 +57,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 // Eine Methode, die die Benutzerinformationen aus einer Datenbank lädt und den _userInfo-State aktualisiert.
   _loadUserInfo() async {
     UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    var userAvatar = userInfo?.avatarImage;
     if (userInfo != null) {
       setState(() {
         _userInfo = userInfo;
@@ -69,7 +70,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit, 
+/* *Diese Funktion nimmt die gewählte Snooze Time auf und übergibt sie und die Uhrzeit,
    *zu dem genauen Zeitpunkt, als die Snooze Time gewählt wurde, per SharedPreference */
   void setSnoozeTime(SnoozeTime snoozeTime) async {
     setState(() {
@@ -91,7 +92,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     await SharedPref.instance
         .saveStringValue(SharedPref.keyAvatarImage, avatar!);
     UserInfo? userInfo =
-        await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
+    await DatabaseHelper.instance.getUserInfo(AppCache.instance.userDbId);
     if (userInfo != null) {
       userInfo.avatarImage = avatar;
       await DatabaseHelper.instance
@@ -103,15 +104,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat 
+/* *Diese Funktion wird genutzt, um zu überprüfen ob deer Nutzer eine Snooze Time gesetzt  hat
    *Hier wird die gewählte Snooze Dauer, Zeit zu der Snooze aktiviert wurde und entscheidet basierend
    *auf der aktuellen Zeit, ob die Snooze Time noch läuft oder schon abgelaufen ist.
    * */
   _checkSnoozeTimeStatus() async {
     int snoozeDuration =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozeDuration);
     int snoozedAt =
-        await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
+    await SharedPref.instance.getIntValue(SharedPref.keySnoozedAt);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (currentTime - snoozedAt > snoozeDuration * 60 * 1000) {
@@ -171,7 +172,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         value: Platform.isIOS
             ? SystemUiOverlayStyle.light
             : const SystemUiOverlayStyle(
-                statusBarIconBrightness: Brightness.light),
+            statusBarIconBrightness: Brightness.light),
         child: SingleChildScrollView(
           child: Stack(
             children: <Widget>[
@@ -252,7 +253,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           'Nutzername: ',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyLarge
+                              .bodyMedium
                               ?.copyWith(fontSize: 18),
                         ),
                         Text(
@@ -292,7 +293,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             icon: Icons.line_weight,
                             label: 'BMI:',
                             value:
-                                '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
+                            '${_getCalculatedBmiValue(_userInfo?.weight, _userInfo?.height)} '
                                 '(Größe: ${_userInfo?.height} cm, Gewicht: ${_userInfo?.weight} kg)',
                           ),
                           const SizedBox(height: 10),
@@ -301,7 +302,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             icon: Icons.filter_tilt_shift,
                             label: 'Arbeitsinfo:',
                             value:
-                                '${_userInfo?.jobPosition}, ${_userInfo?.jobType}',
+                            '${_userInfo?.jobPosition}, ${_userInfo?.jobType}',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -316,7 +317,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             icon: Icons.schedule,
                             label: 'Arbeitszeitplan:',
                             value:
-                                '${_userInfo?.workStartTime} - ${_userInfo?.workEndTime}',
+                            '${_userInfo?.workStartTime} - ${_userInfo?.workEndTime}',
                           ),
                           const SizedBox(height: 10),
                           _buildProfileRow(
@@ -468,9 +469,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   // Hilfsmethode zum Erstellen jeder Zeile im Profil.
   Widget _buildProfileRow(
       {required BuildContext context,
-      required IconData icon,
-      required String label,
-      required String value}) {
+        required IconData icon,
+        required String label,
+        required String value}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -596,7 +597,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 print(userId);
                 // Call the API method to send feedback
                 bool success =
-                    await ApiManager().sendFeedback(userId, feedbackText);
+                await ApiManager().sendFeedback(userId, feedbackText);
 
                 if (success && mounted) {
                   Navigator.pop(context); // Close the dialog
@@ -612,7 +613,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:
-                          Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
+                      Text('Fehler beim Einreichen des Feedbacks. Bitte versuchen Sie es erneut.'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -666,18 +667,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     label: Text(
                                         '${(snoozeTime.duration.inMinutes)} min'),
                                     labelStyle:
-                                        const TextStyle(color: Colors.white),
+                                    const TextStyle(color: Colors.white),
                                     selected: snoozeTime.isSelected,
                                     onSelected: (bool selected) {
                                       setState(() {
                                         for (var i = 0;
-                                            i < _snoozeTimeItems.length;
-                                            i += 1) {
+                                        i < _snoozeTimeItems.length;
+                                        i += 1) {
                                           _snoozeTimeItems[i].isSelected =
-                                              false;
+                                          false;
                                         }
                                         snoozeTime.isSelected =
-                                            !(snoozeTime.isSelected);
+                                        !(snoozeTime.isSelected);
                                         setSnoozeTime(snoozeTime);
                                       });
                                     },
@@ -703,7 +704,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 child: Text(
                                   'OK',
                                   style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                  Theme.of(context).textTheme.titleMedium,
                                 )),
                           )
                         ],
