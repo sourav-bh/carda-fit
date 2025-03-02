@@ -1,12 +1,13 @@
 import 'package:app/model/exercise.dart';
 import 'package:app/model/learning.dart';
 
+
 //**Die AppConstant-Klasse enthält Konstanten, die in der gesamten Anwendung verwendet werden, 
 //um bestimmte Einstellungen oder Verhaltensweisen festzulegen. */
 class AppConstant {
   static const productionBuild = false;
   // static const baseURL = "http://10.0.2.2:8075"; // local
-  static const baseURL = "https://kontikat.de/cardafit"; // live
+  static const baseURL = "https://kmudigital.wineme.wiwi.uni-siegen.de/cardafit";//live
   // bgf-internal, unisiegen-thesis, maipham-mai
   // dokuworks-company1, pmd-company2, firma-company3
   static const teamNameForCustomBuild = 'bgf';

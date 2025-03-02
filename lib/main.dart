@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:app/service/socket_path_manual.dart';
 
 import 'firebase_options.dart';
 
@@ -26,6 +27,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 // Die `main`-Methode ist der Einstiegspunkt der Anwendung. Diese Klasse initialisiert die Flutter-App und konfiguriert Firebase.
 void main() async {
+  HttpOverrides.global = MyHttpOverrides();
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
