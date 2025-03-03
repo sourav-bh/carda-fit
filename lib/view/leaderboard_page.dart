@@ -175,7 +175,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                             SizedBox(
                               width: 100,
                               child: Text('${participant.score ?? 0}',
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 30, color: Colors.black54, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 30, color: Colors.black54, fontWeight: FontWeight.bold), textAlign: TextAlign.center,
                               ),
                             ),
                           ],

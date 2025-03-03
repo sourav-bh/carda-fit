@@ -23,10 +23,10 @@ class UserLearningItemView extends StatelessWidget {
             height: 80,
             margin: const EdgeInsets.all(10),
             child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              child: Image.network(itemData.thumbnail ?? "",
-                fit: BoxFit.fitHeight,
-              )
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                child: Image.network(itemData.thumbnail ?? "",
+                  fit: BoxFit.fitHeight,
+                )
             ),
           ),
           Expanded(

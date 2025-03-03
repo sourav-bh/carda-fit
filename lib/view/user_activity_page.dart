@@ -91,7 +91,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Aktivität heute",
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColor.darkBlue, fontSize: 30, fontStyle: FontStyle.normal,)
                   ),
                   InkWell(
@@ -101,7 +101,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                     child: Row(
                       children: [
                         Text("",
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColor.darkBlue, fontSize: 20, fontStyle: FontStyle.normal,)
                         ),
                         const Icon(Icons.list_alt, color: AppColor.primary, size: 30,)

@@ -26,10 +26,10 @@ class LeaderboardTopItemView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text('$position', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+            Text('$position', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
             const SizedBox(width: 10,),
             Text(userInfo?.userName ?? "",
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 20), textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 20), textAlign: TextAlign.center,
               maxLines: 2,
             ),
             Padding(

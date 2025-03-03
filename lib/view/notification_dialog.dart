@@ -35,7 +35,7 @@ class NotificationAlertDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text(_motivatingQuote ?? '', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22, color: AppColor.darkBlue), textAlign: TextAlign.center,),
+              Text(_motivatingQuote ?? '', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 22, color: AppColor.darkBlue), textAlign: TextAlign.center,),
               const SizedBox(height: 30,),
               Text(_fitnessTask ?? '', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 20), textAlign: TextAlign.center,),
               const SizedBox(height: 15,),

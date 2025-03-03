@@ -633,7 +633,7 @@ und Pausen zwischen Sätzen festlegt.*/
               _stepNo ?? "",
               style: Theme.of(context)
                   .textTheme
-                  .titleLarge
+                  .bodySmall
                   ?.copyWith(fontSize: 24, color: Colors.brown),
               textAlign: TextAlign.center,
             ),
@@ -665,7 +665,7 @@ und Pausen zwischen Sätzen festlegt.*/
                           _totalExerciseSec - _passedExerciseSec),
                       style: Theme.of(context)
                           .textTheme
-                          .titleLarge
+                          .bodySmall
                           ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                       textAlign: TextAlign.center,
                     ),
@@ -681,7 +681,7 @@ und Pausen zwischen Sätzen festlegt.*/
               _title,
               style: Theme.of(context)
                   .textTheme
-                  .titleLarge
+                  .bodySmall
                   ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
               textAlign: TextAlign.center,
             ),
@@ -717,7 +717,7 @@ und Pausen zwischen Sätzen festlegt.*/
                           _targetTotalTimeInSec - _timePassedInSec),
                       style: Theme.of(context)
                           .textTheme
-                          .titleLarge
+                          .bodySmall
                           ?.copyWith(fontSize: 30, color: AppColor.darkBlue),
                       textAlign: TextAlign.center,
                     ),

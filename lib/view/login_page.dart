@@ -4,11 +4,11 @@ import 'package:app/api/api_manager.dart';
 import 'package:app/app.dart';
 import 'package:app/model/user_info.dart';
 import 'package:app/service/database_helper.dart';
+import 'package:app/service/local_auth_service.dart';
 import 'package:app/util/app_constant.dart';
 import 'package:app/util/app_style.dart';
 import 'package:app/util/common_util.dart';
 import 'package:app/util/shared_preference.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -253,17 +253,16 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  Visibility(
-                                    visible: false,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: const Text(
-                                        "Passwort vergessen?",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
-                                        ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      LocalAuth.handleForgotPassword(context);
+                                    },
+                                    child: const Text(
+                                      "Passwort vergessen?",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ),
@@ -275,12 +274,12 @@ class _LoginPageState extends State<LoginPage> {
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
                               child: TextButton(
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty
+                                    backgroundColor: WidgetStateProperty
                                         .resolveWith<Color>(
-                                      (Set<MaterialState> states) =>
+                                      (Set<WidgetState> states) =>
                                           Colors.transparent,
                                     ),
-                                    overlayColor: MaterialStateProperty.all(
+                                    overlayColor: WidgetStateProperty.all(
                                         Colors.transparent),
                                   ),
                                   onPressed: () {
